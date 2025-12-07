@@ -173,7 +173,7 @@ CLOUD_KEY=...
 CLOUD_SECRET=...
 
 # Session Key 
-SESSION_SECRET=Sodsfo89sdFDfdasdgdsf65asd
+SESSION_SECRET=
 
 # Tính năng gửi mail
 EMAIL_USER=your-gmail@gmail.com
@@ -189,9 +189,9 @@ ZALOPAY_ENDPOINT_CREATE=https://sb-openapi.zalopay.vn/v2/create
 ZALOPAY_ENDPOINT_QUERY=https://sb-openapi.zalopay.vn/v2/query
 
 # Secret Keys (CREATE YOUR OWN COMPLEX RANDOM STRINGS)
-JWT_SECRET=fghfghKDASDJD9UOH7T7GHOIIOJDOIH8998$%%$^$%DF
-JWT_SECRET_RESET=ijhduashOHDOAUHSDohdohs993rnfwe$@&%^&^%@
-JWT_SECRET_ADMIN=dfgdfg43534gregfdg$$34greasdasdasdsadasd
+JWT_SECRET=
+JWT_SECRET_RESET=
+JWT_SECRET_ADMIN=
 
 # Google OAuth (Get from Google Cloud Console)
 GOOGLE_CLIENT_ID=...
