@@ -1,26 +1,29 @@
 import type { LoginInterface, LogoutInterface } from '~/types/auth.type'
 import { API_ROOT } from '~/utils/constants'
-import axiosInstance from '~/apis/axiosInstance'
-import { tokenManager } from '~/utils/tokenManager'
+import axios from 'axios'
 
 export const fetchLoginAPI = async (email: string, password: string): Promise<LoginInterface> => {
-  const response = await axiosInstance.post(
+  const response = await axios.post(
     `${API_ROOT}/admin/auth/login`,
-    { email, password }
+    { email, password },
+    { withCredentials: true }
   )
-  // Lưu access token nếu login thành công
-  if (response.data.accessToken) {
-    tokenManager.setAccessToken(response.data.accessToken)
-  }
   return response.data
 }
 
 export const fetchLogoutAPI = async (): Promise<LogoutInterface> => {
-  const response = await axiosInstance.get(
+  const response = await axios.get(
     `${API_ROOT}/admin/auth/logout`,
     { withCredentials: true }
   )
-  // Xóa access token
-  tokenManager.clearAccessToken()
+  return response.data
+}
+
+export const refreshTokenAPI = async () => {
+  const response = await axios.post(
+    `${API_ROOT}/admin/auth/refresh-token`,
+    {},
+    { withCredentials: true }
+  )
   return response.data
 }

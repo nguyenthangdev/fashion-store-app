@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import LayoutDefault from '~/layouts/Client/LayoutDefault/LayoutDefault'
 import LayoutDefaultAdmin from '~/layouts/Admin/LayoutDefault/LayoutDefault'
 import Home from '~/pages/Client/Home'
@@ -79,8 +79,11 @@ import EditBrand from '~/pages/Admin/Brand/EditBrand'
 import BrandPage from '~/pages/Client/Brand/Brand'
 import AdminChatPage from '~/pages/Admin/AdminChatPage/AdminChatPage'
 import GoogleCallback from './pages/Client/GoogleCallback/GoogleCallback'
+import { Error404Page } from './pages/Error404Page/Error404Page'
+import UnauthorizedRoutesAdmin from './components/Admin/UnauthorizedRoutes/UnauthorizedRoutes'
 
 function App() {
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -91,134 +94,133 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path='/' element={<LayoutDefault />}>
-            <Route index element={<Home />}/>
-            <Route path='search' element={<Search />}/>
-            <Route path='help' element={<HelpCenter />} />
-            <Route path='brands' element={<BrandPage />}/>
-            <Route path='products'>
-              <Route index element={<ProductClient />}/>
-              <Route path=':slugCategory' element={<ProductCategory />}/>
-              <Route path='detail/:slugProduct' element={<DetailProductClient />}/>
-              <Route path='productsNew' element={<ProductsNew />}/>
-              <Route path='productsFeatured' element={<ProductsFeatured />}/>
-            </Route>
-            <Route path='articles'>
-              <Route index element={<ArticleClient />}/>
-              <Route path=':slugCategory' element={<ArticleCategory />}/>
-              <Route path='detail/:slugArticle' element={<DetailArticleClient />}/>
-              <Route path='articlesNew' element={<ArticlesNew />}/>
-              <Route path='articlesFeatured' element={<ArticlesFeatured />}/>
-            </Route>
-            <Route path='cart' element={<Cart />}/>
-            <Route path='checkout' element={<PrivateRouteClient><Checkout /></PrivateRouteClient>}/>
-            <Route path='checkout/success/:orderId' element={<PrivateRouteClient><Success /></PrivateRouteClient>}/>
-            <Route path='user' element={<PrivateRouteClient><LayoutUser /></PrivateRouteClient>}>
-              <Route path='notification'></Route>
-              <Route path='account'>
-                <Route path='info'>
-                  <Route index element={ <MyAccountClient />} />
-                  <Route path='edit' element={ <EditMyAccountClient />}/>
-                  <Route path='change-password' element={ <ChangePassword />}/>
-                </Route>
-                <Route path='payment'></Route>
-                <Route path='address'></Route>
-                <Route path='setting-privacy'></Route>
+      <ScrollToTop />
+      <Routes>
+        <Route path='/' element={<LayoutDefault />}>
+          <Route index element={<Home />}/>
+          <Route path='search' element={<Search />}/>
+          <Route path='help' element={<HelpCenter />} />
+          <Route path='brands' element={<BrandPage />}/>
+          <Route path='products'>
+            <Route index element={<ProductClient />}/>
+            <Route path=':slugCategory' element={<ProductCategory />}/>
+            <Route path='detail/:slugProduct' element={<DetailProductClient />}/>
+            <Route path='productsNew' element={<ProductsNew />}/>
+            <Route path='productsFeatured' element={<ProductsFeatured />}/>
+          </Route>
+          <Route path='articles'>
+            <Route index element={<ArticleClient />}/>
+            <Route path=':slugCategory' element={<ArticleCategory />}/>
+            <Route path='detail/:slugArticle' element={<DetailArticleClient />}/>
+            <Route path='articlesNew' element={<ArticlesNew />}/>
+            <Route path='articlesFeatured' element={<ArticlesFeatured />}/>
+          </Route>
+          <Route path='cart' element={<Cart />}/>
+          <Route path='checkout' element={<PrivateRouteClient><Checkout /></PrivateRouteClient>}/>
+          <Route path='checkout/success/:orderId' element={<PrivateRouteClient><Success /></PrivateRouteClient>}/>
+          <Route path='user' element={<PrivateRouteClient><LayoutUser /></PrivateRouteClient>}>
+            <Route path='notification'></Route>
+            <Route path='account'>
+              <Route path='info'>
+                <Route index element={ <MyAccountClient />} />
+                <Route path='edit' element={ <EditMyAccountClient />}/>
+                <Route path='change-password' element={ <ChangePassword />}/>
               </Route>
-              <Route path='my-orders' element={ <MyOrders />}/>
-              <Route path='voucher-wallet'></Route>
-              <Route path='coin'></Route>
+              <Route path='payment'></Route>
+              <Route path='address'></Route>
+              <Route path='setting-privacy'></Route>
             </Route>
+            <Route path='my-orders' element={ <MyOrders />}/>
+            <Route path='voucher-wallet'></Route>
+            <Route path='coin'></Route>
           </Route>
-          <Route path='user' element={<LayoutAuth />}>
-            <Route path='login' element={<LoginClient />} />
-            <Route path='register' element={<RegisterClient />} />
-            <Route path='password'>
-              <Route path='forgot' element={ <Forgot />}/>
-              {/* <Route path='otp' element={ <OTP />}/> */}
-              <Route path='reset' element={ <Reset />}/>
-            </Route>
+        </Route>
+        <Route path='user' element={<LayoutAuth />}>
+          <Route path='login' element={<LoginClient />} />
+          <Route path='register' element={<RegisterClient />} />
+          <Route path='password'>
+            <Route path='forgot' element={ <Forgot />}/>
+            {/* <Route path='otp' element={ <OTP />}/> */}
+            <Route path='reset' element={ <Reset />}/>
           </Route>
-          <Route path="/auth/google/callback" element={<GoogleCallback />} />
-          <Route path='admin' element={<PrivateRouteAdmin><LayoutDefaultAdmin /></PrivateRouteAdmin>}>
-            <Route index element={ <Dashboard />} />
-            <Route path='dashboard' element={ <Dashboard />}/>
-            <Route path='orders'>
-              <Route index element={ <OrderAdmin />}/>
-              <Route path='detail/:id' element={<DetailOrder />}/>
-            </Route>
-            <Route path='notification' element={<Notification />}/>
-            <Route path='brands'>
-              <Route index element={<BrandAdmin />}/>
-              <Route path='create' element={ <CreateBrand />}/>
-              <Route path='edit/:id' element={ <EditBrand />}/>
-              {/* <Route path='detail/:id' element={ <DetailBrand />}/> */}
-            </Route>
-            <Route path='products'>
-              <Route index element={ <ProductAdmin />}/>
-              <Route path='create' element={<CreateProduct />}/>
-              <Route path='detail/:id' element={ <DetailProduct />}/>
-              <Route path='edit/:id' element={<EditProduct />}/>
-            </Route>
-            <Route path='products-category'>
-              <Route index element={<ProductCategoryAdmin />}/>
-              <Route path='create' element={<CreateProductCategory />}/>
-              <Route path='detail/:id' element={ <DetailProductCategory />}/>
-              <Route path='edit/:id' element={<EditProductCategory />}/>
-            </Route>
-            <Route path='articles'>
-              <Route index element={ <ArticleAdmin />}/>
-              <Route path='create' element={ <CreateArticle />}/>
-              <Route path='detail/:id' element={ <DetailArticle />}/>
-              <Route path='edit/:id' element={ <EditArticle />}/>
-            </Route>
-            <Route path='articles-category'>
-              <Route index element={ <ArticleCategoryAdmin />}/>
-              <Route path='create' element={ <CreateArticleCategory />}/>
-              <Route path='detail/:id' element={ <DetailArticleCategory />}/>
-              <Route path='edit/:id' element={ <EditArticleCategory />}/>
-            </Route>
-            <Route path='roles'>
-              <Route index element={ <Role />} />
-              <Route path='create' element={ <CreateRole />} />
-              <Route path='detail/:id' element={ <DetailRole />} />
-              <Route path='edit/:id' element={ <EditRole />} />
-              <Route path='permissions' element={<Permission />} />
-            </Route>
-            <Route path='accounts'>
-              <Route index element={ <Account />}/>
-              <Route path='create' element={ <CreateAccount />}/>
-              <Route path='detail/:id' element={ <DetailAccount />}/>
-              <Route path='edit/:id' element={ <EditAccount />}/>
-            </Route>
-            <Route path='users'>
-              <Route index element={<User />}/>
-              <Route path='detail/:id' element={<DetailUser />}/>
-              <Route path='edit/:id' element={<EditUser />}/>
-            </Route>
-            <Route path='my-account'>
-              <Route index element={ <MyAccountAdmin />}/>
-              <Route path='edit' element={ <EditMyAccount />}/>
-            </Route>
-            <Route path='chats' element={ <AdminChatPage />}/>
-            <Route path='settings'>
-              <Route path='general'>
-                <Route index element={<General />}/>
-                <Route path='edit' element={<EditSettingGeneral />}/>
-              </Route>
-              <Route path='advance' element={<Advance />}/>
-            </Route>
-            <Route path='trash' element={<Trash />}/>
+        </Route>
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        <Route path='admin' element={<PrivateRouteAdmin><LayoutDefaultAdmin /></PrivateRouteAdmin>}>
+          <Route index element={ <Dashboard />} />
+          <Route path='dashboard' element={ <Dashboard />}/>
+          <Route path='orders'>
+            <Route index element={ <OrderAdmin />}/>
+            <Route path='detail/:id' element={<DetailOrder />}/>
           </Route>
-          <Route path='admin/auth'>
-            <Route path='login' element={ <Login />}/>
-            <Route path='forgot-password' element={<ForgotPassword />}/>
+          <Route path='notification' element={<Notification />}/>
+          <Route path='brands'>
+            <Route index element={<BrandAdmin />}/>
+            <Route path='create' element={ <CreateBrand />}/>
+            <Route path='edit/:id' element={ <EditBrand />}/>
+            {/* <Route path='detail/:id' element={ <DetailBrand />}/> */}
           </Route>
-        </Routes>
-      </BrowserRouter>
+          <Route path='products'>
+            <Route index element={ <ProductAdmin />}/>
+            <Route path='create' element={<CreateProduct />}/>
+            <Route path='detail/:id' element={ <DetailProduct />}/>
+            <Route path='edit/:id' element={<EditProduct />}/>
+          </Route>
+          <Route path='products-category'>
+            <Route index element={<ProductCategoryAdmin />}/>
+            <Route path='create' element={<CreateProductCategory />}/>
+            <Route path='detail/:id' element={ <DetailProductCategory />}/>
+            <Route path='edit/:id' element={<EditProductCategory />}/>
+          </Route>
+          <Route path='articles'>
+            <Route index element={ <ArticleAdmin />}/>
+            <Route path='create' element={ <CreateArticle />}/>
+            <Route path='detail/:id' element={ <DetailArticle />}/>
+            <Route path='edit/:id' element={ <EditArticle />}/>
+          </Route>
+          <Route path='articles-category'>
+            <Route index element={ <ArticleCategoryAdmin />}/>
+            <Route path='create' element={ <CreateArticleCategory />}/>
+            <Route path='detail/:id' element={ <DetailArticleCategory />}/>
+            <Route path='edit/:id' element={ <EditArticleCategory />}/>
+          </Route>
+          <Route path='roles'>
+            <Route index element={ <Role />} />
+            <Route path='create' element={ <CreateRole />} />
+            <Route path='detail/:id' element={ <DetailRole />} />
+            <Route path='edit/:id' element={ <EditRole />} />
+            <Route path='permissions' element={<Permission />} />
+          </Route>
+          <Route path='accounts'>
+            <Route index element={ <Account />}/>
+            <Route path='create' element={ <CreateAccount />}/>
+            <Route path='detail/:id' element={ <DetailAccount />}/>
+            <Route path='edit/:id' element={ <EditAccount />}/>
+          </Route>
+          <Route path='users'>
+            <Route index element={<User />}/>
+            <Route path='detail/:id' element={<DetailUser />}/>
+            <Route path='edit/:id' element={<EditUser />}/>
+          </Route>
+          <Route path='my-account'>
+            <Route index element={ <MyAccountAdmin />}/>
+            <Route path='edit' element={ <EditMyAccount />}/>
+          </Route>
+          <Route path='chats' element={ <AdminChatPage />}/>
+          <Route path='settings'>
+            <Route path='general'>
+              <Route index element={<General />}/>
+              <Route path='edit' element={<EditSettingGeneral />}/>
+            </Route>
+            <Route path='advance' element={<Advance />}/>
+          </Route>
+          <Route path='trash' element={<Trash />}/>
+        </Route>
+        <Route path='admin/auth' element={<UnauthorizedRoutesAdmin />}>
+          <Route path='login' element={ <Login />}/>
+          <Route path='forgot-password' element={<ForgotPassword />}/>
+        </Route>
+        <Route path="*" element={<Error404Page />} />
+      </Routes>
     </>
   )
 }

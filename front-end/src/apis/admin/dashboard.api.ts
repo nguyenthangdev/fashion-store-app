@@ -1,11 +1,10 @@
 import type { DashboardInterface } from '~/types/dashboard.type'
 import { API_ROOT } from '~/utils/constants'
-import axiosInstance from '../axiosInstance'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 
 export const fetchDashboardAPI = async (): Promise<DashboardInterface> => {
-  const response = await axiosInstance.get(
-    `${API_ROOT}/admin/dashboard`,
-    { withCredentials: true }
+  const response = await authorizedAxiosInstance.get(
+    `${API_ROOT}/admin/dashboard`
   )
   return response.data
 }

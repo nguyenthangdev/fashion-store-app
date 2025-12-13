@@ -1,5 +1,5 @@
-import axios from 'axios'
 import type { OrderAllResponseInterface, OrderDetailInterface } from '~/types/order.type'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 export const fetchOrdersAPI = async (
@@ -16,7 +16,7 @@ export const fetchOrdersAPI = async (
   if (currentSortKey) queryParams.set('sortKey', currentSortKey)
   if (currentSortValue) queryParams.set('sortValue', currentSortValue)
 
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/orders?${queryParams.toString()}`,
     { withCredentials: true }
   )
@@ -24,7 +24,7 @@ export const fetchOrdersAPI = async (
 }
 
 export const fetchChangeStatusAPI = async (status: string, id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/orders/change-status/${status}/${id}`,
     { status },
     { withCredentials: true }
@@ -33,7 +33,7 @@ export const fetchChangeStatusAPI = async (status: string, id: string) => {
 }
 
 export const fetchChangeMultiAPI = async (data: { ids: string[], type: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/orders/change-multi`,
     data,
     { withCredentials: true }
@@ -42,7 +42,7 @@ export const fetchChangeMultiAPI = async (data: { ids: string[], type: string })
 }
 
 export const fetchDeleteOrderAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/orders/delete/${id}`,
     { withCredentials: true }
   )
@@ -50,7 +50,7 @@ export const fetchDeleteOrderAPI = async (id: string) => {
 }
 
 export const fetchPermanentlyDeleteOrderAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/orders/permanentlyDelete/${id}`,
     { withCredentials: true }
   )
@@ -58,7 +58,7 @@ export const fetchPermanentlyDeleteOrderAPI = async (id: string) => {
 }
 
 export const fetchDetailOrderAPI = async (id: string): Promise<OrderDetailInterface> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/orders/detail/${id}`,
     { withCredentials: true }
   )
@@ -66,7 +66,7 @@ export const fetchDetailOrderAPI = async (id: string): Promise<OrderDetailInterf
 }
 
 export const fetchRecoverOrderAPI = async (id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/orders/recover/${id}`,
     {},
     { withCredentials: true }
@@ -75,7 +75,7 @@ export const fetchRecoverOrderAPI = async (id: string) => {
 }
 
 export const fetchEditEstimatedDeliveryDay = async ( data: { estimatedDeliveryDay: string, id: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/orders/edit-estimatedDeliveryDay`,
     data,
     { withCredentials: true }
@@ -84,7 +84,7 @@ export const fetchEditEstimatedDeliveryDay = async ( data: { estimatedDeliveryDa
 }
 
 export const fetchEditEstimatedConfirmedDay = async (data: { estimatedConfirmedDay: string, id: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/orders/edit-estimatedConfirmedDay`,
     data,
     { withCredentials: true }

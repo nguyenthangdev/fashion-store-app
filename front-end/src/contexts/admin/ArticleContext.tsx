@@ -57,6 +57,7 @@ export const ArticleProvider = ({ children }: { children: React.ReactNode }) => 
         dispatchArticle({ type: 'SET_LOADING', payload: false })
       }
     }, [])
+
   return (
     <ArticleContext.Provider value={{ stateArticle, fetchArticle, dispatchArticle }}>
       {children}

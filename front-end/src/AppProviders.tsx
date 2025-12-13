@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './theme'
@@ -21,11 +22,29 @@ function ThemeProviderWrapper({ children }: { children: React.ReactNode }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>
 }
 
+export function AuthAdminProviderWithKey({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  const [authVersion, setAuthVersion] = React.useState(0)
+
+  // expose global trigger (hoặc context)
+  ;(window as any).bumpAuth = () =>
+    setAuthVersion(v => v + 1)
+
+  return (
+    <AuthAdminProvider key={authVersion}>
+      {children}
+    </AuthAdminProvider>
+  )
+}
+
 // Gom tất cả provider thành 1 (Nhớ viết từ trên xuống để khi chạy nó sẽ chạy từ children -> từ dưới lên trên)
 export const AppProviders = composeProviders(
   ThemeProviderWrapper,
   AlertProvider,
-  AuthAdminProvider,
+  AuthAdminProviderWithKey,
   AuthClientProvider,
   HomeClientProvider,
   SettingGeneralProvider,

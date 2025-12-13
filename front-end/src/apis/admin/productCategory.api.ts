@@ -1,5 +1,5 @@
-import axios from 'axios'
 import type { ProductCategoryAllResponseInterface, ProductCategoryDetailInterface } from '~/types/productCategory.type'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 export const fetchAllProductCategoriesAPI = async (
@@ -16,7 +16,7 @@ export const fetchAllProductCategoriesAPI = async (
   if (currentSortKey) queryParams.set('sortKey', currentSortKey)
   if (currentSortValue) queryParams.set('sortValue', currentSortValue)
 
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/products-category?${queryParams.toString()}`,
     { withCredentials: true }
   )
@@ -24,7 +24,7 @@ export const fetchAllProductCategoriesAPI = async (
 }
 
 // export const fetchChangeStatusAPI = async (status: string, id: string) => {
-//   const response = await axios.patch(
+//   const response = await authorizedAxiosInstance.patch(
 //     `${API_ROOT}/admin/products-category/change-status/${status}/${id}`,
 //     { status },
 //     { withCredentials: true }
@@ -33,7 +33,7 @@ export const fetchAllProductCategoriesAPI = async (
 // }
 
 export const fetchChangeStatusWithChildren = async (status: string, id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products-category/change-status-with-children/${status}/${id}`,
     {},
     { withCredentials: true }
@@ -42,7 +42,7 @@ export const fetchChangeStatusWithChildren = async (status: string, id: string) 
 }
 
 export const fetchDeleteProductCategoryAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/products-category/delete/${id}`,
     { withCredentials: true }
   )
@@ -50,7 +50,7 @@ export const fetchDeleteProductCategoryAPI = async (id: string) => {
 }
 
 export const fetchDetailProductCategoryAPI = async (id: string): Promise<ProductCategoryDetailInterface> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/products-category/detail/${id}`,
     { withCredentials: true }
   )
@@ -58,7 +58,7 @@ export const fetchDetailProductCategoryAPI = async (id: string): Promise<Product
 }
 
 export const fetchEditProductCategoryAPI = async (id: string, formData: FormData) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products-category/edit/${id}`,
     formData,
     { withCredentials: true }
@@ -67,7 +67,7 @@ export const fetchEditProductCategoryAPI = async (id: string, formData: FormData
 }
 
 export const fetchCreateProductCategoryAPI = async (formData: FormData) => {
-  const response = await axios.post(
+  const response = await authorizedAxiosInstance.post(
     `${API_ROOT}/admin/products-category/create`,
     formData,
     { withCredentials: true }
@@ -76,7 +76,7 @@ export const fetchCreateProductCategoryAPI = async (formData: FormData) => {
 }
 
 export const fetchChangeMultiAPI = async (data: { ids: string[], type: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products-category/change-multi`,
     data,
     { withCredentials: true }

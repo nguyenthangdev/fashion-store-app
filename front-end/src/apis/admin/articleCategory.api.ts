@@ -1,5 +1,5 @@
-import axios from 'axios'
 import type { ArticleCategoryAllResponseInterface, ArticleCategoryDetailInterface } from '~/types/articleCategory.type'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 export const fetchAllArticleCategoriesAPI = async (
@@ -16,15 +16,14 @@ export const fetchAllArticleCategoriesAPI = async (
   if (currentSortKey) queryParams.set('sortKey', currentSortKey)
   if (currentSortValue) queryParams.set('sortValue', currentSortValue)
 
-  const response = await axios.get(
-    `${API_ROOT}/admin/articles-category?${queryParams.toString()}`,
-    { withCredentials: true }
+  const response = await authorizedAxiosInstance.get(
+    `${API_ROOT}/admin/articles-category?${queryParams.toString()}`
   )
   return response.data
 }
 
 export const fetchDeleteArticleCategoryAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/articles-category/delete/${id}`,
     { withCredentials: true }
   )
@@ -32,7 +31,7 @@ export const fetchDeleteArticleCategoryAPI = async (id: string) => {
 }
 
 export const fetchDetailArticleCategoryAPI = async (id: string): Promise<ArticleCategoryDetailInterface> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/articles-category/detail/${id}`,
     { withCredentials: true }
   )
@@ -40,7 +39,7 @@ export const fetchDetailArticleCategoryAPI = async (id: string): Promise<Article
 }
 
 export const fetchEditArticleCategoryAPI = async (id: string, formData: FormData) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/articles-category/edit/${id}`,
     formData,
     { withCredentials: true }
@@ -49,7 +48,7 @@ export const fetchEditArticleCategoryAPI = async (id: string, formData: FormData
 }
 
 export const fetchCreateArticleCategoryAPI = async (formData: FormData) => {
-  const response = await axios.post(
+  const response = await authorizedAxiosInstance.post(
     `${API_ROOT}/admin/articles-category/create`,
     formData,
     { withCredentials: true }
@@ -58,7 +57,7 @@ export const fetchCreateArticleCategoryAPI = async (formData: FormData) => {
 }
 
 export const fetchChangeStatusWithChildren = async (status: string, id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/articles-category/change-status-with-children/${status}/${id}`,
     {},
     { withCredentials: true }
@@ -67,7 +66,7 @@ export const fetchChangeStatusWithChildren = async (status: string, id: string) 
 }
 
 export const fetchChangeMultiAPI = async (data: { ids: string[], type: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/articles-category/change-multi`,
     data,
     { withCredentials: true }

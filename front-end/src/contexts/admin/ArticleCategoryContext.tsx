@@ -4,6 +4,7 @@ import { createContext, useContext, useReducer, useCallback, useEffect } from 'r
 import { fetchAllArticleCategoriesAPI } from '~/apis/admin/articleCategory.api'
 import { initialState, articleCategoryReducer } from '~/reducers/admin/articleCategory'
 import type { ArticleCategoryActions, ArticleCategoryAllResponseInterface, ArticleCategoryStates } from '~/types/articleCategory.type'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 interface ArticleCategoryContextType {
   stateArticleCategory: ArticleCategoryStates
@@ -21,6 +22,8 @@ const ArticleCategoryContext = createContext<ArticleCategoryContextType | null>(
 
 export const ArticleCategoryProvider = ({ children }: { children: React.ReactNode }) => {
   const [stateArticleCategory, dispatchArticleCategory] = useReducer(articleCategoryReducer, initialState)
+  const { isAuthenticated, isLoading } = useAuth()
+  const isAuthLoading = isLoading
 
   const fetchArticleCategory = useCallback(
     async ({
@@ -58,8 +61,14 @@ export const ArticleCategoryProvider = ({ children }: { children: React.ReactNod
     }, [])
   // Gọi APi của article-category bên các trang khác
   useEffect(() => {
+    //  Chỉ gọi API khi đã xác thực VÀ AuthContext không còn loading
+    if (isAuthLoading || !isAuthenticated) {
+      // Nếu chưa xác thực hoặc đang load auth, thoát khỏi useEffect
+      return
+    }
     fetchArticleCategory()
-  }, [fetchArticleCategory])
+  }, [fetchArticleCategory, isAuthLoading, isAuthenticated])
+
   return (
     <ArticleCategoryContext.Provider value={{ stateArticleCategory, fetchArticleCategory, dispatchArticleCategory }}>
       {children}

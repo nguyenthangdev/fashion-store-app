@@ -4,6 +4,7 @@ import { createContext, useContext, useReducer, useCallback, useEffect } from 'r
 import { fetchAllProductCategoriesAPI } from '~/apis/admin/productCategory.api'
 import { initialState, productCategoryReducer } from '~/reducers/admin/productCategoryReducer'
 import type { ProductCategoryActions, ProductCategoryAllResponseInterface, ProductCategoryStates } from '~/types/productCategory.type'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 interface ProductCategoryContextType {
   stateProductCategory: ProductCategoryStates
@@ -21,6 +22,7 @@ const ProductCategoryContext = createContext<ProductCategoryContextType | null>(
 
 export const ProductCategoryProvider = ({ children }: { children: React.ReactNode }) => {
   const [stateProductCategory, dispatchProductCategory] = useReducer(productCategoryReducer, initialState)
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
 
   const fetchProductCategory = useCallback(
     async ({
@@ -58,8 +60,14 @@ export const ProductCategoryProvider = ({ children }: { children: React.ReactNod
     }, [])
   // Gọi APi của product-category để xài bên các trang khác
   useEffect(() => {
+    //  Chỉ gọi API khi đã xác thực VÀ AuthContext không còn loading
+    if (isAuthLoading || !isAuthenticated) {
+      // Nếu chưa xác thực hoặc đang load auth, thoát khỏi useEffect
+      return
+    }
     fetchProductCategory()
-  }, [fetchProductCategory])
+  }, [fetchProductCategory, isAuthLoading, isAuthenticated])
+
   return (
     <ProductCategoryContext.Provider value={{ stateProductCategory, fetchProductCategory, dispatchProductCategory }}>
       {children}

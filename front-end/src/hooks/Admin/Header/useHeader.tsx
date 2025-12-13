@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom'
 import { fetchLogoutAPI } from '~/apis/admin/auth.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 
 export const useHeader = () => {
@@ -23,12 +23,12 @@ export const useHeader = () => {
         payload: { message: response.message, severity: 'success' }
       })
       await logout()
-      setTimeout(() => {
-        navigate('/admin/auth/login')
+      navigate('/admin/auth/login')
+    } else {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: response.message, severity: 'error' }
       })
-    } else if (response.code === 400) {
-      alert('error: ' + response.error)
-      return
     }
   }
 

@@ -1,9 +1,8 @@
-import { type JSX } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress'
 
-const PrivateRouteAdmin = ({ children }: { children: JSX.Element }) => {
+const UnauthorizedRoutesAdmin = () => {
   const { isAuthenticated, isLoading, authChecked } = useAuth()
 
   if (!authChecked || isLoading) {
@@ -13,10 +12,10 @@ const PrivateRouteAdmin = ({ children }: { children: JSX.Element }) => {
       </div>
     )
   }
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/auth/login" replace={true}/>
+  if (isAuthenticated) {
+    return <Navigate to="/admin/dashboard" replace={true}/>
   }
-  return children
+  return <Outlet />
 }
 
-export default PrivateRouteAdmin
+export default UnauthorizedRoutesAdmin

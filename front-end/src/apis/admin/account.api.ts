@@ -1,17 +1,16 @@
-import axios from 'axios'
 import type { AccountDetailInterface, AccountsDetailInterface } from '~/types/account.type'
 import { API_ROOT } from '~/utils/constants'
-import axiosInstance from '../axiosInstance'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 
 export const fetchAccountsAPI = async (): Promise<AccountsDetailInterface> => {
-  const resposne = await axiosInstance.get(
+  const resposne = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/accounts`
   )
   return resposne.data
 }
 
 export const fetchChangeStatusAPI = async (status: string, id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/accounts/change-status/${status}/${id}`,
     { status },
     { withCredentials: true }
@@ -20,7 +19,7 @@ export const fetchChangeStatusAPI = async (status: string, id: string) => {
 }
 
 export const fetchCreateAccountAPI = async (formData: FormData) => {
-  const response = await axios.post(
+  const response = await authorizedAxiosInstance.post(
     `${API_ROOT}/admin/accounts/create`,
     formData,
     { withCredentials: true }
@@ -29,7 +28,7 @@ export const fetchCreateAccountAPI = async (formData: FormData) => {
 }
 
 export const fetchDetailAccountAPI = async (id: string): Promise<AccountDetailInterface> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/accounts/detail/${id}`,
     { withCredentials: true }
   )
@@ -37,7 +36,7 @@ export const fetchDetailAccountAPI = async (id: string): Promise<AccountDetailIn
 }
 
 export const fetchEditAccountAPI = async (id: string, formData: FormData) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/accounts/edit/${id}`,
     formData,
     { withCredentials: true }
@@ -46,7 +45,7 @@ export const fetchEditAccountAPI = async (id: string, formData: FormData) => {
 }
 
 export const fetchDeleteAccountAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/accounts/delete/${id}`,
     { withCredentials: true }
   )

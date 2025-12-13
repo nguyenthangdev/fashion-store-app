@@ -56,6 +56,7 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         dispatchOrder({ type: 'SET_LOADING', payload: false })
       }
     }, [])
+
   return (
     <OrderContext.Provider value={{ stateOrder, fetchOrder, dispatchOrder }}>
       {children}

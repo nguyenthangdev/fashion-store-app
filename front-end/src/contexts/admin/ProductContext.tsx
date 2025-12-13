@@ -57,6 +57,7 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
         dispatchProduct({ type: 'SET_LOADING', payload: false })
       }
     }, [])
+
   return (
     <ProductContext.Provider value={{ stateProduct, fetchProduct, dispatchProduct }}>
       {children}

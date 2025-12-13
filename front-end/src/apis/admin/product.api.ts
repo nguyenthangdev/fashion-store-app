@@ -1,5 +1,5 @@
-import axios from 'axios'
 import type { ProductAllResponseInterface, ProductDetailInterface } from '~/types/product.type'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 export const fetchAllProductsAPI = async (
@@ -16,7 +16,7 @@ export const fetchAllProductsAPI = async (
   if (currentSortKey) queryParams.set('sortKey', currentSortKey)
   if (currentSortValue) queryParams.set('sortValue', currentSortValue)
 
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/products?${queryParams.toString()}`,
     { withCredentials: true }
   )
@@ -24,7 +24,7 @@ export const fetchAllProductsAPI = async (
 }
 
 export const fetchChangeStatusAPI = async (status: string, id: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products/change-status/${status}/${id}`,
     { status },
     { withCredentials: true }
@@ -33,7 +33,7 @@ export const fetchChangeStatusAPI = async (status: string, id: string) => {
 }
 
 export const fetchDetailProductAPI = async (id: string): Promise<ProductDetailInterface> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/products/detail/${id}`,
     { withCredentials: true }
   )
@@ -41,7 +41,7 @@ export const fetchDetailProductAPI = async (id: string): Promise<ProductDetailIn
 }
 
 export const fetchEditProductAPI = async (id: string, formData: FormData) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products/edit/${id}`,
     formData,
     { withCredentials: true }
@@ -50,7 +50,7 @@ export const fetchEditProductAPI = async (id: string, formData: FormData) => {
 }
 
 export const fetchDeleteProductAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/products/delete/${id}`,
     { withCredentials: true }
   )
@@ -58,7 +58,7 @@ export const fetchDeleteProductAPI = async (id: string) => {
 }
 
 export const fetchChangeMultiAPI = async (data: { ids: string[], type: string }) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/products/change-multi`,
     data,
     { withCredentials: true }
@@ -67,7 +67,7 @@ export const fetchChangeMultiAPI = async (data: { ids: string[], type: string })
 }
 
 export const fetchCreateProductAPI = async (formData: FormData) => {
-  const response = await axios.post(
+  const response = await authorizedAxiosInstance.post(
     `${API_ROOT}/admin/products/create`,
     formData,
     { withCredentials: true }

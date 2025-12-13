@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from 'axios'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchLoginAPI } from '~/apis/admin/auth.api'
@@ -12,7 +12,6 @@ export const useLoginAdmin = () => {
   const { dispatchAlert } = useAlertContext()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { refreshUser } = useAuth()
   const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     setIsLoading(true)
@@ -23,14 +22,14 @@ export const useLoginAdmin = () => {
       const response = await fetchLoginAPI(email, password)
 
       if (response.code === 200 && response.accountAdmin) {
+
         dispatchAlert({
           type: 'SHOW_ALERT',
           payload: { message: response.message, severity: 'success' }
         })
-        await refreshUser()
-
-        navigate('/admin/dashboard')
-
+        // await refreshUser()
+        ;(window as any).bumpAuth?.() // ép remount AuthAdminProvider
+        navigate('/admin/dashboard', { replace: true })
       } else {
         dispatchAlert({
           type: 'SHOW_ALERT',

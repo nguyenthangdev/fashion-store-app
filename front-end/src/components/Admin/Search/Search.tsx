@@ -30,7 +30,7 @@ const Search = ({ keyword, handleChangeKeyword, handleSearch }: Props) => {
             type="text"
             name="keyword"
             value={keyword}
-            placeholder='Nhập từ khóa...'
+            placeholder='Tìm kiếm theo mã đơn...'
             className='outline-none p-[10px] w-full pr-10'
           />
         </form>

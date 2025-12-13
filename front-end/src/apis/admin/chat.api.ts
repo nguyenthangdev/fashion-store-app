@@ -1,9 +1,9 @@
-import axios from 'axios'
 import { API_ROOT } from '~/utils/constants'
 import type { AdminChatRoomsResponse, AdminChatHistoryResponse } from '~/types/chat.type'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 
 export const fetchAdminChatRoomsAPI = async (): Promise<AdminChatRoomsResponse> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/chats`,
     { withCredentials: true }
   )
@@ -11,7 +11,7 @@ export const fetchAdminChatRoomsAPI = async (): Promise<AdminChatRoomsResponse> 
 }
 
 export const fetchAdminChatHistoryAPI = async (userId: string): Promise<AdminChatHistoryResponse> => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/chats/${userId}`,
     { withCredentials: true }
   )

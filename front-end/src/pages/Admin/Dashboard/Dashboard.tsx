@@ -44,7 +44,6 @@ const Dashboard = () => {
   } = useDashboard()
 
   if (!chartData) return <p>Đang tải...</p>
-
   return (
     <>
       <div className='flex flex-col gap-[20px] bg-[#FFFFFF] px-[30px] py-[30px] shadow-md'>

@@ -1,8 +1,8 @@
-import axios from 'axios'
+import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 export const fetchUsersAPI = async () => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/users`,
     { withCredentials: true }
   )
@@ -10,7 +10,7 @@ export const fetchUsersAPI = async () => {
 }
 
 export const fetchChangeStatusAPI = async (id: string, status: string) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/users/change-status/${status}/${id}`,
     { status },
     { withCredentials: true }
@@ -19,7 +19,7 @@ export const fetchChangeStatusAPI = async (id: string, status: string) => {
 }
 
 export const fetchDeleteUserAPI = async (id: string) => {
-  const response = await axios.delete(
+  const response = await authorizedAxiosInstance.delete(
     `${API_ROOT}/admin/users/delete/${id}`,
     { withCredentials: true }
   )
@@ -27,7 +27,7 @@ export const fetchDeleteUserAPI = async (id: string) => {
 }
 
 export const fetchDetailUserAPI = async (id: string) => {
-  const response = await axios.get(
+  const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/users/detail/${id}`,
     { withCredentials: true }
   )
@@ -35,7 +35,7 @@ export const fetchDetailUserAPI = async (id: string) => {
 }
 
 export const fetchEditUserAPI = async (id: string, formData: FormData) => {
-  const response = await axios.patch(
+  const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/admin/users/edit/${id}`,
     formData,
     { withCredentials: true }
