@@ -52,5 +52,5 @@ export const Error404Page = () => {
         </p>
       </div>
     </div>
-  );
+  )
 }
