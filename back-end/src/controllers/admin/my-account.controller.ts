@@ -6,15 +6,22 @@ import Role from '~/models/role.model'
 // [GET] /admin/my-account
 export const index = async (req: Request, res: Response) => {
   try {
-    const myAccount = await Account.findOne({ _id: req['accountAdmin'].id, deleted: false })
-    const role = await Role.findOne({ _id: myAccount.role_id, deleted: false })
-    if (myAccount && role) {
-      res.json({
-      code: 200,
-      message: 'Thành công!',
-      myAccount: myAccount,
-      role: role
+    const myAccount = await Account.findOne({ 
+      _id: req['accountAdmin']._id, 
+      deleted: false 
     })
+    const role = await Role.findOne({ 
+      _id: myAccount.role_id, 
+      deleted: false 
+    })
+    if (myAccount && role) {
+        res.json({
+        code: 200,
+        message: 'Thành công!',
+        myAccount: myAccount,
+        role: role
+      })
+      return
     }
   } catch (error) {
     res.json({

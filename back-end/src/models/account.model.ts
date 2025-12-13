@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-// import * as generate from '../helpers/generate' // Không còn cần thiết
 
 const accountSchema = new mongoose.Schema(
   {
@@ -10,17 +9,17 @@ const accountSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true // Email admin phải là duy nhất
+      unique: true
     },
     password: {
       type: String,
       required: true,
       select: false // Quan trọng: Ẩn mật khẩu khỏi các truy vấn find()
     },
-    refreshToken: {
-      type: String,
-      select: false // Ẩn khỏi query
-    },
+//     refreshToken: {
+//       type: String,
+//       select: false
+//     },
     phone: String,
     avatar: String,
     role_id: {

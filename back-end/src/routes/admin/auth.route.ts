@@ -5,5 +5,6 @@ import * as validate from '~/validates/admin/auth.validate'
 
 router.post('/login', validate.loginPost, controller.loginPost)
 router.get('/logout', controller.logout)
+router.post('logout-all', controller.logoutALL)
 router.post('/refresh-token', controller.refreshToken)
 export const authRoutes: Router = router

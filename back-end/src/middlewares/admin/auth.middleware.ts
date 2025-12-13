@@ -1,72 +1,35 @@
-// import { Request, Response, NextFunction } from 'express'
-// import Account from '~/models/account.model'
-
-// export const requireAuth = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   const token = req.cookies.token
-//   if (token) {
-//     const accountAdmin = await Account.findOne({
-//       token: token,
-//       deleted: false
-//     }).select('-password')
-
-//     if (!accountAdmin) {
-//       res.json({
-//         code: 401,
-//         message: 'Token không hợp lệ!'
-//       })
-//       return
-//     }
-//     req['accountAdmin'] = accountAdmin
-//     next()
-//   } else {
-//     res.json({
-//       code: 401,
-//       message: 'Vui lòng gửi kèm token!',
-//     })
-//     return
-//   }
-// }
-
-
 import { Request, Response, NextFunction } from 'express'
 import Account from '~/models/account.model'
-import jwt from 'jsonwebtoken'
+import { StatusCodes } from 'http-status-codes'
+import { JWTProvider } from '~/providers/jwt.provider'
 
 export const requireAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-
+  const accessToken = req.cookies?.accessToken
+  if (!accessToken) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Vui lòng gửi kèm token!' })
+    return
+  }
   try {
-    const accessToken = req.headers.authorization?.split(' ')[1]
-    if (!accessToken) {
-      res.json({
-        code: 401,
-        message: 'Vui lòng gửi kèm token!'
-      })
-      return
-    }
-    // Xác thực chữ ký của token
-    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_ADMIN as string) as { 
+    const accessTokenDecoded = await JWTProvider.verifyToken(
+      accessToken, 
+      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN
+    ) as {
       accountId: string,
       email: string,
       role_id: string  
     }
-
-    // Tìm user bằng ID lấy từ payload của accessToken
     const accountAdmin = await Account.findOne({
-      _id: decoded.accountId,
+      _id: accessTokenDecoded.accountId,
       deleted: false,
       status: 'active'
     }).select('-password')
-  
+  
     if (!accountAdmin) {
-      res.json({ code: 401, message: 'Token không hợp lệ!' })
+      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ!' })
       return
     }
 
@@ -74,11 +37,11 @@ export const requireAuth = async (
     next()
 
   } catch (error) {
-    // Nếu token hết hạn hoặc không hợp lệ, jwt.verify sẽ ném lỗi
-    res.json({
-      code: 401,
-      message: 'Token không hợp lệ hoặc đã hết hạn!'
-    })
-    return
+    if (error.message?.includes('jwt expired')) {
+      res.status(StatusCodes.GONE).json({ message: 'Cần refresh token mới!' })
+      return
+    }
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ, vui lòng đăng nhập lại!' })
+    return
   }
 }

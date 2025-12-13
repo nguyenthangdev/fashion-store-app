@@ -29,7 +29,7 @@ app.use(cors({
   origin: allowedOrigins, // FE origin
   credentials: true, // Cho phép gửi cookie từ FE
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],     // Các phương thức HTTP được phép
-  allowedHeaders: ['Content-Type', 'Authorization']     // Cho phép các header cần thiết
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']   // Cho phép các header cần thiết
 }))
 
 // Socket IO

@@ -1,8 +1,11 @@
 import Account from '~/models/account.model'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt' 
-import jwt from 'jsonwebtoken'
-import { COOKIE_OPTIONS } from '~/utils/constants'
+import { JWTProvider } from '~/providers/jwt.provider'
+import ms from 'ms'
+import { StatusCodes } from 'http-status-codes'
+import Session from '~/models/session.model'
+import crypto from 'crypto'
 
 // [POST] /admin/auth/login
 export const loginPost = async (req: Request, res: Response) => {
@@ -12,28 +15,21 @@ export const loginPost = async (req: Request, res: Response) => {
     const accountAdmin = await Account.findOne({
       email: email,
       deleted: false
-    }).select('+password') // Bị chặn bởi select = false nên phải dùng dấu "+"
-
+    }).select('+password')
     if (!accountAdmin) {
-      return res.json({
-        code: 401,
-        message: 'Tài khoản hoặc mật khẩu không chính xác'
-      })
+      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Tài khoản hoặc mật khẩu không chính xác!' })
+      return
     }
 
     const isMatch = await bcrypt.compare(password, accountAdmin.password)
     if (!isMatch) {
-      return res.json({
-        code: 401,
-        message: 'Tài khoản hoặc mật khẩu không chính xác'
-      })
+      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Tài khoản hoặc mật khẩu không chính xác!' })
+      return
     }
 
     if (accountAdmin.status === 'inactive') {
-      return res.json({
-        code: 403,
-        message: 'Tài khoản đã bị khóa!'
-      })
+      res.status(StatusCodes.FORBIDDEN).json({ message: 'Tài khoản đã bị khóa!' })
+      return
     }
 
     const payload = {
@@ -42,127 +38,187 @@ export const loginPost = async (req: Request, res: Response) => {
       role_id: accountAdmin.role_id 
     }
 
-    // Ký và tạo JWT
-    const accessToken = jwt.sign(
+    const accessToken = await JWTProvider.generateToken(
       payload,
-      process.env.JWT_SECRET_ADMIN as string, 
-      { expiresIn: '15m' } // Token hết hạn sau 15 phút
+      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN, 
+      '1h'
     )
 
-    const refreshToken = jwt.sign(
+    const refreshToken = await JWTProvider.generateToken(
       payload,
-      process.env.JWT_REFRESH_SECRET_ADMIN as string,
-      { expiresIn: '7d' } // Refresh token hết hạn sau 7 ngày
+      process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
+      '14 days'
     )
+    // const parser = new UAParser(req.get("User-Agent"))
+    // const device = parser.getDevice()
+    // const os = parser.getOS()
+    // const browser = parser.getBrowser()
+    // const session = new Session({
+    //   accountId: accountAdmin._id,
+    //   refreshTokenHash: hashToken(refreshToken),
+    //   userAgent: req.get('User-Agent'),
+    //   ip: req.ip,
+    //   // deviceName: `${device.vendor || "Unknown"} ${device.model || ""} - ${os.name} - ${browser.name}`,
+    //   deviceName: "Unknow",
+    //   expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
+    // })
+    // await session.save()
 
-    await Account.updateOne(
-      { _id: accountAdmin._id },
-      { refreshToken: refreshToken }
-    )
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days'),
+    })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true, // Chỉ gửi qua HTTPS
-      sameSite: 'none', // 'strict' an toàn hơn cho trang admin
-      maxAge: 24 * 60 * 60 * 1000, // 1 ngày
-      path: '/admin/auth/refresh-token' // Chỉ gửi cookie này đến endpoint làm mới token
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days'),
     })
-    
-    res.json({
-      code: 200,
-      message: 'Đăng nhập thành công!',
-      accessToken: accessToken,
-      accountAdmin: accountAdmin
-    })
+    res.json({ code: 200, message: 'Đăng nhập thành công!', accountAdmin: accountAdmin });
+    return
 
   } catch (error) {
-    console.error("LỖI ĐĂNG NHẬP ADMIN:", error);
-    res.json({
-      code: 400,
-      message: 'Lỗi!',
-      error: error.message
-    })
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error)
   }
 }
 
-// [GET] /admin/auth/refresh-token
+// [POST] /admin/auth/refresh-token
 export const refreshToken = async (req: Request, res: Response) => {
+  const refreshToken = req.cookies?.refreshToken
+
+  if (!refreshToken) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Không tồn tại refreshToken!' })
+    return
+  }
   try {
-    const refreshToken = req.cookies.refreshToken
-
-    if (!refreshToken) {
-      return res.json({
-        code: 401,
-        message: 'Không tìm thấy token!'
-      })
+    const refreshTokenDecoded = await JWTProvider.verifyToken(
+      refreshToken, 
+      process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN
+    ) as {
+      accountId: string,
+      email: string,
+      role_id: string
     }
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET_ADMIN as string) as jwt.JwtPayload
-
     const account = await Account.findOne({
-      _id: decoded.accountId,
-      refreshToken: refreshToken,
+      _id: refreshTokenDecoded.accountId,
       deleted: false,
-      status: 'active'
+      status: "active"
     })
-
     if (!account) {
-      return res.json({
-        code: 401,
-        message: 'Token không hợp lệ!'
-      })
+      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Account không tồn tại!' })
+      return
+    }
+    // const session = await Session.findOne({
+    //   accountId: new mongoose.Types.ObjectId(refreshTokenDecoded.accountId),
+    //   refreshTokenHash: hashToken(refreshToken)
+    // })
+
+    // if (!session) {
+    //   res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Refresh Token không hợp lệ' })
+    //   return
+    // }
+    
+    // // Xóa phiên cũ, tạo phiên mới + accessToken mới
+    // await session.deleteOne()
+
+    const payload = { 
+      accountId: refreshTokenDecoded.accountId, 
+      email: refreshTokenDecoded.email, 
+      role_id: refreshTokenDecoded.role_id, 
     }
 
-    const payload = {
-      accountId: account._id,
-      email: account.email,
-      role_id: account.role_id 
-    }
-
-    const newAccessToken = jwt.sign(
+    const newAccessToken = await JWTProvider.generateToken(
       payload,
-      process.env.JWT_SECRET_ADMIN as string,
-      { expiresIn: '15m' }
+      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN,
+      '1h'
     )
 
-    res.json({
-      code: 200,
-      message: 'Làm mới token thành công!',
-      accessToken: newAccessToken
+    // const newRefreshToken = await JWTProvider.generateToken(
+    //   payload,
+    //   process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
+    //   '14 days'
+    // )
+    // console.log("🚀 ~ auth.controller.ts ~ refreshToken ~ newRefreshToken:", newRefreshToken);
+
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
     })
+
+    // res.cookie('refreshToken', newRefreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'none',
+    //   maxAge: ms('14 days'),
+    //   path: '/'
+    // })
+
+    res.status(StatusCodes.OK).json({ message: 'Làm mới accessToken thành công!' })
   } catch (error) {
-    res.json({
-      code: 400,
-      message: 'Lỗi!',
-      error: error.message
-    })
+    res.status(StatusCodes.UNAUTHORIZED).json( {message: 'RefreshToken invalid!'} )
   }
 }
-// [GET] /admin/auth/logout
+// [DELETE] /admin/auth/logout
 export const logout = async (req: Request, res: Response) => {
   try {
-    const accessToken = req.headers.authorization?.split(' ')[1]
-    const decoded = jwt.verify(accessToken as string, process.env.JWT_SECRET_ADMIN as string) as jwt.JwtPayload 
-    await Account.updateOne(
-      { _id: decoded.accountId },
-      { refreshToken: null }
-    )
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    })
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      path: '/admin/auth/refresh-token'
     })
 
-    res.json({
-      code: 200,
-      message: 'Đăng xuất thành công!'
-    })
+    res.json({ code: 200, message: "Đăng xuất thành công 1 thiết bị!" })
   } catch (error) {
-    res.json({
-      code: 400,
-      message: 'Lỗi!',
-      error: error.message
-    })
+    res.status(StatusCodes.UNAUTHORIZED).json(error)
   }
 }
 
+// [POST] /auth/logout-all
+export const logoutALL = async (req: Request, res: Response) => {
+  try {
+    const accessToken = req.cookies?.accessToken
+    if (!accessToken) return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Không tồn tại accessToken' })
+    const accessTokenDecoded = await JWTProvider.verifyToken(
+      accessToken,
+      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN
+    ) as {
+      accountId: string,
+      email: string,
+      role_id: string
+    }
+    await Session.deleteMany({ accountId: accessTokenDecoded.accountId })
+
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/'
+      })
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/'
+    })  
+
+    res.status(StatusCodes.OK).json({ message: 'Đăng xuất thành công tất cả thiết bị!' })
+
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error)
+  }
+}
+
+export function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex')
+}

@@ -3,7 +3,6 @@ import slug from 'mongoose-slug-updater'
 
 mongoose.plugin(slug)
 
-// --- TẠO SCHEMA RIÊNG CHO COMMENT ---
 const commentSchema = new mongoose.Schema({
   user_id: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -21,7 +20,7 @@ const commentSchema = new mongoose.Schema({
   size:  String   // Kích cỡ, ví dụ: "XL"
   }, 
   {
-    timestamps: true // Đặt timestamps option ở đây
+    timestamps: true
   }
 )
 
@@ -48,7 +47,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    selled: Number, // Số lượng sản phẩm đã bán được
+    selled: Number,
     colors: [
       {
         name: { type: String, required: true }, // Ví dụ: "Xanh Navy"

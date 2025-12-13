@@ -54,7 +54,7 @@ export const index = async (req: Request, res: Response) => {
       .find({ deleted: false })
       .sort(sort)
   
-    // 👉 Query song song bằng Promise.all (giảm round-trip)
+    //  Query song song bằng Promise.all (giảm round-trip)
     const [parentCategories, accounts] = await Promise.all([
       ProductCategory
         .find(parentFind)
