@@ -1,4 +1,4 @@
-import { convertToFullName, convertToSlug } from "./convertToSlug";
+import { convertToFullName, convertToSlug } from "./convertToSlug"
 
 interface ObjectSearch {
   slug?: RegExp,
@@ -14,12 +14,12 @@ const searchHelpers = (query: Record<string, unknown>): ObjectSearch => {
 
   if (query.keyword) {
     if (typeof query.keyword === 'string') {  
-      objectSearch.keyword = query.keyword
+      objectSearch.keyword = query.keyword.trim()
       const stringSlug = convertToSlug(String(query.keyword))
       const stringSlugRegex = new RegExp(stringSlug, 'i')
       const regex = new RegExp(objectSearch.keyword, 'i') // Lưu ý: không sử dụng global(g) do sẽ có sự luân phiên true/false khi hàm test chạy.
 
-      objectSearch.regex = regex // Tự tạo thêm biến title vào đối tượng find
+      objectSearch.regex = regex
       objectSearch.slug = stringSlugRegex
     }
   }

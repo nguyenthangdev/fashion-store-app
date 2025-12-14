@@ -13,7 +13,7 @@ import ExcelJS from 'exceljs'
 // [GET] /admin/orders
 export const index = async (req: Request, res: Response) => {
   try {
-    const find: any = { }
+    const find: any = { deleted: false }
 
     // if (req.query.status === 'CANCELED') {
     //   find.deleted = true
@@ -24,19 +24,13 @@ export const index = async (req: Request, res: Response) => {
     //   }
     // }
 
-        
-    find.deleted = false
     if (req.query.status) {
       find.status = req.query.status.toString()
     }
-    
-    // Search
-    const objectSearch = searchHelpers(req.query)
-    if (objectSearch.keyword) {
-      find._id = new mongoose.Types.ObjectId(objectSearch.keyword)
+    if (req.query.phone) {
+      find['userInfo.phone'] = req.query.phone
     }
-    // End search
-
+    
     // Pagination
     const countOrders = await Order.countDocuments(find)
     const objectPagination = paginationHelpers(
@@ -49,13 +43,23 @@ export const index = async (req: Request, res: Response) => {
     )
     // End Pagination
 
+    // Search
+    const objectSearch = searchHelpers(req.query)
+    if (objectSearch.regex) {
+      find["userInfo.phone"] = objectSearch.regex
+    }
+    // End search
+
     // Sort
-    let sort: Record<string, any> = {}
-    if (req.query.sortKey && req.query.sortValue) {
-      const sortKey = req.query.sortKey.toLocaleString()
-      sort[sortKey] = req.query.sortValue
-    } else {
-      sort['position'] = 'desc'
+    let sort: Record<string, 1 | -1> = { }
+    if (req.query.sortKey) {
+      const key = req.query.sortKey.toString()
+      const dir = req.query.sortValue === 'asc' ? 1 : -1
+      sort[key] = dir
+    }
+    // luôn sort phụ theo createdAt
+    if (!sort.createdAt) {
+      sort.createdAt = -1
     }
     // End Sort
 
@@ -64,46 +68,8 @@ export const index = async (req: Request, res: Response) => {
       .sort(sort)
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip)
-
-    for (const order of orders) {
-      // Lấy ra thông tin người tạo
-      const user = await Account.findOne({
-        _id: order.createdBy.account_id
-      })
-      if (user) {
-        order['accountFullName'] = user.fullName
-      }
-      // Lấy ra thông tin người cập nhật gần nhất
-      const updatedBy = order.updatedBy[order.updatedBy.length - 1]
-      if (updatedBy) {
-        const userUpdated = await Account.findOne({
-          _id: updatedBy.account_id
-        })
-        updatedBy['accountFullName'] = userUpdated.fullName
-      }
-      if (order.products.length > 0) {
-        for (const item of order.products) {
-          const productId = item.product_id
-          const productInfo: OneProduct = await Product.findOne({
-            _id: productId
-          }).select('price discountPercentage')
-          productInfo.priceNew = productsHelper.priceNewProduct(productInfo)
-          item['productInfo'] = productInfo
-          item['totalPrice'] = productInfo.priceNew * item.quantity
-        }
-      }
-      order['totalsPrice'] = order.products.reduce(
-        (sum, item) => sum + item['totalPrice'],
-        0
-      )
-      order['price'] = order['totalsPrice']
-    }
-    // Sort chay do không sài hàm sort() kia cho các thuộc tính không có trong db.
-    if (req.query.sortKey === 'price' && req.query.sortValue) {
-      const dir = req.query.sortValue === 'desc' ? -1 : 1
-      orders.sort((a, b) => dir * (a['price'] - b['price']))
-    }
-    
+      .lean()
+      
     const accounts = await Account.find({
       deleted: false
     })
@@ -119,7 +85,7 @@ export const index = async (req: Request, res: Response) => {
       keyword: objectSearch.keyword,
       pagination: objectPagination,
       accounts: accounts,
-      allOrders: allOrders,
+      allOrders: allOrders, // Tất cả những order ban đầu chưa có phân trang
     })
   } catch (error) {
     res.json({

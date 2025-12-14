@@ -74,6 +74,13 @@ const orderSchema = new mongoose.Schema(
   }
 )
 
+// ===== INDEXES =====
+orderSchema.index({ deleted: 1, createdAt: -1 })
+orderSchema.index({ status: 1, createdAt: -1 })
+orderSchema.index({ amount: -1 })
+orderSchema.index({ 'userInfo.phone': 1 })
+
+
 const Order = mongoose.model('Order', orderSchema, 'orders')
 
 export default Order
