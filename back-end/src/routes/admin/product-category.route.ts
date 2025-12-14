@@ -31,4 +31,9 @@ router.patch(
 router.get('/detail/:id', requirePermission("products-category_view"), controller.detail)
 router.patch('/change-status-with-children/:status/:id', requirePermission("products-category_edit"), controller.changeStatusWithChildren)
 
+router.get('/trash', controller.ProductCategoryTrash)
+router.patch('/trash/form-change-multi-trash', controller.changeMultiTrash)
+router.delete('/trash/permanentlyDelete/:id', controller.permanentlyDeleteProductCategory)
+router.patch('/trash/recover/:id', controller.recoverProductCategory)
+
 export const productCategoryRoutes: Router = router

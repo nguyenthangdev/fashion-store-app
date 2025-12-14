@@ -49,20 +49,17 @@ export const index = async (req: Request, res: Response) => {
     }
     // End Sort
 
-    const orders = await Order
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .lean()
-      
-    const accounts = await Account.find({
-      deleted: false
-    })
-    const allOrders = await Order.find({
-      deleted: false
-    })
-  
+    const [orders, accounts, allOrders] = await Promise.all([
+      Order
+        .find(find)
+        .sort(sort)
+        .limit(objectPagination.limitItems)
+        .skip(objectPagination.skip)
+        .lean(),  
+      Account.find({deleted: false}),
+      Order.find({deleted: false})
+    ])
+
     res.json({
       code: 200,
       message: 'Thành công!',
@@ -469,7 +466,7 @@ export const orderTrash = async (req: Request, res: Response) => {
   }
 }
 
-// [DELETE] /admin/orders/trash/form-change-multi-trash
+// [PATCH] /admin/orders/trash/form-change-multi-trash
 export const changeMultiTrash = async (req: Request, res: Response) => {
   try {
     const body = req.body as { type: string; ids: string[] }
@@ -537,7 +534,6 @@ export const permanentlyDeleteOrder = async (req: Request, res: Response) => {
 export const recoverOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.id
-    console.log("🚀 ~ order.controller.ts ~ recoverOrder ~ id:", id);
     await Order.updateOne(
       { _id: id },
       { deleted: false, recoveredAt: new Date() }

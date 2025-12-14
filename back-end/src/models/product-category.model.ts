@@ -49,6 +49,12 @@ const productCategorySchema = new mongoose.Schema(
   }
 )
 
+// ===== INDEXES =====
+productCategorySchema.index({ slug: 1 }, { unique: true })
+productCategorySchema.index({ title: 1, deleted: 1 })
+productCategorySchema.index({ deleted: 1, status: 1, createdAt: -1 })
+
+
 const ProductCategory = mongoose.model(
   'ProductCategory',
   productCategorySchema,
