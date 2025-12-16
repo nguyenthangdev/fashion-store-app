@@ -9,14 +9,14 @@ export const initialState: ProductStates = {
     currentPage: 1,
     limitItems: 3,
     skip: 0,
-    totalPage: 0
+    totalPage: 0,
+    totalItems: 0
   },
   keyword: '',
   sortKey: '',
   sortValue: '',
   loading: false,
-  allProducts: [],
-  date: ''
+  allProducts: []
 }
 
 export function productReducer(
@@ -28,8 +28,6 @@ export function productReducer(
       return { ...stateProduct, loading: actionProduct.payload }
     case 'SET_DATA':
       return { ...stateProduct, ...actionProduct.payload }
-    case 'RESET':
-      return initialState
     default:
       return stateProduct
   }

@@ -1,4 +1,5 @@
 import { Editor } from '@tinymce/tinymce-react'
+import { Link } from 'react-router-dom'
 import SelectTree from '~/components/Admin/TableTree/SelectTreeProduct'
 import { useCreate } from '~/hooks/Admin/ProductCategory/useCreate'
 import { API_KEY } from '~/utils/constants'
@@ -101,19 +102,6 @@ const CreateProductCategory = () => {
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="position">Vị trí</label>
-              <input
-                onChange={(event) => setProductCategoryInfo({ ...productCategoryInfo, position: Number(event.target.value) })}
-                type="number"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                className='py-[3px] text-[16px]'
-                min={1}
-              />
-            </div>
-
             <div className="flex items-center justify-start gap-[10px] text-[16px]">
               <div className="flex gap-[5px]">
                 <input
@@ -122,8 +110,8 @@ const CreateProductCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusActive"
                   name="status"
-                  value={'active'}
-                  checked={productCategoryInfo.status === 'active' ? true : false}
+                  value={'ACTIVE'}
+                  checked={productCategoryInfo.status === 'ACTIVE' ? true : false}
                 />
                 <label htmlFor="statusActive">Hoạt động</label>
               </div>
@@ -135,19 +123,26 @@ const CreateProductCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusInActive"
                   name="status"
-                  value={'inactive'}
-                  checked={productCategoryInfo.status === 'inactive' ? true : false}
+                  value={'INACTIVE'}
+                  checked={productCategoryInfo.status === 'INACTIVE' ? true : false}
                 />
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>
             </div>
-
-            <button
-              type="submit"
-              className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[5px] text-[14px]"
-            >
-            Tạo mới
-            </button>
+            <div className='flex items-center justify-start gap-[5px]'>
+              <Link
+                to={'/admin/products-category'}
+                className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[80px] text-center'
+              >
+                  Quay lại
+              </Link>
+              <button
+                type="submit"
+                className="nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white w-[80px] text-center"
+              >
+              Tạo mới
+              </button>
+            </div>
           </form>
         )
       )}

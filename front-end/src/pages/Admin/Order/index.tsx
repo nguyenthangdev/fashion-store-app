@@ -13,7 +13,7 @@ import OrderTable from '~/components/Admin/ItemTable/OrderTable'
 import type { OrderStatus } from '~/types/order.type'
 import { FaTrashAlt } from 'react-icons/fa'
 import { FaFileExcel } from 'react-icons/fa'
-import { API_ROOT } from '~/utils/constants'
+import { API_ROOT, ORDER_STATUSES_CHANGEMULTI } from '~/utils/constants'
 import { Link } from 'react-router-dom'
 
 const OrderAdmin = () => {
@@ -33,7 +33,7 @@ const OrderAdmin = () => {
     handleSubmit,
     handleSort,
     clearSortParams,
-    handleFilterStatus,
+    handleFilterOrder,
     open,
     handleClose,
     handleConfirmDeleteAll,
@@ -53,7 +53,7 @@ const OrderAdmin = () => {
                 <FilterStatusOrder
                   filterOrder={filterOrder}
                   currentStatus={status as OrderStatus}
-                  handleFilterStatus={handleFilterStatus}
+                  handleFilterOrder={handleFilterOrder}
                   items={allOrders ?? []}
                 />
               </div>
@@ -74,11 +74,9 @@ const OrderAdmin = () => {
                   className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
                 >
                   <option disabled value={''}>-- Chọn hành động --</option>
-                  <option value="PENDING">Đang xử lý</option>
-                  <option value="TRANSPORTING">Đang giao hàng</option>
-                  <option value="CONFIRMED">Hoàn thành</option>
-                  <option value="CANCELED">Hủy</option>
-                  <option value="DELETEALL">Xóa</option>
+                  {ORDER_STATUSES_CHANGEMULTI.map((status, idx) => (
+                    <option key={idx} value={status.value}>{status.label}</option>
+                  ))}
                 </select>
                 <button
                   type="submit"
@@ -115,7 +113,7 @@ const OrderAdmin = () => {
                 </Link>
               </button>
               <a
-                href={`${API_ROOT}/admin/orders/export?status=${status}`}
+                href={`${API_ROOT}/admin/orders/export?status=${status.toUpperCase()}`}
                 download={`don-hang-${status || 'all'}.xlsx`}
                 className='p-[5px] border rounded-[5px] border-green-600 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center gap-[5px]'
               >
@@ -133,6 +131,7 @@ const OrderAdmin = () => {
           <OrderTable
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
+            filterOrder={filterOrder}
           />
           <Pagination
             pagination={pagination}

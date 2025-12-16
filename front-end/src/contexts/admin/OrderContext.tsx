@@ -11,7 +11,6 @@ interface OrderContextType {
   stateOrder: OrderState
   dispatchOrder: React.Dispatch<OrderAction>
   fetchOrders: (params?: AllParams) => Promise<void>
-  resetOrders: () => void
 }
 
 const OrderContext = createContext<OrderContextType | null>(null)
@@ -47,12 +46,8 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
-  const resetOrders = useCallback(() => {
-    dispatchOrder({ type: 'RESET' })
-  }, [])
-
   return (
-    <OrderContext.Provider value={{ stateOrder, fetchOrders, dispatchOrder, resetOrders }}>
+    <OrderContext.Provider value={{ stateOrder, fetchOrders, dispatchOrder }}>
       {children}
     </OrderContext.Provider>
   )

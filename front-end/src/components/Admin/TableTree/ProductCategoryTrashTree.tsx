@@ -65,9 +65,9 @@ const ProductCategoryTrashTree = ({
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
           <button
             className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
-              ${productCategory.status === 'active' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
+              ${productCategory.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
           >
-            {productCategory.status === 'active' ? 'Hoạt động' : 'Ngừng hoạt động'}
+            {productCategory.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
           </button>
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>

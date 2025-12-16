@@ -102,20 +102,6 @@ const EditProductCategory = () => {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="position">Vị trí</label>
-              <input
-                onChange={(event) => setProductCategoryInfo(productCategoryInfo ? { ...productCategoryInfo, position: Number(event.target.value) }: productCategoryInfo)}
-                type="number"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                min={1}
-                className='text-[16px] py-[3px]'
-                value={productCategoryInfo.position ? productCategoryInfo.position : ''}
-              />
-            </div>
-
             <div className="flex items-center justify-start gap-[10px] text-[16px]">
               <div className="flex gap-[5px]">
                 <input
@@ -124,8 +110,8 @@ const EditProductCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusActive"
                   name="status"
-                  value={'active'}
-                  checked={productCategoryInfo.status === 'active' ? true : false}
+                  value={'ACTIVE'}
+                  checked={productCategoryInfo.status === 'ACTIVE' ? true : false}
                 />
                 <label htmlFor="statusActive">Hoạt động</label>
               </div>
@@ -137,8 +123,8 @@ const EditProductCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusInActive"
                   name="status"
-                  value={'inactive'}
-                  checked={productCategoryInfo.status === 'inactive' ? true : false}
+                  value={'INACTIVE'}
+                  checked={productCategoryInfo.status === 'INACTIVE' ? true : false}
                 />
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>

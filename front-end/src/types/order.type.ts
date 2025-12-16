@@ -85,4 +85,3 @@ export interface OrderState {
 export type OrderAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_DATA'; payload: Partial<OrderState> }
-  | { type: 'RESET' }

@@ -125,8 +125,9 @@ export const useOrder = () => {
     setSearchParams(newParams)
   }
 
-  const handleFilterStatus = useCallback((status: OrderStatus) => {
-    updateParams({ status, page: 1 })
+  const handleFilterOrder = useCallback((status: OrderStatus) => {
+    const urlFriendlyStatus = status.toLowerCase()
+    updateParams({ status: urlFriendlyStatus, page: 1 })
   }, [updateParams])
 
   return {
@@ -146,7 +147,7 @@ export const useOrder = () => {
     handleSubmit,
     handleSort,
     clearSortParams,
-    handleFilterStatus,
+    handleFilterOrder,
     open,
     handleClose,
     handleConfirmDeleteAll,

@@ -27,7 +27,6 @@ export interface ProductCategoryStates extends HelperInterface {
 export type ProductCategoryActions =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_DATA'; payload: Partial<ProductCategoryStates> }
-  | { type: 'RESET' }
 
 export interface ProductCategoryDetailInterface {
   productCategory: ProductCategoryInfoInterface

@@ -2,7 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable no-unused-vars */
 import { createContext, useContext, useReducer, useCallback, useEffect } from 'react'
-import { fetchAllProductCategoriesAPI } from '~/apis/admin/productCategory.api'
+import { fetchProductCategoryAPI } from '~/apis/admin/productCategory.api'
 import { initialState, productCategoryReducer } from '~/reducers/admin/productCategoryReducer'
 import type { ProductCategoryActions, ProductCategoryAPIResponse, ProductCategoryStates } from '~/types/productCategory.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
@@ -24,7 +24,7 @@ export const ProductCategoryProvider = ({ children }: { children: React.ReactNod
     async (params: AllParams = {}) => {
       dispatchProductCategory({ type: 'SET_LOADING', payload: true })
       try {
-        const res: ProductCategoryAPIResponse = await fetchAllProductCategoriesAPI(params)
+        const res: ProductCategoryAPIResponse = await fetchProductCategoryAPI(params)
         dispatchProductCategory({
           type: 'SET_DATA',
           payload: {

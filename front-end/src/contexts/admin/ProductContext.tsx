@@ -1,20 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable no-unused-vars */
 import { createContext, useContext, useReducer, useCallback } from 'react'
-import { fetchAllProductsAPI } from '~/apis/admin/product.api'
+import { fetchProductAPI } from '~/apis/admin/product.api'
 import { initialState } from '~/reducers/admin/productReducer'
 import { productReducer } from '~/reducers/admin/productReducer'
-import type { ProductActions, ProductAllResponseInterface, ProductStates } from '~/types/product.type'
+import type { AllParams } from '~/types/helper.type'
+import type { ProductActions, ProductAPIResponse, ProductStates } from '~/types/product.type'
 
 interface ProductContextType {
   stateProduct: ProductStates
-  fetchProduct: (params?: {
-    status?: string
-    page?: number
-    keyword?: string
-    sortKey?: string
-    sortValue?: string
-  }) => Promise<void>
+  fetchProduct: (params?: AllParams) => Promise<void>
   dispatchProduct: React.Dispatch<ProductActions>
 }
 
@@ -24,33 +19,21 @@ export const ProductProvider = ({ children }: { children: React.ReactNode }) => 
   const [stateProduct, dispatchProduct] = useReducer(productReducer, initialState)
 
   const fetchProduct = useCallback(
-    async ({
-      status = '',
-      page = 1,
-      keyword = '',
-      sortKey = '',
-      sortValue = ''
-    } = {}) => {
+    async (params: AllParams = {}) => {
       dispatchProduct({ type: 'SET_LOADING', payload: true })
       try {
-        const res: ProductAllResponseInterface = await fetchAllProductsAPI(
-          status,
-          page,
-          keyword,
-          sortKey,
-          sortValue
-        )
+        const res: ProductAPIResponse = await fetchProductAPI(params)
         dispatchProduct({
           type: 'SET_DATA',
           payload: {
             products: res.products,
+            allProducts: res.allProducts,
             accounts: res.accounts,
             pagination: res.pagination,
             filterStatus: res.filterStatus,
             keyword: res.keyword,
-            allProducts: res.allProducts,
-            sortKey,
-            sortValue
+            sortKey: params.sortKey || '',
+            sortValue: params.sortValue || ''
           }
         })
       } finally {

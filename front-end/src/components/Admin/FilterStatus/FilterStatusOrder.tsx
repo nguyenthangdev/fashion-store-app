@@ -7,11 +7,11 @@ import type { OrderStatus } from '~/types/order.type'
 interface Props {
   filterOrder: FilterStatusInterface[]
   currentStatus: OrderStatus
-  handleFilterStatus: (status: OrderStatus) => void
+  handleFilterOrder: (status: OrderStatus) => void
   items: { status: string }[],
 }
 
-const FilterStatusOrder = ({ filterOrder, currentStatus, handleFilterStatus, items }: Props) => {
+const FilterStatusOrder = ({ filterOrder, currentStatus, handleFilterOrder, items }: Props) => {
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = items.reduce((acc, item) => {
       acc[item.status] = (acc[item.status] || 0) + 1
@@ -27,12 +27,12 @@ const FilterStatusOrder = ({ filterOrder, currentStatus, handleFilterStatus, ite
       {filterOrder && filterOrder.length > 0 ? (
         <div className='flex gap-[15px] items-center'>
           {filterOrder.map((item, index) => {
-            const isActive = currentStatus === item.status
+            const isActive = currentStatus.toUpperCase() === item.status
             const count = statusCounts[item.status] || 0
             return (
               <button
                 key={index}
-                onClick={() => handleFilterStatus(item.status as OrderStatus)}
+                onClick={() => handleFilterOrder(item.status as OrderStatus)}
                 className={`p-[5px] border rounded-[5px] border-[#525FE1] hover:bg-[#525FE1] 
                   ${isActive ? 'bg-[#525FE1] border-[#525FE1]' : 'bg-white'}`}
               >

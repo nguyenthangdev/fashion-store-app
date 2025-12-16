@@ -26,7 +26,7 @@ const FilterStatus = ({ filterStatus, currentStatus, handleFilterStatus, items }
       {filterStatus && filterStatus.length > 0 ? (
         <div className='flex gap-[15px] items-center'>
           {filterStatus.map((item, index) => {
-            const isActive = currentStatus === item.status
+            const isActive = currentStatus.toUpperCase() === item.status
             const count = statusCounts[item.status] || 0
             return (
               <button

@@ -32,16 +32,12 @@ const DetailProductCategory = () => {
                   />
                 </div>
                 <div>
-                  <b>Trạng thái:</b>
+                  <b>Trạng thái: </b>
                   {
-                    productCategoryDetail.status === 'active' ?
+                    productCategoryDetail.status === 'ACTIVE' ?
                       <span className="text-green-500 font-[600]">Hoạt động</span> :
                       <span className="text-red-500 font-[600]"> Dừng hoạt động</span>
                   }
-                </div>
-                <div>
-                  <b>Vị trí: </b>
-                  {productCategoryDetail.position}
                 </div>
                 <div className='flex items-center gap-[5px]'>
                   <b>Mô tả: </b>

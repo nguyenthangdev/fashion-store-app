@@ -11,7 +11,6 @@ interface OrderTrashContextType {
   stateOrder: OrderState
   dispatchOrder: React.Dispatch<OrderAction>
   fetchOrdersTrash: (params?: AllParams) => Promise<void>
-  resetOrders: () => void
 }
 
 const OrderTrashContext = createContext<OrderTrashContextType | null>(null)
@@ -45,12 +44,9 @@ export const OrderTrashProvider = ({ children }: { children: React.ReactNode }) 
     }
   }, [])
 
-  const resetOrders = useCallback(() => {
-    dispatchOrder({ type: 'RESET' })
-  }, [])
 
   return (
-    <OrderTrashContext.Provider value={{ stateOrder, fetchOrdersTrash, dispatchOrder, resetOrders }}>
+    <OrderTrashContext.Provider value={{ stateOrder, fetchOrdersTrash, dispatchOrder }}>
       {children}
     </OrderTrashContext.Provider>
   )

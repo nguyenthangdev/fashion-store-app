@@ -3,11 +3,11 @@ import type { ProductCategoryAPIResponse, ProductCategoryDetailInterface } from 
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const fetchAllProductCategoriesAPI = async (
+export const fetchProductCategoryAPI = async (
   params: AllParams
 ): Promise<ProductCategoryAPIResponse> => {
   const queryParams = new URLSearchParams()
-  if (params.status) queryParams.set('status', params.status)
+  if (params.status) queryParams.set('status', params.status.toUpperCase())
   if (params.page) queryParams.set('page', params.page.toString())
   if (params.keyword) queryParams.set('keyword', params.keyword)
   if (params.sortKey) queryParams.set('sortKey', params.sortKey)

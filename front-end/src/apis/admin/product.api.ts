@@ -1,20 +1,17 @@
-import type { ProductAllResponseInterface, ProductDetailInterface } from '~/types/product.type'
+import type { AllParams } from '~/types/helper.type'
+import type { ProductAPIResponse, ProductDetailInterface } from '~/types/product.type'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const fetchAllProductsAPI = async (
-  status: string,
-  page: number,
-  currentKeyword: string,
-  currentSortKey: string,
-  currentSortValue: string
-): Promise<ProductAllResponseInterface> => {
+export const fetchProductAPI = async (
+  params: AllParams
+): Promise<ProductAPIResponse> => {
   const queryParams = new URLSearchParams()
-  if (status) queryParams.set('status', status)
-  if (page) queryParams.set('page', page.toString())
-  if (currentKeyword) queryParams.set('keyword', currentKeyword)
-  if (currentSortKey) queryParams.set('sortKey', currentSortKey)
-  if (currentSortValue) queryParams.set('sortValue', currentSortValue)
+  if (params.status) queryParams.set('status', params.status)
+  if (params.page) queryParams.set('page', params.page.toString())
+  if (params.keyword) queryParams.set('keyword', params.keyword)
+  if (params.sortKey) queryParams.set('sortKey', params.sortKey)
+  if (params.sortValue) queryParams.set('sortValue', params.sortValue)
 
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/products?${queryParams.toString()}`,

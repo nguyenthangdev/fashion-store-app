@@ -31,7 +31,8 @@ const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
     handleDelete,
     handleCheckbox,
     handleCheckAll,
-    isCheckAll
+    isCheckAll,
+    pagination
   } = useTable({ selectedIds, setSelectedIds })
 
   if (loading) {
@@ -54,14 +55,17 @@ const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
                   sx={{ padding: 0 }}
                 />
               </TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', padding: '0px 2px' }}>
+                STT
+              </TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tên sản phẩm</TableCell>
-              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá bán (đ)</TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá cuối (đ)</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá gốc (đ)</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giảm giá (%)</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Số lượng</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Ngày tạo</TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Thời gian tạo</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
             </TableRow>
@@ -131,14 +135,17 @@ const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
                     sx={{ padding: 0 }}
                   />
                 </TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', padding: '0px 2px' }}>
+                STT
+                </TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tên sản phẩm</TableCell>
-                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá bán (đ)</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá cuối (đ)</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giá gốc (đ)</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Giảm giá (%)</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Số lượng</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Ngày tạo</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Thời gian tạo</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
               </TableRow>
@@ -156,6 +163,9 @@ const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
                         sx={{ padding: 0 }}
                         value={product._id}
                       />
+                    </TableCell>
+                    <TableCell align='center' sx={{ padding: '0px 2px' }}>
+                      {(pagination.currentPage - 1) * pagination.limitItems + index + 1}
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '10px 0px' }}>
                       <div className='flex justify-center items-center'>

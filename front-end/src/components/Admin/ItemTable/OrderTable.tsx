@@ -20,7 +20,7 @@ import Button from '@mui/material/Button'
 import { getTotalBill } from '~/helpers/totalBill'
 import type { OrderStatus } from '~/types/order.type'
 
-const OrderTable = ({ selectedIds, setSelectedIds }: Props) => {
+const OrderTable = ({ selectedIds, setSelectedIds, filterOrder }: Props) => {
 
   const {
     orders,
@@ -35,7 +35,7 @@ const OrderTable = ({ selectedIds, setSelectedIds }: Props) => {
     accounts,
     handleDelete,
     pagination
-  } = useTable({ selectedIds, setSelectedIds })
+  } = useTable({ selectedIds, setSelectedIds, filterOrder })
 
   if (loading) {
     return (
@@ -183,10 +183,9 @@ const OrderTable = ({ selectedIds, setSelectedIds }: Props) => {
                         className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px] bg-amber-100 text-black'
                       >
                         <option disabled value={''}>-- Chọn hành động --</option>
-                        <option value="PENDING">Đang xử lý</option>
-                        <option value="TRANSPORTING">Đang giao hàng</option>
-                        <option value="CONFIRMED">Hoàn thành</option>
-                        <option value="CANCELED">Hủy</option>
+                        {filterOrder.map((item, idx) => (
+                          <option key={idx} value={item.status}>{item.name}</option>
+                        ))}
                       </select>
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '6px 0px' }}>

@@ -1,12 +1,13 @@
 import { fetchChangeStatusAPI, fetchDeleteOrderAPI } from '~/apis/admin/order.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
-import type { UpdatedBy } from '~/types/helper.type'
+import type { FilterStatusInterface, UpdatedBy } from '~/types/helper.type'
 import { useState } from 'react'
 import { useOrderContext } from '~/contexts/admin/OrderContext'
 import type { OrderStatus } from '~/types/order.type'
 
 export interface Props {
+  filterOrder: FilterStatusInterface[]
   selectedIds: string[],
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>
 }

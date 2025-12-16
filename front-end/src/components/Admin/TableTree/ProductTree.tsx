@@ -6,6 +6,8 @@ import type { ProductCategoryActions, ProductCategoryInfoInterface } from '~/typ
 import type { AccountInfoInterface } from '~/types/account.type'
 
 interface Props {
+  index: number // Vị trí trong cùng cấp
+  parentNumber?: string // STT của cha, ví dụ: "2" hoặc "2.1"
   productCategory: ProductCategoryInfoInterface
   level: number
   selectedIds: string[]
@@ -21,6 +23,8 @@ interface Props {
 }
 
 const ProductTree = ({
+  index,
+  parentNumber,
   productCategory,
   level,
   selectedIds,
@@ -35,14 +39,16 @@ const ProductTree = ({
   handleDelete
 }: Props) => {
   const prefix = '— '.repeat(level)
-
   const updatedBy = productCategory.updatedBy.at(-1)
   const creator = accounts.find((account) => account._id === productCategory.createdBy.account_id)
   const updater = accounts.find((account) => account._id === updatedBy?.account_id)
 
+  // Tạo số thứ tự phân cấp
+  const currentNumber = parentNumber ? `${parentNumber}.${index + 1}` : `${index + 1}`
+
   return (
     <>
-      <TableRow key={productCategory._id}>
+      <TableRow>
         <TableCell align="center" sx={{ padding: '0px 2px' }}>
           <Checkbox
             checked={selectedIds.includes(productCategory._id ?? '')}
@@ -50,6 +56,9 @@ const ProductTree = ({
             size="small"
             sx={{ padding: 0 }}
           />
+        </TableCell>
+        <TableCell align="center" sx={{ padding: '0px 2px' }}>
+          {currentNumber}
         </TableCell>
         <TableCell align="center" sx={{ padding: '10px 0px' }}>
           <div className="flex justify-center items-center">
@@ -69,9 +78,9 @@ const ProductTree = ({
           <button
             onClick={() => handleToggleStatus(productCategory.status, productCategory._id ?? '')}
             className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
-              ${productCategory.status === 'active' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
+              ${productCategory.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
           >
-            {productCategory.status === 'active' ? 'Hoạt động' : 'Ngừng hoạt động'}
+            {productCategory.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
           </button>
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
@@ -119,9 +128,11 @@ const ProductTree = ({
           </button>
         </TableCell>
       </TableRow>
-      {productCategory.children?.map((child) => (
+      {productCategory.children?.map((child, idx) => (
         <ProductTree
-          key={child._id}
+          key={idx}
+          index={idx}
+          parentNumber={currentNumber}
           productCategory={child}
           level={level + 1}
           selectedIds={selectedIds}

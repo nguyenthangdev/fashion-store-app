@@ -61,7 +61,6 @@ export interface GeneralInfoInterface {
   updatedBy: UpdatedBy[],
   title: string,
   thumbnail: string,
-  position: number | string,
   status: string,
   slug?: string,
   createdAt: Date | null

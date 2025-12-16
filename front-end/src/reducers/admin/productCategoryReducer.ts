@@ -10,7 +10,8 @@ export const initialState: ProductCategoryStates = {
     currentPage: 1,
     limitItems: 3,
     skip: 0,
-    totalPage: 0
+    totalPage: 0,
+    totalItems: 0
   },
   keyword: '',
   sortKey: '',
@@ -29,8 +30,6 @@ export function productCategoryReducer(
       return { ...stateProductCategory, loading: actionProductCategory.payload }
     case 'SET_DATA':
       return { ...stateProductCategory, ...actionProductCategory.payload }
-    case 'RESET':
-      return initialState
     default:
       return stateProductCategory
   }

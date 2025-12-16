@@ -7,7 +7,7 @@ export const fetchOrdersAPI = async (
   params: AllParams
 ): Promise<OrderAPIResponse> => {
   const queryParams = new URLSearchParams()
-  if (params.status) queryParams.set('status', params.status)
+  if (params.status) queryParams.set('status', params.status.toUpperCase())
   if (params.page) queryParams.set('page', params.page.toString())
   if (params.keyword) queryParams.set('keyword', params.keyword)
   if (params.sortKey) queryParams.set('sortKey', params.sortKey)

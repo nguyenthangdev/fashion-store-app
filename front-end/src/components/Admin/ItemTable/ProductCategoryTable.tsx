@@ -53,10 +53,11 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
                   sx={{ padding: 0 }}
                 />
               </TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>STT</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Tên danh mục</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Thời gian tạo</TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Nguời tạo / Thời gian tạo</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
             </TableRow>
@@ -64,6 +65,11 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
           <TableBody>
             {Array.from({ length: 6 }).map((_item, index) => (
               <TableRow key={index}>
+                <TableCell align='center'>
+                  <div className='flex items-center justify-center'>
+                    <Skeleton variant="rectangular" width={20} height={20} sx={{ bgcolor: 'grey.400', padding: '0px 8px' }}/>
+                  </div>
+                </TableCell>
                 <TableCell align='center'>
                   <div className='flex items-center justify-center'>
                     <Skeleton variant="rectangular" width={20} height={20} sx={{ bgcolor: 'grey.400', padding: '0px 8px' }}/>
@@ -127,18 +133,20 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
                     sx={{ padding: 0 }}
                   />
                 </TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>STT</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tên danh mục</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Thời gian tạo</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Thời gian tạo</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {productCategories.map(productCategory => (
+              {productCategories.map((productCategory, idx) => (
                 <ProductTree
-                  key={productCategory._id}
+                  key={idx}
+                  index={idx}
                   productCategory={productCategory}
                   level={1}
                   selectedIds={selectedIds}

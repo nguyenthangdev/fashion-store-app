@@ -25,6 +25,7 @@ export const useProductCategory = () => {
     sortKey: searchParams.get('sortKey') || '',
     sortValue: searchParams.get('sortValue') || ''
   }), [searchParams])
+
   useEffect(() => {
     fetchProductCategory(urlParams)
   }, [urlParams.status, urlParams.page, urlParams.keyword, urlParams.sortKey, urlParams.sortValue, fetchProductCategory, urlParams])
@@ -67,8 +68,8 @@ export const useProductCategory = () => {
       })
       return
     }
-    if (typeChange === 'delete-all') {
-      setPendingAction('delete-all')
+    if (typeChange === 'DELETEALL') {
+      setPendingAction('DELETEALL')
       setOpen(true)
       return
     }
@@ -76,10 +77,11 @@ export const useProductCategory = () => {
   }
 
   const executeAction = async (typeChange: string) => {
-    const selectedProductsCategory = productCategories.filter(productCategory => selectedIds.includes(productCategory._id ?? ''))
-    const result: string[] = selectedProductsCategory
-      .map(productCategory => productCategory._id)
-      .filter((id): id is string => typeof id === 'string')
+    // const selectedProductsCategory = productCategories.filter(productCategory => selectedIds.includes(productCategory._id ?? ''))
+    // const result: string[] = selectedProductsCategory
+    //   .map(productCategory => productCategory._id)
+    //   .filter((id): id is string => typeof id === 'string')
+    const result = selectedIds
     const response = await fetchChangeMultiAPI({ ids: result, type: typeChange })
 
     if ([200, 204].includes(response.code)) {
@@ -102,8 +104,8 @@ export const useProductCategory = () => {
   }
 
   const handleConfirmDeleteAll = async () => {
-    if (pendingAction === 'delete-all') {
-      await executeAction('delete-all')
+    if (pendingAction === 'DELETEALL') {
+      await executeAction('DELETEALL')
     }
     setOpen(false)
   }
@@ -121,7 +123,8 @@ export const useProductCategory = () => {
   }
 
   const handleFilterStatus = useCallback((status: string) => {
-    updateParams({ status, page: 1 })
+    const urlFriendlyStatus = status.toLowerCase()
+    updateParams({ status: urlFriendlyStatus, page: 1 })
   }, [updateParams])
 
   return {

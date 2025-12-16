@@ -1,9 +1,10 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchChangeMultiAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductContext } from '~/contexts/admin/ProductContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import type { AllParams } from '~/types/helper.type'
 
 export const useProduct = () => {
   const { stateProduct, fetchProduct, dispatchProduct } = useProductContext()
@@ -14,48 +15,35 @@ export const useProduct = () => {
   const [actionType, setActionType] = useState('')
   const [open, setOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
-  const currentStatus = searchParams.get('status') || ''
-  const currentPage = parseInt(searchParams.get('page') || '1', 10)
-  const currentKeyword = searchParams.get('keyword') || ''
-  const currentSortKey = searchParams.get('sortKey') || ''
-  const currentSortValue = searchParams.get('sortValue') || ''
   const { role } = useAuth()
 
+  // Parse URL params một lần
+  const urlParams = useMemo(() => ({
+    status: searchParams.get('status') || '',
+    page: parseInt(searchParams.get('page') || '1', 10),
+    keyword: searchParams.get('keyword') || '',
+    sortKey: searchParams.get('sortKey') || '',
+    sortValue: searchParams.get('sortValue') || ''
+  }), [searchParams])
+
   useEffect(() => {
-    fetchProduct({
-      status: currentStatus,
-      page: currentPage,
-      keyword: currentKeyword,
-      sortKey: currentSortKey,
-      sortValue: currentSortValue
-    })
-  }, [currentStatus, currentPage, currentKeyword, currentSortKey, currentSortValue, fetchProduct])
+    fetchProduct(urlParams)
+  }, [urlParams.status, urlParams.page, urlParams.keyword, urlParams.sortKey, urlParams.sortValue, urlParams, fetchProduct])
 
-  const updateSearchParams = (key: string, value: string): void => {
+  const updateParams = useCallback((params: Partial<AllParams>) => {
     const newParams = new URLSearchParams(searchParams)
-    if (value) {
-      newParams.set(key, value)
-    } else {
-      newParams.delete(key)
-    }
-
-    // Nếu xóa sortKey hoặc sortValue → xóa cả 2
-    if ((key === 'sortKey' || key === 'sortValue') && !value) {
-      newParams.delete('sortKey')
-      newParams.delete('sortValue')
-    }
-
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        newParams.set(key, value.toString())
+      } else {
+        newParams.delete(key)
+      }
+    })
     setSearchParams(newParams)
-  }
+  }, [searchParams, setSearchParams])
 
   const reloadData = (): void => {
-    fetchProduct({
-      status: currentStatus,
-      page: currentPage,
-      keyword: currentKeyword,
-      sortKey: currentSortKey,
-      sortValue: currentSortValue
-    })
+    fetchProduct(urlParams)
   }
 
   const handleClose = () => {
@@ -64,8 +52,8 @@ export const useProduct = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
-
     const typeChange = actionType
+
     if (selectedIds.length === 0) {
       dispatchAlert({
         type: 'SHOW_ALERT',
@@ -125,15 +113,10 @@ export const useProduct = () => {
     setOpen(false)
   }
 
-  const handleSort = (event: ChangeEvent<HTMLSelectElement>): void => {
+  const handleSort = useCallback((event: ChangeEvent<HTMLSelectElement>): void => {
     const [sortKey, sortValue] = event.currentTarget.value.split('-')
-    if (sortKey && sortValue) {
-      const newParams = new URLSearchParams(searchParams)
-      newParams.set('sortKey', sortKey)
-      newParams.set('sortValue', sortValue)
-      setSearchParams(newParams)
-    }
-  }
+    updateParams({ sortKey, sortValue, page: 1 })
+  }, [updateParams])
 
   const clearSortParams = (): void => {
     const newParams = new URLSearchParams(searchParams)
@@ -142,16 +125,9 @@ export const useProduct = () => {
     setSearchParams(newParams)
   }
 
-  const handleFilterStatus = (status: string): void => {
-    const newParams = new URLSearchParams(searchParams)
-    if (status) {
-      newParams.set('status', status)
-      newParams.set('page', '1')
-    } else {
-      newParams.delete('status')
-    }
-    setSearchParams(newParams)
-  }
+  const handleFilterStatus = useCallback((status: string) => {
+    updateParams({ status, page: 1 })
+  }, [updateParams])
 
   return {
     dispatchProduct,
@@ -160,14 +136,14 @@ export const useProduct = () => {
     filterStatus,
     pagination,
     keyword,
-    sortKey: currentSortKey,
-    sortValue: currentSortValue,
+    sortKey: urlParams.sortKey,
+    sortValue: urlParams.sortValue,
     selectedIds,
     setSelectedIds,
     actionType,
     setActionType,
-    currentStatus,
-    updateSearchParams,
+    status: urlParams.status,
+    updateParams,
     handleSubmit,
     handleSort,
     clearSortParams,

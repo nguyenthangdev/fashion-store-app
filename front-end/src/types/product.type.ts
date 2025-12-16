@@ -1,5 +1,5 @@
 import type { AccountInfoInterface } from './account.type'
-import type { CurrentParamsInterface, GeneralInfoInterface, HelperInterface, ParamsInterface } from './helper.type'
+import type { GeneralInfoInterface, HelperInterface } from './helper.type'
 
 export interface ProductInfoInterface extends GeneralInfoInterface {
   price: number,
@@ -33,24 +33,30 @@ export interface ProductInfoInterface extends GeneralInfoInterface {
   }[]
 }
 
-export interface ProductAllResponseInterface extends HelperInterface, CurrentParamsInterface {
+export interface ProductAPIResponse extends HelperInterface {
   products: ProductInfoInterface[],
-  allProducts: ProductInfoInterface[]
+  allProducts: ProductInfoInterface[],
+  code: number,
+  message: string,
+  keyword: string
 }
 
-export interface ProductStates extends HelperInterface, ParamsInterface {
+export interface ProductStates extends HelperInterface {
   products: ProductInfoInterface[],
   allProducts: ProductInfoInterface[],
   category?: string,
   maxPrice?: string,
   color?: string,
-  size?: string
+  size?: string,
+  keyword: string
+  sortKey: string
+  sortValue: string
+  loading: boolean,
 }
 
 export type ProductActions =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_DATA'; payload: Partial<ProductStates> }
-  | { type: 'RESET' }
 
 export type ProductClientActions =
   | { type: 'SET_LOADING'; payload: boolean }

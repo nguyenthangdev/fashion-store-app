@@ -29,8 +29,6 @@ export function orderReducer(
       return { ...stateOrder, loading: actionOrder.payload }
     case 'SET_DATA':
       return { ...stateOrder, ...actionOrder.payload }
-    case 'RESET':
-      return initialOrderState
     default:
       return stateOrder
   }
