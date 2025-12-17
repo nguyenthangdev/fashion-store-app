@@ -25,6 +25,19 @@ export const index = async (req: Request, res: Response) => {
     }
     // End search
 
+    // Sort
+    let sort: Record<string, 1 | -1> = { }
+    if (req.query.sortKey) {
+      const key = req.query.sortKey.toString()
+      const dir = req.query.sortValue === 'asc' ? 1 : -1
+      sort[key] = dir
+    }
+    // luôn sort phụ theo createdAt
+    if (!sort.createdAt) {
+      sort.createdAt = -1
+    }
+    // End Sort
+
     // Pagination
     const countArticles = await Article.countDocuments(find)
     const objectPagination = paginationHelpers(
@@ -36,53 +49,24 @@ export const index = async (req: Request, res: Response) => {
       countArticles
     )
     // End Pagination
-
-    // Sort
-    const sort = {}
-    if (req.query.sortKey && req.query.sortValue) {
-      const sortKey = req.query.sortKey.toLocaleString()
-      sort[sortKey] = req.query.sortValue
-    } else {
-      sort['position'] = 'desc'
-    }
-    // End Sort
-
-    const articles = await Article
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-
-    for (const article of articles) {
-      // Lấy ra thông tin người tạo
-      const user = await Account.findOne({
-        _id: article.createdBy.account_id
-      })
-      if (user) {
-        article['accountFullName'] = user.fullName
-      }
-      // Lấy ra thông tin người cập nhật gần nhất
-      const updatedBy = article.updatedBy[article.updatedBy.length - 1]
-      if (updatedBy) {
-        const userUpdated = await Account.findOne({
-          _id: updatedBy.account_id
-        })
-        updatedBy['accountFullName'] = userUpdated.fullName
-      }
-    }
-    const accounts = await Account.find({
-      deleted: false
-    })
-
-    const allArticles = await Article.find({
-      deleted: false
-    })
+    const [articles, allArticles] = await Promise.all([
+      Article
+        .find(find)
+        .sort(sort)
+        .limit(objectPagination.limitItems)
+        .skip(objectPagination.skip)
+        .populate('createdBy.account_id', 'fullName email')
+        .populate('updatedBy.account_id', 'fullName email')
+        .lean(),
+      Article
+        .find({ deleted: false })
+        .lean()
+    ])
 
     res.json({
       code: 200,
       message: 'Thành công!',
       articles: articles,
-      accounts: accounts,
       filterStatus: filterStatusHelpers(req.query),
       keyword: objectSearch.keyword,
       pagination: objectPagination,
@@ -100,12 +84,6 @@ export const index = async (req: Request, res: Response) => {
 // [POST] /admin/articles/create
 export const createPost = async (req: Request, res: Response) => {
   try {
-    if (req.body.position == '') {
-      const countArticles = await Article.countDocuments()
-      req.body.position = countArticles + 1
-    } else {
-      req.body.position = parseInt(req.body.position)
-    }
     req.body.createdBy = {
       account_id: req['accountAdmin'].id
     }
@@ -150,7 +128,6 @@ export const detail = async (req: Request, res: Response) => {
 
 // [PATCH] /admin/articles/edit/:id
 export const editPatch = async (req: Request, res: Response) => {
-  req.body.position = parseInt(req.body.position)
   try {
     const updatedBy = {
       account_id: req['accountAdmin'].id,
@@ -188,16 +165,22 @@ export const changeStatus = async (req: Request, res: Response) => {
       account_id: req['accountAdmin'].id,
       updatedAt: new Date()
     }
-    await Article.updateOne(
-      { _id: id },
-      {
-        status: status,
-        $push: { updatedBy: updatedBy }
-      }
-    )
+    const updater = await Article
+      .findByIdAndUpdate(
+        { _id: id },
+        {
+          status: status,
+          $push: { updatedBy: updatedBy }
+        },
+        { new: true } // Trả về document sau update
+      )
+      .populate('updatedBy.account_id', 'fullName email')
+      .lean() 
+
     res.json({
       code: 200,
-      message: 'Cập nhật thành công trạng thái bài viết!'
+      message: 'Cập nhật thành công trạng thái bài viết!',
+      updater: updater
     })
   } catch (error) {
     res.json({
@@ -219,9 +202,9 @@ export const changeMulti = async (req: Request, res: Response) => {
       updatedAt: new Date()
     }
     enum Key {
-      ACTIVE = 'active',
-      INACTIVE = 'inactive',
-      DELETEALL = 'delete-all',
+      ACTIVE = 'ACTIVE',
+      INACTIVE = 'INACTIVE',
+      DELETEALL = 'DELETEALL',
     }
     switch (type) {
       case Key.ACTIVE:

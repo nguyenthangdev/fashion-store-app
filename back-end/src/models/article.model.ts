@@ -5,7 +5,10 @@ mongoose.plugin(slug)
 
 const articleSchema = new mongoose.Schema(
   {
-    title: String, // San pham 1
+    title: {
+      type: String,
+      required: true
+    },
     article_category_id: {
       type: String,
       default: ''
@@ -13,7 +16,11 @@ const articleSchema = new mongoose.Schema(
     descriptionShort: String,
     descriptionDetail: String,
     thumbnail: String,
-    status: String,
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE'],
+      default: 'ACTIVE'
+    },
     featured: String,
     slug: {
       type: String,
@@ -25,19 +32,24 @@ const articleSchema = new mongoose.Schema(
       default: false
     },
     createdBy: {
-      account_id: String,
-      createdAt: {
-        type: Date,
-        default: Date.now
+      account_id: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Account'
       }
     },
     deletedBy: {
-      account_id: String,
+       account_id: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Account'
+      },
       deletedAt: Date
     },
     updatedBy: [
       {
-        account_id: String,
+        account_id: {
+          type: mongoose.Schema.Types.ObjectId, 
+          ref: 'Account'
+      },
         updatedAt: Date
       }
     ],
@@ -47,6 +59,11 @@ const articleSchema = new mongoose.Schema(
     timestamps: true
   }
 )
+
+// INDEXES 
+articleSchema.index({ title: 1, deleted: 1 })
+articleSchema.index({ deleted: 1, status: 1, createdAt: -1 })
+
 
 const Article = mongoose.model('Article', articleSchema, 'articles')
 
