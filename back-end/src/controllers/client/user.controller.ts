@@ -1,9 +1,6 @@
 import { Request, Response } from 'express'
 import User from '~/models/user.model'
-import ForgotPassword from '~/models/forgot-password.model'
 import Cart from '~/models/cart.model'
-import md5 from 'md5'
-import * as generateHelper from '~/helpers/generate'
 import * as sendMailHelper from '~/helpers/sendMail'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
@@ -16,17 +13,8 @@ import { COOKIE_OPTIONS } from '~/utils/constants'
 // [POST] /user/register
 export const registerPost = async (req: Request, res: Response) => {
   try {
-    const { fullName, email, password, confirmPassword } = req.body
-    const isFullName = await User.findOne({
-      fullName: fullName
-    })
-    if (isFullName) {
-      res.json({
-        code: 401,
-        message: 'Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!'
-      })
-      return
-    }
+    const { fullName, email, password } = req.body
+
     const isExistEmail = await User.findOne({
       email: email
     })
@@ -37,26 +25,22 @@ export const registerPost = async (req: Request, res: Response) => {
       })
       return
     }
-    if (password !== confirmPassword) {
-      res.json({
-        code: 400,
-        message: 'Mật khẩu xác nhận không khớp!'
-      })
-      return
-    }
 
     const salt = await bcrypt.genSalt(10)
-    req.body.password = await bcrypt.hash(password, salt)
-    delete req.body.confirmPassword 
+    const hashedPassword = await bcrypt.hash(password, salt)
 
-    const user = new User(req.body)
+    const user = new User({
+      fullName: fullName,
+      email: email,
+      password: hashedPassword
+    })
     await user.save()
     res.json({
-      code: 200,
+      code: 201,
       message: 'Đăng ký tài khoản thành công, mời bạn đăng nhập lại để tiếp tục!'
     })
   } catch (error) {
-    res.json({ code: 400, message: 'Lỗi!', error: error })
+    res.json({ code: 400, message: 'Lỗi!' })
   }
 }
 
@@ -210,8 +194,6 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
     //   Mã OTP để lấy lại mật khẩu là <b>${otp}</b>. Thời hạn sử dụng là 2 phút.
     // `
 
-    // Tạo link reset (Giả sử frontend của bạn có route /user/password/reset)
-    // BẠN CẦN THÊM BIẾN NÀY VÀO FILE .env
     const clientUrl = process.env.CLIENT_URL
     const resetLink = `${clientUrl}/user/password/reset?token=${resetToken}`
 

@@ -4,7 +4,8 @@ import Chat from '~/models/chat.model'
 // Lấy danh sách tất cả các cuộc trò chuyện
 export const getAdminChatRooms = async (req: Request, res: Response) => {
   try {
-    const chatRooms = await Chat.find()
+    const chatRooms = await Chat
+      .find()
       .populate('user_id', 'fullName avatar') // Lấy thông tin user
       .sort({ lastMessageAt: -1 }) // Sắp xếp theo tin nhắn mới nhất
       .lean() // Dùng .lean() để tăng tốc độ
@@ -22,7 +23,8 @@ export const getAdminChatRooms = async (req: Request, res: Response) => {
 export const getAdminChatHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId
-    const chat = await Chat.findOne({ user_id: userId })
+    const chat = await Chat
+      .findOne({ user_id: userId })
       .populate('user_id', 'fullName avatar')
 
     if (!chat) {
