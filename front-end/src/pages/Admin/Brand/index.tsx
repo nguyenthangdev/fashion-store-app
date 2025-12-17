@@ -3,7 +3,7 @@
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { fetchAllBrandsAPI, deleteBrandAPI } from '~/apis/admin/brand.api'
+import { deleteBrandAPI, fetchBrandAPI } from '~/apis/admin/brand.api'
 import type { Brand } from '~/types/brand.type'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -21,7 +21,7 @@ const BrandAdmin = () => {
   const loadBrands = async (currentPage = 1) => {
     setLoading(true)
     try {
-      const res = await fetchAllBrandsAPI(currentPage)
+      const res = await fetchBrandAPI(currentPage)
       if (res.code === 200) {
         setBrands(res.brands)
         setPagination(res.pagination)

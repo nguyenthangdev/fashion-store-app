@@ -1,12 +1,16 @@
 import type { AccountInfoInterface } from './account.type'
 
 export interface UpdatedBy {
-  account_id: string,
+  account_id: AccountInfoInterface | string,
   updatedAt: Date | null
 }
 
+export interface CreatedBy {
+  account_id: AccountInfoInterface | string
+  fullName?: string
+}
 export interface DeletedBy {
-  account_id: string,
+  account_id: AccountInfoInterface | string,
   deletedAt: Date | null
 }
 
@@ -55,15 +59,18 @@ export interface AllParams {
 
 export interface GeneralInfoInterface {
   _id?: string,
-  createdBy: {
-    account_id: string,
-  },
-  updatedBy: UpdatedBy[],
   title: string,
   thumbnail: string,
   status: string,
   slug?: string,
+  createdBy: CreatedBy
   createdAt: Date | null
+  updatedBy: UpdatedBy[],
   updatedAt: Date | null,
   deletedBy: DeletedBy,
+  lastUpdatedBy?: {
+    account_id: string
+    fullName: string
+    updatedAt: Date | null
+  }
 }

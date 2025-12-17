@@ -19,3 +19,25 @@ export const PRODUCTCATEGORY_STATUSES_CHANGEMULTI = [
   { value: 'INACTIVE', label: 'Ngừng hoạt động' },
   { value: 'DELETEALL', label: 'Xóa tất cả' }
 ]
+
+export const PRODUCTCATEGORYTRASH_STATUSES_CHANGEMULTI = [
+  { value: 'RECOVER', label: 'Khôi phục' },
+  { value: 'DELETEALL', label: 'Xóa vĩnh viễn' }
+]
+
+export const PRODUCT_STATUSES_CHANGEMULTI = [
+  { value: 'ACTIVE', label: 'Hoạt động' },
+  { value: 'INACTIVE', label: 'Ngừng hoạt động' },
+  { value: 'DELETEALL', label: 'Xóa tất cả' }
+]
+
+export const PRODUCTTRASH_STATUSES_CHANGEMULTI = [
+  { value: 'RECOVER', label: 'Khôi phục' },
+  { value: 'DELETEALL', label: 'Xóa vĩnh viễn' }
+]
+
+export const ARTICLECATEGORY_STATUSES_CHANGEMULTI = [
+  { value: 'ACTIVE', label: 'Hoạt động' },
+  { value: 'INACTIVE', label: 'Ngừng hoạt động' },
+  { value: 'DELETEALL', label: 'Xóa tất cả' }
+]

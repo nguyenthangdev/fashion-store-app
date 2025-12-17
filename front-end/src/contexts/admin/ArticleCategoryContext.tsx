@@ -1,20 +1,16 @@
+/* eslint-disable no-console */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable no-unused-vars */
 import { createContext, useContext, useReducer, useCallback, useEffect } from 'react'
-import { fetchAllArticleCategoriesAPI } from '~/apis/admin/articleCategory.api'
 import { initialState, articleCategoryReducer } from '~/reducers/admin/articleCategory'
-import type { ArticleCategoryActions, ArticleCategoryAllResponseInterface, ArticleCategoryStates } from '~/types/articleCategory.type'
+import type { ArticleCategoryActions, ArticleCategoryAPIResponse, ArticleCategoryStates } from '~/types/articleCategory.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import type { AllParams } from '~/types/helper.type'
+import { fetchArticleCategoryAPI } from '~/apis/admin/articleCategory.api'
 
 interface ArticleCategoryContextType {
   stateArticleCategory: ArticleCategoryStates
-  fetchArticleCategory: (params?: {
-    status?: string
-    page?: number
-    keyword?: string
-    sortKey?: string
-    sortValue?: string
-  }) => Promise<void>
+  fetchArticleCategory: (params?: AllParams) => Promise<void>
   dispatchArticleCategory: React.Dispatch<ArticleCategoryActions>
 }
 
@@ -26,22 +22,10 @@ export const ArticleCategoryProvider = ({ children }: { children: React.ReactNod
   const isAuthLoading = isLoading
 
   const fetchArticleCategory = useCallback(
-    async ({
-      status = '',
-      page = 1,
-      keyword = '',
-      sortKey = '',
-      sortValue = ''
-    } = {}) => {
+    async (params: AllParams = {}) => {
       dispatchArticleCategory({ type: 'SET_LOADING', payload: true })
       try {
-        const res: ArticleCategoryAllResponseInterface = await fetchAllArticleCategoriesAPI(
-          status,
-          page,
-          keyword,
-          sortKey,
-          sortValue
-        )
+        const res: ArticleCategoryAPIResponse = await fetchArticleCategoryAPI(params)
         dispatchArticleCategory({
           type: 'SET_DATA',
           payload: {
@@ -51,14 +35,17 @@ export const ArticleCategoryProvider = ({ children }: { children: React.ReactNod
             pagination: res.pagination,
             filterStatus: res.filterStatus,
             keyword: res.keyword,
-            sortKey,
-            sortValue
+            sortKey: params.sortKey || '',
+            sortValue: params.sortValue || ''
           }
         })
+      } catch (error) {
+        console.error('Error fetching ProductCategory:', error)
       } finally {
         dispatchArticleCategory({ type: 'SET_LOADING', payload: false })
       }
     }, [])
+
   // Gọi APi của article-category bên các trang khác
   useEffect(() => {
     //  Chỉ gọi API khi đã xác thực VÀ AuthContext không còn loading

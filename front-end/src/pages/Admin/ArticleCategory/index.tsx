@@ -11,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
+import { ARTICLECATEGORY_STATUSES_CHANGEMULTI } from '~/utils/constants'
 
 const ArticleCategoryAdmin = () => {
   const {
@@ -24,8 +25,8 @@ const ArticleCategoryAdmin = () => {
     setSelectedIds,
     actionType,
     setActionType,
-    currentStatus,
-    updateSearchParams,
+    status,
+    updateParams,
     handleSubmit,
     handleSort,
     clearSortParams,
@@ -47,68 +48,74 @@ const ArticleCategoryAdmin = () => {
             <div className='flex items-center justify-between text-[15px]'>
               <FilterStatus
                 filterStatus={filterStatus}
-                currentStatus={currentStatus}
+                currentStatus={status}
                 handleFilterStatus={handleFilterStatus}
                 items={allArticleCategories}
               />
               <Search
                 keyword={keyword}
                 handleChangeKeyword={(value) => dispatchArticleCategory({ type: 'SET_DATA', payload: { keyword: value } })}
-                handleSearch={(keyword) => updateSearchParams('keyword', keyword)}
+                handleSearch={(keyword) => updateParams({ keyword })}
               />
             </div>
           </div>
           <div className='flex items-center justify-between text-[15px]'>
-            <form onSubmit={(event) => handleSubmit(event)} className='flex gap-[5px]'>
-              <select
-                name="type"
-                id=""
-                value={actionType}
-                onChange={(e) => setActionType(e.target.value)}
-                className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
-              >
-                <option disabled value={''}>-- Chọn hành động --</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Dừng hoạt động</option>
-                <option value="delete-all">Xóa tất cả</option>
-              </select>
-              <button
-                type='submit'
-                className='border rounded-[5px] border-[#9D9995] p-[5px] bg-[#96D5FE]'>
+            <div className='flex items-center justify-center gap-[15px]'>
+              <form onSubmit={(event) => handleSubmit(event)} className='flex gap-[5px]'>
+                <select
+                  name="type"
+                  id=""
+                  value={actionType}
+                  onChange={(e) => setActionType(e.target.value)}
+                  className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
+                >
+                  <option disabled value={''}>-- Chọn hành động --</option>
+                  {ARTICLECATEGORY_STATUSES_CHANGEMULTI.map((status, idx) => (
+                    <option key={idx} value={status.value}>{status.label}</option>
+                  ))}
+                </select>
+                <button
+                  type='submit'
+                  className='border rounded-[5px] border-[#9D9995] p-[5px] bg-[#96D5FE]'>
                 Áp dụng
-              </button>
-              <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="delete-dialog-title"
-              >
-                <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
-                <DialogContent>
-                  <DialogContentText>
+                </button>
+                <Dialog
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="delete-dialog-title"
+                >
+                  <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
                     Bạn có chắc chắn muốn xóa {selectedIds.length} danh mục bài viết này không?
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose}>Hủy</Button>
-                  <Button onClick={handleConfirmDeleteAll} color="error" variant="contained">
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Hủy</Button>
+                    <Button onClick={handleConfirmDeleteAll} color="error" variant="contained">
                     óa
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            </form>
-            <SortRecords
-              handleSort={handleSort}
-              sortKey={sortKey}
-              sortValue={sortValue}
-              clearSortParams={clearSortParams}
-            />
-            <div>
-              <Link
-                to={'/admin/articles-category/create'}
-                className='nav-link border rounded-[5px] px-[15px] py-[5px] border-[#607D00] font-[700] bg-[#607D00] text-white'
-              >
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+              </form>
+              <div className='border rounded-[5px] p-[5px]'>Đã chọn: {selectedIds.length}</div>
+            </div>
+
+            <div className='flex items-center justify-center gap-[15px]'>
+              <SortRecords
+                handleSort={handleSort}
+                sortKey={sortKey}
+                sortValue={sortValue}
+                clearSortParams={clearSortParams}
+              />
+              <div>
+                <Link
+                  to={'/admin/articles-category/create'}
+                  className='nav-link border rounded-[5px] px-[15px] py-[5px] border-[#607D00] font-[700] bg-[#607D00] text-white'
+                >
                 + Thêm mới
-              </Link>
+                </Link>
+              </div>
             </div>
           </div>
           <ArticleCategoryTable
@@ -117,9 +124,9 @@ const ArticleCategoryAdmin = () => {
           />
           <Pagination
             pagination={pagination}
-            handlePagination={(page: number) => updateSearchParams('page', (page).toString())}
-            handlePaginationPrevious={(page: number) => updateSearchParams('page', (page - 1).toString())}
-            handlePaginationNext={(page: number) => updateSearchParams('page', (page + 1).toString())}
+            handlePagination={(page: number) => updateParams({ page })}
+            handlePaginationPrevious={(page: number) => updateParams({ page: page - 1 })}
+            handlePaginationNext={(page: number) => updateParams({ page: page + 1 })}
             items={articleCategories}
           />
         </div>

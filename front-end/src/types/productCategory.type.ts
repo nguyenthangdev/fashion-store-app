@@ -1,4 +1,5 @@
 import type { GeneralInfoInterface, HelperInterface } from './helper.type'
+import type { ProductInfoInterface } from './product.type'
 
 export interface ProductCategoryInfoInterface extends GeneralInfoInterface {
   children: ProductCategoryInfoInterface[] | [],
@@ -30,4 +31,14 @@ export type ProductCategoryActions =
 
 export interface ProductCategoryDetailInterface {
   productCategory: ProductCategoryInfoInterface
+}
+
+export interface ProductCategoryForm {
+  title: string
+  status: string
+  description: string
+  thumbnail: string
+  children: ProductInfoInterface[]
+  slug: string
+  parent_id: string
 }

@@ -21,9 +21,9 @@ export interface Brand extends GeneralInfoInterface {
 // --- Brand Group (Dữ liệu trả về từ API Client) ---
 // Đây là kiểu dữ liệu mà aggregation pipeline trong brand.controller.ts trả về
 export interface BrandGroup {
-  categoryTitle: string;
-  categorySlug?: string;
-  brands: Brand[];
+  categoryTitle: string
+  categorySlug?: string
+  brands: Brand[]
 }
 
 export interface BrandsClientResponseInterface {
@@ -48,3 +48,9 @@ export type BrandActions =
   | { type: 'SET_DATA'; payload: Partial<BrandStates> }
   | { type: 'RESET' }
 
+
+export interface BranchApiResponse {
+  code: number
+  message: string
+  [key: string]: any
+}

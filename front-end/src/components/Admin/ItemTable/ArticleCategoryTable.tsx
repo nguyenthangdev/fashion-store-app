@@ -29,7 +29,8 @@ const ArticleCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     open,
     handleOpen,
-    handleClose
+    handleClose,
+    pagination
   } = useTable({ selectedIds, setSelectedIds })
 
   if (loading) {
@@ -51,6 +52,9 @@ const ArticleCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
                   size="small"
                   sx={{ padding: 0 }}
                 />
+              </TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>
+                STT
               </TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>
                 Hình ảnh
@@ -138,6 +142,7 @@ const ArticleCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
                     sx={{ padding: 0 }}
                   />
                 </TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>STT</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tiêu đề</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
@@ -147,9 +152,11 @@ const ArticleCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {articleCategories.map(articleCategory => (
+              {articleCategories.map((articleCategory, idx) => (
                 <ArticleTree
                   key={articleCategory._id}
+                  index={idx}
+                  pagination={pagination}
                   articleCategory={articleCategory}
                   level={1}
                   selectedIds={selectedIds}

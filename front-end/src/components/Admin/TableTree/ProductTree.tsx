@@ -3,15 +3,15 @@ import { TableRow, TableCell, Checkbox } from '@mui/material'
 import { Link } from 'react-router-dom'
 import FormatDateTime from '../Moment/FormatDateTime'
 import type { ProductCategoryActions, ProductCategoryInfoInterface } from '~/types/productCategory.type'
-import type { AccountInfoInterface } from '~/types/account.type'
+import type { PaginationInterface } from '~/types/helper.type'
 
 interface Props {
   index: number // Vị trí trong cùng cấp
+  pagination: PaginationInterface | null
   parentNumber?: string // STT của cha, ví dụ: "2" hoặc "2.1"
   productCategory: ProductCategoryInfoInterface
   level: number
   selectedIds: string[]
-  accounts: AccountInfoInterface[]
   handleCheckbox: (_id: string, checked: boolean) => void
   handleToggleStatus: (_id: string, status: string) => void
   dispatchProductCategory: React.Dispatch<ProductCategoryActions>
@@ -24,11 +24,11 @@ interface Props {
 
 const ProductTree = ({
   index,
+  pagination,
   parentNumber,
   productCategory,
   level,
   selectedIds,
-  accounts,
   handleCheckbox,
   handleToggleStatus,
   dispatchProductCategory,
@@ -39,12 +39,12 @@ const ProductTree = ({
   handleDelete
 }: Props) => {
   const prefix = '— '.repeat(level)
-  const updatedBy = productCategory.updatedBy.at(-1)
-  const creator = accounts.find((account) => account._id === productCategory.createdBy.account_id)
-  const updater = accounts.find((account) => account._id === updatedBy?.account_id)
-
+  const lastUpdaterName = productCategory.lastUpdatedBy // Người cập nhật gần nhất
+  const creatorName = productCategory.createdBy // Người tạo
+  const baseIndex = pagination ? (pagination.currentPage - 1) * pagination.limitItems : 0
+  const displayIndex = baseIndex + index + 1
   // Tạo số thứ tự phân cấp
-  const currentNumber = parentNumber ? `${parentNumber}.${index + 1}` : `${index + 1}`
+  const currentNumber = parentNumber ? `${parentNumber}.${displayIndex}` : `${displayIndex}`
 
   return (
     <>
@@ -84,9 +84,9 @@ const ProductTree = ({
           </button>
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
-          {creator ? (
+          {creatorName ? (
             <>
-              <p className="text-sm font-medium text-gray-800">{creator.fullName}</p>
+              <p className="text-sm font-medium text-gray-800">{creatorName.fullName}</p>
               <FormatDateTime time={productCategory.createdAt} />
             </>
           ) : (
@@ -94,18 +94,15 @@ const ProductTree = ({
           )}
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
-          {updatedBy ? (
-            updater ? (
-              <>
-                <p className="text-sm font-medium text-gray-800">{updater.fullName}</p>
-                <FormatDateTime time={updatedBy.updatedAt} />
-              </>
-            ) : (
-              <p className="text-sm italic text-gray-400">Không xác định</p>
-            )
+          {lastUpdaterName ? (
+            <>
+              <p className="text-sm font-medium text-gray-800">{lastUpdaterName.fullName}</p>
+              <FormatDateTime time={lastUpdaterName.updatedAt} />
+            </>
           ) : (
-            <p className="text-xs italic text-gray-400">Chưa có ai cập nhật</p>
-          )}
+            <p className="text-sm italic text-gray-400">Chưa có ai cập nhật</p>
+          )
+          }
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
           <Link
@@ -132,11 +129,11 @@ const ProductTree = ({
         <ProductTree
           key={idx}
           index={idx}
+          pagination={pagination}
           parentNumber={currentNumber}
           productCategory={child}
           level={level + 1}
           selectedIds={selectedIds}
-          accounts={accounts}
           handleCheckbox={handleCheckbox}
           handleToggleStatus={handleToggleStatus}
           handleDelete={handleDelete}

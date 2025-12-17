@@ -19,6 +19,7 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import { getTotalBill } from '~/helpers/totalBill'
 import type { OrderStatus } from '~/types/order.type'
+import type { AccountInfoInterface } from '~/types/account.type'
 
 const OrderTable = ({ selectedIds, setSelectedIds, filterOrder }: Props) => {
 
@@ -32,7 +33,6 @@ const OrderTable = ({ selectedIds, setSelectedIds, filterOrder }: Props) => {
     handleCheckbox,
     handleCheckAll,
     isCheckAll,
-    accounts,
     handleDelete,
     pagination
   } = useTable({ selectedIds, setSelectedIds, filterOrder })
@@ -228,7 +228,7 @@ const OrderTable = ({ selectedIds, setSelectedIds, filterOrder }: Props) => {
                           )
                         }
                         if (Array.isArray(order.updatedBy) && order.updatedBy.length > 0) {
-                          const updater = (accounts ?? []).find((account) => account._id === updatedBy.account_id)
+                          const updater = updatedBy?.account_id as AccountInfoInterface
                           return updater ? (
                             <>
                               <span className="text-sm font-medium text-gray-800">

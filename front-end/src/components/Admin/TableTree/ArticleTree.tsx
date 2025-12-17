@@ -4,9 +4,13 @@ import { Link } from 'react-router-dom'
 import FormatDateTime from '../Moment/FormatDateTime'
 import type { ArticleCategoryActions, ArticleCategoryInfoInterface } from '~/types/articleCategory.type'
 import type { AccountInfoInterface } from '~/types/account.type'
+import type { PaginationInterface } from '~/types/helper.type'
 
 interface Props {
   articleCategory: ArticleCategoryInfoInterface
+  index: number // Vị trí trong cùng cấp
+  pagination: PaginationInterface | null
+  parentNumber?: string // STT của cha, ví dụ: "2" hoặc "2.1"
   level: number
   selectedIds: string[]
   accounts: AccountInfoInterface[]
@@ -21,6 +25,9 @@ interface Props {
 }
 
 const ArticleTree = ({
+  index,
+  pagination,
+  parentNumber,
   articleCategory,
   level,
   selectedIds,
@@ -36,9 +43,16 @@ const ArticleTree = ({
 }: Props) => {
   const prefix = '— '.repeat(level)
 
-  const updatedBy = articleCategory.updatedBy.at(-1)
-  const creator = accounts.find((account) => account._id === articleCategory.createdBy.account_id)
-  const updater = accounts.find((account) => account._id === updatedBy?.account_id)
+  // const updatedBy = articleCategory.updatedBy.at(-1)
+  // const creator = accounts.find((account) => account._id === articleCategory.createdBy.account_id)
+  // const updater = accounts.find((account) => account._id === updatedBy?.account_id)
+
+  const lastUpdaterName = articleCategory.lastUpdatedBy // Người cập nhật gần nhất
+  const creatorName = articleCategory.createdBy // Người tạo
+  const baseIndex = pagination ? (pagination.currentPage - 1) * pagination.limitItems : 0
+  const displayIndex = baseIndex + index + 1
+  // Tạo số thứ tự phân cấp
+  const currentNumber = parentNumber ? `${parentNumber}.${displayIndex}` : `${displayIndex}`
 
   return (
     <>
@@ -50,6 +64,9 @@ const ArticleTree = ({
             size="small"
             sx={{ padding: 0 }}
           />
+        </TableCell>
+        <TableCell align="center" sx={{ padding: '0px 2px' }}>
+          {currentNumber}
         </TableCell>
         <TableCell align="center" sx={{ padding: '10px 0px' }}>
           <div className="flex justify-center items-center">
@@ -69,15 +86,15 @@ const ArticleTree = ({
           <button
             onClick={() => handleToggleStatus(articleCategory.status, articleCategory._id ?? '')}
             className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
-              ${articleCategory.status === 'active' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
+              ${articleCategory.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
           >
-            {articleCategory.status === 'active' ? 'Hoạt động' : 'Ngừng hoạt động'}
+            {articleCategory.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
           </button>
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
-          {creator ? (
+          {creatorName ? (
             <>
-              <p className="text-sm font-medium text-gray-800">{creator.fullName}</p>
+              <p className="text-sm font-medium text-gray-800">{creatorName.fullName}</p>
               <FormatDateTime time={articleCategory.createdAt} />
             </>
           ) : (
@@ -85,17 +102,13 @@ const ArticleTree = ({
           )}
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
-          {updatedBy ? (
-            updater ? (
-              <>
-                <p className="text-sm font-medium text-gray-800">{updater.fullName}</p>
-                <FormatDateTime time={articleCategory.updatedAt} />
-              </>
-            ) : (
-              <p className="text-sm italic text-gray-400">Không xác định</p>
-            )
+          {lastUpdaterName ? (
+            <>
+              <p className="text-sm font-medium text-gray-800">{lastUpdaterName.fullName}</p>
+              <FormatDateTime time={lastUpdaterName.updatedAt} />
+            </>
           ) : (
-            <p className="text-xs italic text-gray-400">Chưa có ai cập nhật</p>
+            <p className="text-sm italic text-gray-400">Chưa có ai cập nhật</p>
           )}
         </TableCell>
         <TableCell align="center" sx={{ padding: '6px 0px' }}>
@@ -119,9 +132,12 @@ const ArticleTree = ({
           </button>
         </TableCell>
       </TableRow>
-      {articleCategory.children?.map((child) => (
+      {articleCategory.children?.map((child, idx) => (
         <ArticleTree
-          key={child._id}
+          key={idx}
+          index={idx}
+          pagination={pagination}
+          parentNumber={currentNumber}
           articleCategory={child}
           level={level + 1}
           selectedIds={selectedIds}

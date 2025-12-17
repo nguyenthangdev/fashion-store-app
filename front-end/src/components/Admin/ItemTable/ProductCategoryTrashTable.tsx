@@ -14,10 +14,10 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
-import { useTableTrash } from '~/hooks/Admin/ProductCategory/useTableTrash'
+import { useTableTrash } from '~/hooks/Admin/ProductCategory/useTrashTable'
 import ProductCategoryTrashTree from '../TableTree/ProductCategoryTrashTree'
 
-const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
+const ProductCategoryTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
   const {
     loading,
     productCategories,
@@ -162,7 +162,7 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
               <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Bạn có chắc chắn muốn xóa vĩnh viễn danh mục này không?
+                  Bạn có chắc chắn muốn xóa vĩnh viễn danh mục sản phẩm này không?
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
@@ -181,4 +181,4 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
   )
 }
 
-export default ProductCategoryTable
+export default ProductCategoryTrashTable

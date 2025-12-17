@@ -30,7 +30,6 @@ export const OrderTrashProvider = ({ children }: { children: React.ReactNode }) 
         type: 'SET_DATA',
         payload: {
           orders: res.orders,
-          accounts: res.accounts,
           pagination: res.pagination,
           keyword: res.keyword,
           sortKey: params.sortKey || '',

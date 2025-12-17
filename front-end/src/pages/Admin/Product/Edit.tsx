@@ -3,6 +3,7 @@ import { API_KEY } from '~/utils/constants'
 import { useEdit } from '~/hooks/Admin/Product/useEdit'
 import SelectTree from '~/components/Admin/TableTree/SelectTreeProduct'
 import Skeleton from '@mui/material/Skeleton'
+import { Link } from 'react-router-dom'
 
 const EditProduct = () => {
   const {
@@ -270,20 +271,6 @@ const EditProduct = () => {
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="position">Vị trí</label>
-              <input
-                onChange={(event) => setProductInfo({ ...productInfo, position: Number(event.target.value) })}
-                type="number"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                min={1}
-                className='text-[16px] py-[3px]'
-                value={productInfo?.position ?? ''}
-              />
-            </div>
-
             <div className="flex items-center justify-start gap-[10px] text-[16px]">
               <div className="flex gap-[5px]">
                 <input
@@ -292,8 +279,8 @@ const EditProduct = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusActive"
                   name="status"
-                  value={'active'}
-                  checked={productInfo.status === 'active' ? true : false}
+                  value={'ACTIVE'}
+                  checked={productInfo.status === 'ACTIVE' ? true : false}
                 />
                 <label htmlFor="statusActive">Hoạt động</label>
               </div>
@@ -305,19 +292,27 @@ const EditProduct = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusInActive"
                   name="status"
-                  value={'inactive'}
-                  checked={productInfo.status === 'inactive' ? true : false}
+                  value={'INACTIVE'}
+                  checked={productInfo.status === 'INACTIVE' ? true : false}
                 />
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="w-[5%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
-            >
-            Cập nhật
-            </button>
+            <div className='flex items-center justify-start text-center gap-[5px]'>
+              <Link
+                to="/admin/products"
+                className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
+              >
+              Quay lại
+              </Link>
+              <button
+                type="submit"
+                className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
+              >
+              Cập nhật
+              </button>
+            </div>
           </form>
         ) : (
           <>

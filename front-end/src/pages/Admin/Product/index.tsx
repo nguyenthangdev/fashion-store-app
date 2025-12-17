@@ -12,6 +12,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import { FaTrashAlt } from 'react-icons/fa'
+import { PRODUCT_STATUSES_CHANGEMULTI } from '~/utils/constants'
 
 const ProductAdmin = () => {
   const {
@@ -69,9 +70,9 @@ const ProductAdmin = () => {
                   className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
                 >
                   <option disabled value={''}>-- Chọn hành động --</option>
-                  <option value="active">Hoạt động</option>
-                  <option value="inactive">Dừng hoạt động</option>
-                  <option value="delete-all">Xóa</option>
+                  {PRODUCT_STATUSES_CHANGEMULTI.map((status, idx) => (
+                    <option key={idx} value={status.value}>{status.label}</option>
+                  ))}
                 </select>
                 <button
                   type="submit"
@@ -122,7 +123,6 @@ const ProductAdmin = () => {
                 </Link>
               </div>
             </div>
-
           </div>
           <ProductTable
             selectedIds={selectedIds}

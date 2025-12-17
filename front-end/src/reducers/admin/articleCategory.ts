@@ -10,7 +10,8 @@ export const initialState: ArticleCategoryStates = {
     currentPage: 1,
     limitItems: 3,
     skip: 0,
-    totalPage: 0
+    totalPage: 0,
+    totalItems: 0
   },
   keyword: '',
   sortKey: '',

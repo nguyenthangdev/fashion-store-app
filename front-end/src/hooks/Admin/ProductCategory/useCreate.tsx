@@ -3,32 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { fetchCreateProductCategoryAPI } from '~/apis/admin/productCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryContext'
-import type { ProductCategoryInfoInterface } from '~/types/productCategory.type'
+import type { ProductCategoryForm } from '~/types/productCategory.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
 export const useCreate = () => {
-  const initialProductCategory: ProductCategoryInfoInterface = {
-    _id: '',
+  const initialProductCategory: ProductCategoryForm = {
     title: '',
     status: 'ACTIVE',
     description: '',
     thumbnail: '',
-    createdBy: {
-      account_id: ''
-    },
-    updatedBy: [],
     children: [],
     slug: '',
-    parent_id: '',
-    createdAt: null,
-    updatedAt: null,
-    deletedBy: {
-      account_id: '',
-      deletedAt: null
-    }
+    parent_id: ''
   }
 
-  const [productCategoryInfo, setProductCategoryInfo] = useState<ProductCategoryInfoInterface>(initialProductCategory)
+  const [productCategoryInfo, setProductCategoryInfo] = useState<ProductCategoryForm>(initialProductCategory)
   const { stateProductCategory } = useProductCategoryContext()
   const { dispatchAlert } = useAlertContext()
   const { allProductCategories } = stateProductCategory
@@ -56,7 +45,6 @@ export const useCreate = () => {
     }
     const response = await fetchCreateProductCategoryAPI(formData)
     if (response.code === 201) {
-      setProductCategoryInfo(response.data)
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }

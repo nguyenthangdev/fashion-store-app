@@ -1,75 +1,61 @@
-import { fetchChangeStatusAPI, fetchDeleteProductAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import { useProductContext } from '~/contexts/admin/ProductContext'
-import { useSearchParams } from 'react-router-dom'
 import { useState } from 'react'
+import { useProductTrashContext } from '~/contexts/admin/ProductTrashContext'
+import { fetchPermanentlyDeleteProductAPI, fetchRecoverProductAPI } from '~/apis/admin/product.api'
 
 export interface Props {
   selectedIds: string[],
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>
 }
 
-export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
-  const { stateProduct, dispatchProduct } = useProductContext()
+export const useTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
+  const { stateProduct, dispatchProduct } = useProductTrashContext()
   const { products, loading, pagination } = stateProduct
   const { dispatchAlert } = useAlertContext()
-  const [searchParams] = useSearchParams()
-  const currentStatus = searchParams.get('status') || ''
-  const [open, setOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [openPermanentlyDelete, setOpenPermanentlyDelete] = useState(false)
+  const [selectedIdPermanentlyDelete, setSelectedIdPermanentlyDelete] = useState<string | null>(null)
 
-  const handleOpen = (id: string) => {
-    setSelectedId(id)
-    setOpen(true)
+  const handleOpenPermanentlyDelete = (id: string) => {
+    setSelectedIdPermanentlyDelete(id)
+    setOpenPermanentlyDelete(true)
   }
 
-  const handleClose = () => {
-    setSelectedId(null)
-    setOpen(false)
+  const handleClosePermanentlyDelete = () => {
+    setSelectedIdPermanentlyDelete(null)
+    setOpenPermanentlyDelete(false)
   }
 
-  const handleDelete = async () => {
-    if (!selectedId) return
+  const handlePermanentlyDelete = async () => {
+    if (!selectedIdPermanentlyDelete) return
 
-    const response = await fetchDeleteProductAPI(selectedId)
+    const response = await fetchPermanentlyDeleteProductAPI(selectedIdPermanentlyDelete)
     if (response.code === 204) {
       dispatchProduct({
         type: 'SET_DATA',
         payload: {
-          products: products.filter((product) => product._id !== selectedId)
+          products: products.filter((product) => product._id !== selectedIdPermanentlyDelete)
         }
       })
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }
       })
-      setOpen(false)
+      setOpenPermanentlyDelete(false)
     } else if (response.code === 400) {
       alert('error: ' + response.error)
       return
     }
   }
 
-  const handleToggleStatus = async (id: string, currentStatus: string): Promise<void> => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusAPI(newStatus, id)
+  const handleRecover = async (id: string) => {
+    if (!id) return
+
+    const response = await fetchRecoverProductAPI(id)
     if (response.code === 200) {
-      const updateProduct = response
-      const updatedAllProducts = stateProduct.allProducts.map(product =>
-        product._id === id
-          ? updateProduct.updater
-          : product
-      )
-      const updatedProducts = stateProduct.products.map(product =>
-        product._id === id
-          ? updateProduct.updater
-          : product
-      )
       dispatchProduct({
         type: 'SET_DATA',
         payload: {
-          products: updatedProducts,
-          allProducts: updatedAllProducts
+          products: products.filter((product) => product._id !== id)
         }
       })
       dispatchAlert({
@@ -105,19 +91,16 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const isCheckAll = (products.length > 0) && (selectedIds.length === products.length)
 
   return {
-    currentStatus,
     products,
     loading,
-    dispatchProduct,
-    handleToggleStatus,
-    open,
-    handleOpen,
-    handleClose,
-    handleDelete,
+    openPermanentlyDelete,
+    handleOpenPermanentlyDelete,
+    handleClosePermanentlyDelete,
     handleCheckbox,
     handleCheckAll,
     isCheckAll,
-    selectedId,
+    handleRecover,
+    handlePermanentlyDelete,
     pagination
   }
 }

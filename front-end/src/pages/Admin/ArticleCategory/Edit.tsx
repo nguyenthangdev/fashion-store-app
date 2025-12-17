@@ -3,6 +3,7 @@ import { API_KEY } from '~/utils/constants'
 import { useEdit } from '~/hooks/Admin/articleCategory/useEdit'
 import SelectTree from '~/components/Admin/TableTree/SelectTreeArticle'
 import Skeleton from '@mui/material/Skeleton'
+import { Link } from 'react-router-dom'
 
 const EditArticleCategory = () => {
   const {
@@ -116,20 +117,6 @@ const EditArticleCategory = () => {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="position">Vị trí</label>
-              <input
-                onChange={(event) => setArticleCategoryInfo(articleCategoryInfo ? { ...articleCategoryInfo, position: Number(event.target.value) }: articleCategoryInfo)}
-                type="number"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                min={1}
-                className='py-[3px] text-[16px]'
-                value={articleCategoryInfo.position}
-              />
-            </div>
-
             <div className="flex items-center justify-start gap-[10px]">
               <div className="flex gap-[5px]">
                 <input
@@ -138,8 +125,8 @@ const EditArticleCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusActive"
                   name="status"
-                  value={'active'}
-                  checked={articleCategoryInfo.status === 'active' ? true : false}
+                  value={'ACTIVE'}
+                  checked={articleCategoryInfo.status === 'ACTIVE' ? true : false}
                 />
                 <label htmlFor="statusActive">Hoạt động</label>
               </div>
@@ -151,19 +138,27 @@ const EditArticleCategory = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusInActive"
                   name="status"
-                  value={'inactive'}
-                  checked={articleCategoryInfo.status === 'inactive' ? true : false}
+                  value={'INACTIVE'}
+                  checked={articleCategoryInfo.status === 'INACTIVE' ? true : false}
                 />
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="w-[5%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
-            >
+            <div className='flex items-center justify-start text-center gap-[5px]'>
+              <Link
+                to="/admin/articles-category"
+                className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
+              >
+              Quay lại
+              </Link>
+              <button
+                type="submit"
+                className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
+              >
               Cập nhật
-            </button>
+              </button>
+            </div>
           </form>
         ) : (
           <div className="flex flex-col gap-[15px] text-[17px] font-[500] bg-[#FFFFFF] p-[15px] shadow-md">

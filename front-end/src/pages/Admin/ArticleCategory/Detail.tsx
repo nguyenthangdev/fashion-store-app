@@ -34,14 +34,10 @@ const DetailArticleCategory = () => {
                 <div>
                   <b>Trạng thái:</b>
                   {
-                    articleCategoryDetail.status === 'active' ?
+                    articleCategoryDetail.status === 'ACTIVE' ?
                       <span className="text-green-500 font-[600]">Hoạt động</span> :
                       <span className="text-red-500 font-[600]"> Dừng hoạt động</span>
                   }
-                </div>
-                <div>
-                  <b>Vị trí: </b>
-                  {articleCategoryDetail.position}
                 </div>
                 <div className='flex items-center gap-[5px]'>
                   <b>Mô tả ngắn: </b>
@@ -51,12 +47,20 @@ const DetailArticleCategory = () => {
                   <b>Mô tả chi tiết: </b>
                   <span dangerouslySetInnerHTML={{ __html: articleCategoryDetail.descriptionDetail }} />
                 </div>
-                <Link
-                  to={`/admin/articles-category/edit/${id}`}
-                  className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[100px] text-center'
-                >
-                  Chỉnh sửa
-                </Link>
+                <div className='flex items-center justify-start gap-[5px]'>
+                  <Link
+                    to={'/admin/articles-category'}
+                    className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[100px] text-center'
+                  >
+                    Quay lại
+                  </Link>
+                  <Link
+                    to={`/admin/articles-category/edit/${id}`}
+                    className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[100px] text-center'
+                  >
+                    Chỉnh sửa
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

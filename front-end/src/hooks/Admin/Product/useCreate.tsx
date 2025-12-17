@@ -3,40 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import { fetchCreateProductAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryContext'
-import type { ProductInfoInterface } from '~/types/product.type'
+import type { ProductForm } from '~/types/product.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
 export const useCreate = () => {
-  const initialProduct: ProductInfoInterface = {
-    _id: '',
+  const initialProduct: ProductForm = {
     title: '',
+    thumbnail: '',
+    status: 'ACTIVE',
     price: 0,
     discountPercentage: 0,
     stock: 0,
-    position: '',
-    status: 'active',
-    description: '',
     featured: '1',
-    thumbnail: '',
-    accountFullName: '',
-    createdBy: {
-      account_id: ''
-      // createdAt: null
-    },
-    updatedBy: [],
     product_category_id: '',
-    createdAt: null,
-    updatedAt: null,
+    description: '',
     colors: [],
-    sizes: [],
-    stars: {
-      average: 0,
-      count: 0
-    },
-    comments: []
+    sizes: []
   }
 
-  const [productInfo, setProductInfo] = useState<ProductInfoInterface>(initialProduct)
+  const [productInfo, setProductInfo] = useState<ProductForm>(initialProduct)
   const { stateProductCategory } = useProductCategoryContext()
   const { allProductCategories } = stateProductCategory
   const { dispatchAlert } = useAlertContext()
@@ -142,7 +127,6 @@ export const useCreate = () => {
       thumbnail: '', // Tạm thời xóa, sẽ được thay thế bằng placeholder
       colors: [] as { name: string; code: string; images: string[] }[]
     }
-    delete productDataPayload._id
     // Xử lý ảnh đại diện
     if (thumbnailFile) {
       filesToUpload.push(thumbnailFile)
@@ -175,7 +159,7 @@ export const useCreate = () => {
 
     const response = await fetchCreateProductAPI(formData)
     if (response.code === 201) {
-      setProductInfo(response.data)
+      // setProductInfo(response.data)
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }

@@ -13,13 +13,8 @@ const Cart = () => {
     totalBill,
     openDeleteOne,
     handleCloseDeleteDialog,
-    handleDelete,
-    loading
+    handleDelete
   } = useCart()
-
-  if (loading) {
-    /* ... Skeleton UI không đổi ... */
-  }
 
   return (
     <>

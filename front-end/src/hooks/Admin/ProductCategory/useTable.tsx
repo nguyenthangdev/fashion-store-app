@@ -12,7 +12,7 @@ export interface Props {
 
 export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateProductCategory, dispatchProductCategory, fetchProductCategory } = useProductCategoryContext()
-  const { productCategories, accounts, loading } = stateProductCategory
+  const { productCategories, accounts, loading, pagination } = stateProductCategory
   const [searchParams] = useSearchParams()
   // const { myAccount } = useAuth()
   const { dispatchAlert } = useAlertContext()
@@ -26,6 +26,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     sortKey: searchParams.get('sortKey') || '',
     sortValue: searchParams.get('sortValue') || ''
   }), [searchParams])
+
   const handleOpen = (id: string) => {
     setSelectedId(id)
     setOpen(true)
@@ -158,7 +159,8 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     open,
     handleOpen,
-    handleClose
+    handleClose,
+    pagination
   }
 }
 

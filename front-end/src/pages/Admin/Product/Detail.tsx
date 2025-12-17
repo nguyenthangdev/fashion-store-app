@@ -103,9 +103,8 @@ const DetailProduct = () => {
                 {/* Nhóm thông tin kho & trạng thái */}
                 <div className='text-sm grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg'>
                   <div><b>Tồn kho:</b> {productDetail.stock} sản phẩm</div>
-                  <div><b>Vị trí:</b> {productDetail.position || 'N/A'}</div>
                   <div><b>Trạng thái:</b> {
-                    productDetail.status === 'active' ?
+                    productDetail.status === 'ACTIVE' ?
                       <span className="text-green-600 font-semibold">● Hoạt động</span> :
                       <span className="text-red-600 font-semibold">● Dừng hoạt động</span>
                   }
@@ -113,15 +112,20 @@ const DetailProduct = () => {
                 </div>
 
                 {/* Nút chỉnh sửa */}
-                <div className='mt-4'>
+                <div className='flex items-center justify-start gap-[5px]'>
+                  <Link
+                    to={'/admin/products'}
+                    className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[100px] text-center'
+                  >
+                  Quay lại
+                  </Link>
                   <Link
                     to={`/admin/products/edit/${id}`}
-                    className='nav-link bg-yellow-500 hover:bg-yellow-600 px-6 py-2 rounded-md text-white font-semibold text-center inline-block'
+                    className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[100px] text-center'
                   >
                     Chỉnh sửa
                   </Link>
                 </div>
-
               </div>
             </div>
 

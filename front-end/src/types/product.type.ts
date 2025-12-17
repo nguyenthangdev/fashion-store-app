@@ -5,7 +5,6 @@ export interface ProductInfoInterface extends GeneralInfoInterface {
   price: number,
   discountPercentage: number,
   stock: number,
-  accountFullName: string,
   featured: string,
   product_category_id: string,
   description: string,
@@ -31,6 +30,27 @@ export interface ProductInfoInterface extends GeneralInfoInterface {
     color: string,
     size: string
   }[]
+}
+
+export interface ProductForm {
+  title: string
+  thumbnail: string
+  status: string
+
+  price: number
+  discountPercentage: number
+  stock: number
+  featured: string
+  product_category_id: string
+  description: string
+
+  colors: {
+    name: string
+    code: string
+    images: (File | string)[]
+  }[]
+
+  sizes: string[]
 }
 
 export interface ProductAPIResponse extends HelperInterface {

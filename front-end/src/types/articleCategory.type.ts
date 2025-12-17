@@ -1,4 +1,5 @@
-import type { CurrentParamsInterface, GeneralInfoInterface, HelperInterface, ParamsInterface } from './helper.type'
+import type { ArticleInfoInterface } from './article.type'
+import type { GeneralInfoInterface, HelperInterface } from './helper.type'
 
 export interface ArticleCategoryInfoInterface extends GeneralInfoInterface {
   children: ArticleCategoryInfoInterface[] | [],
@@ -7,21 +8,38 @@ export interface ArticleCategoryInfoInterface extends GeneralInfoInterface {
   descriptionDetail: string
 }
 
-export interface ArticleCategoryAllResponseInterface extends HelperInterface, CurrentParamsInterface {
-  articleCategories: ArticleCategoryInfoInterface[],
-  allArticleCategories: ArticleCategoryInfoInterface[]
-}
-
-export interface ArticleCategoryStates extends HelperInterface, ParamsInterface {
+export interface ArticleCategoryAPIResponse extends HelperInterface {
   articleCategories: ArticleCategoryInfoInterface[],
   allArticleCategories: ArticleCategoryInfoInterface[],
+  code: number,
+  message: string,
+  keyword: string
+}
+
+export interface ArticleCategoryStates extends HelperInterface {
+  articleCategories: ArticleCategoryInfoInterface[],
+  allArticleCategories: ArticleCategoryInfoInterface[],
+  keyword: string,
+  sortKey: string,
+  sortValue: string,
+  loading: boolean
 }
 
 export type ArticleCategoryActions =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_DATA'; payload: Partial<ArticleCategoryStates> }
-  | { type: 'RESET' }
 
 export interface ArticleCategoryDetailInterface {
   articleCategory: ArticleCategoryInfoInterface
+}
+
+export interface ArticleCategoryForm {
+  title: string
+  status: string
+  descriptionShort: string
+  descriptionDetail: string
+  thumbnail: string
+  children: ArticleInfoInterface[]
+  slug: string
+  parent_id: string
 }

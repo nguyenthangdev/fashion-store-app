@@ -1,7 +1,6 @@
 import { fetchChangeStatusAPI, fetchDeleteOrderAPI } from '~/apis/admin/order.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import { useAuth } from '~/contexts/admin/AuthContext'
-import type { FilterStatusInterface, UpdatedBy } from '~/types/helper.type'
+import type { FilterStatusInterface } from '~/types/helper.type'
 import { useState } from 'react'
 import { useOrderContext } from '~/contexts/admin/OrderContext'
 import type { OrderStatus } from '~/types/order.type'
@@ -14,8 +13,7 @@ export interface Props {
 
 export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateOrder, dispatchOrder } = useOrderContext()
-  const { orders, accounts, loading, pagination } = stateOrder
-  const { myAccount } = useAuth()
+  const { orders, loading, pagination } = stateOrder
   const { dispatchAlert } = useAlertContext()
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -53,21 +51,18 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   }
 
   const handleChangeStatus = async (id: string, newStatus: OrderStatus): Promise<void> => {
-    const currentUser: UpdatedBy = {
-      account_id: myAccount ? myAccount._id : '',
-      updatedAt: new Date()
-    }
 
     const response = await fetchChangeStatusAPI(newStatus, id)
     if (response.code === 200) {
+      const updatedOrder = response
       const updatedAllOrders = (stateOrder.allOrders ?? []).map(order =>
         order._id === id
-          ? { ...order, status: newStatus, updatedBy: [...(order.updatedBy || []), currentUser] }
+          ? updatedOrder.updater
           : order
       )
       const updatedOrders = (stateOrder.orders ?? []).map(order =>
         order._id === id
-          ? { ...order, status: newStatus, updatedBy: [...(order.updatedBy || []), currentUser] }
+          ? updatedOrder.updater
           : order
       )
       dispatchOrder({
@@ -116,7 +111,6 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     handleCheckbox,
     handleCheckAll,
     isCheckAll,
-    accounts,
     handleDelete,
     pagination
   }

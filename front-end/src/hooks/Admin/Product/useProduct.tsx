@@ -69,8 +69,8 @@ export const useProduct = () => {
       return
     }
 
-    if (typeChange === 'delete-all') {
-      setPendingAction('delete-all')
+    if (typeChange === 'DELETEALL') {
+      setPendingAction('DELETEALL')
       setOpen(true)
       return
     }
@@ -107,8 +107,8 @@ export const useProduct = () => {
     reloadData()
   }
   const handleConfirmDeleteAll = async () => {
-    if (pendingAction === 'delete-all') {
-      await executeAction('delete-all')
+    if (pendingAction === 'DELETEALL') {
+      await executeAction('DELETEALL')
     }
     setOpen(false)
   }
@@ -126,7 +126,8 @@ export const useProduct = () => {
   }
 
   const handleFilterStatus = useCallback((status: string) => {
-    updateParams({ status, page: 1 })
+    const urlFriendlyStatus = status.toLowerCase()
+    updateParams({ status: urlFriendlyStatus, page: 1 })
   }, [updateParams])
 
   return {

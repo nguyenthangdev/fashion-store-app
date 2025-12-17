@@ -134,13 +134,13 @@ const CreateProductCategory = () => {
                 to={'/admin/products-category'}
                 className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[80px] text-center'
               >
-                  Quay lại
+                Quay lại
               </Link>
               <button
                 type="submit"
                 className="nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white w-[80px] text-center"
               >
-              Tạo mới
+                Tạo mới
               </button>
             </div>
           </form>

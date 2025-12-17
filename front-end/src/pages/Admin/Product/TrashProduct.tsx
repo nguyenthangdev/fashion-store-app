@@ -8,13 +8,15 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import { Link } from 'react-router-dom'
 import { IoArrowBackSharp } from 'react-icons/io5'
-import { useProductCategoryTrash } from '~/hooks/Admin/ProductCategory/useProductCategoryTrash'
-import ProductCategoryTrashTable from '~/components/Admin/ItemTable/ProductCategoryTrashTable'
-import SortRecords from '~/components/Admin/Sort/SortRecords'
+import { PRODUCTTRASH_STATUSES_CHANGEMULTI } from '~/utils/constants'
+import { useProductTrash } from '~/hooks/Admin/Product/useProductTrash'
+import ProductTrashTable from '~/components/Admin/ItemTable/ProductTrashTable'
+import SortProduct from '~/components/Admin/Sort/SortProduct'
 
 const TrashProduct = () => {
   const {
-    dispatchProductCategory,
+    dispatchProduct,
+    products,
     pagination,
     keyword,
     sortKey,
@@ -30,18 +32,17 @@ const TrashProduct = () => {
     open,
     handleClose,
     handleConfirmDeleteAll,
-    role,
-    productCategories
-  } = useProductCategoryTrash()
+    role
+  } = useProductTrash()
 
   return (
     <>
       {role && role.permissions.includes('orders_view') && (
         <div className='flex flex-col gap-[15px] bg-[#FFFFFF] p-[15px] shadow-md h-[820px] fixed w-[80%]'>
           <div className='flex items-center justify-between'>
-            <h1 className='text-[24px] font-[700] text-[#000000]'>Thùng rác của danh mục sản phẩm</h1>
+            <h1 className='text-[24px] font-[700] text-[#000000]'>Thùng rác của sản phẩm</h1>
             <button className=''>
-              <Link to={'/admin/products-category'} className='border rounded-[5px] p-[5px] flex items-center justify-between gap-[5px]'>
+              <Link to={'/admin/products'} className='border rounded-[5px] p-[5px] flex items-center justify-between gap-[5px]'>
                 <IoArrowBackSharp />
                 Quay lại
               </Link>
@@ -54,7 +55,7 @@ const TrashProduct = () => {
               </div>
               <Search
                 keyword={keyword}
-                handleChangeKeyword={(value) => dispatchProductCategory({ type: 'SET_DATA', payload: { keyword: value } })}
+                handleChangeKeyword={(value) => dispatchProduct({ type: 'SET_DATA', payload: { keyword: value } })}
                 handleSearch={(keyword) => updateParams({ keyword })}
               />
             </div>
@@ -68,8 +69,9 @@ const TrashProduct = () => {
                 className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
               >
                 <option disabled value={''}>-- Chọn hành động --</option>
-                <option value="DELETEALL">Xóa vĩnh viễn</option>
-                <option value="RECOVER">Khôi phục</option>
+                {PRODUCTTRASH_STATUSES_CHANGEMULTI.map((status, idx) => (
+                  <option key={idx} value={status.value}>{status.label}</option>
+                ))}
               </select>
               <button
                 type="submit"
@@ -85,7 +87,7 @@ const TrashProduct = () => {
                 <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
                 <DialogContent>
                   <DialogContentText>
-                    Bạn có chắc chắn muốn xóa vĩnh viễn {selectedIds.length} danh mục sản phẩm này không? (Một khi đã xóa là không thể khôi phục lại được.)
+                    Bạn có chắc chắn muốn xóa vĩnh viễn {selectedIds.length} sản phẩm này không? (Một khi đã xóa là không thể khôi phục lại được.)
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -97,7 +99,7 @@ const TrashProduct = () => {
               </Dialog>
             </form>
             <div className='flex items-center justify-center gap-[15px]'>
-              <SortRecords
+              <SortProduct
                 handleSort={handleSort}
                 sortKey={sortKey}
                 sortValue={sortValue}
@@ -105,7 +107,7 @@ const TrashProduct = () => {
               />
             </div>
           </div>
-          <ProductCategoryTrashTable
+          <ProductTrashTable
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
           />
@@ -114,7 +116,7 @@ const TrashProduct = () => {
             handlePagination={(page: number) => updateParams({ page })}
             handlePaginationPrevious={(page: number) => updateParams({ page: page - 1 })}
             handlePaginationNext={(page: number) => updateParams({ page: page + 1 })}
-            items={productCategories ?? []}
+            items={products ?? []}
           />
         </div>
       )}

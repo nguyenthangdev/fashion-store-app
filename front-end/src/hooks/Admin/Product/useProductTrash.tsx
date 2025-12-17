@@ -1,25 +1,24 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { fetchChangeMultiAPI } from '~/apis/admin/articleCategory.api'
-import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
-import { useAuth } from '~/contexts/admin/AuthContext'
+import { fetchChangeMultiTrashAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
+import { useAuth } from '~/contexts/admin/AuthContext'
 import type { AllParams } from '~/types/helper.type'
+import { useProductTrashContext } from '~/contexts/admin/ProductTrashContext'
 
-export const useArticleCategory = () => {
-  const { stateArticleCategory, fetchArticleCategory, dispatchArticleCategory } = useArticleCategoryContext()
-  const { articleCategories, filterStatus, pagination, keyword, allArticleCategories } = stateArticleCategory
+export const useProductTrash = () => {
+  const { stateProduct, fetchProductTrash, dispatchProduct } = useProductTrashContext()
+  const { products, pagination, keyword } = stateProduct
   const { dispatchAlert } = useAlertContext()
-  const { role } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [actionType, setActionType] = useState('')
   const [open, setOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
+  const { role } = useAuth()
 
   // Parse URL params một lần
   const urlParams = useMemo(() => ({
-    status: searchParams.get('status') || '',
     page: parseInt(searchParams.get('page') || '1', 10),
     keyword: searchParams.get('keyword') || '',
     sortKey: searchParams.get('sortKey') || '',
@@ -27,8 +26,8 @@ export const useArticleCategory = () => {
   }), [searchParams])
 
   useEffect(() => {
-    fetchArticleCategory(urlParams)
-  }, [urlParams.status, urlParams.page, urlParams.keyword, urlParams.sortKey, urlParams.sortValue, urlParams, fetchArticleCategory])
+    fetchProductTrash(urlParams)
+  }, [urlParams.page, urlParams.keyword, urlParams.sortKey, urlParams.sortValue, urlParams, fetchProductTrash])
 
   const updateParams = useCallback((params: Partial<AllParams>) => {
     const newParams = new URLSearchParams(searchParams)
@@ -42,19 +41,19 @@ export const useArticleCategory = () => {
     setSearchParams(newParams)
   }, [searchParams, setSearchParams])
 
-  const reloadData = () => {
-    fetchArticleCategory(urlParams)
+  const reloadData = (): void => {
+    fetchProductTrash(urlParams)
   }
 
   const handleClose = () => {
     setOpen(false)
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     const typeChange = actionType
 
-    if (!selectedIds.length) {
+    if (selectedIds.length === 0) {
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: 'Vui lòng chọn ít nhất một bản ghi!', severity: 'error' }
@@ -68,6 +67,7 @@ export const useArticleCategory = () => {
       })
       return
     }
+
     if (typeChange === 'DELETEALL') {
       setPendingAction('DELETEALL')
       setOpen(true)
@@ -75,15 +75,17 @@ export const useArticleCategory = () => {
     }
     await executeAction(typeChange)
   }
+
   const executeAction = async (typeChange: string) => {
-    // const selectedArticlesCategory = articleCategories.filter(articleCategory => selectedIds.includes(articleCategory._id as string))
+    const selectedProducts = products.filter(product =>
+      selectedIds.includes(product._id ?? '')
+    )
 
-    // const result: string[] = selectedArticlesCategory
-    //   .map(articleCategory => articleCategory._id)
-    //   .filter((id): id is string => typeof id === 'string')
-    const result = selectedIds
+    const result: string[] = selectedProducts
+      .map(product => product._id)
+      .filter((id): id is string => typeof id === 'string')
 
-    const response = await fetchChangeMultiAPI({ ids: result, type: typeChange })
+    const response = await fetchChangeMultiTrashAPI({ ids: result, type: typeChange })
 
     if ([200, 204].includes(response.code)) {
       dispatchAlert({
@@ -100,10 +102,9 @@ export const useArticleCategory = () => {
     setSelectedIds([])
     setActionType('')
     setPendingAction(null)
-
+    // Refetch
     reloadData()
   }
-
   const handleConfirmDeleteAll = async () => {
     if (pendingAction === 'DELETEALL') {
       await executeAction('DELETEALL')
@@ -116,21 +117,16 @@ export const useArticleCategory = () => {
     updateParams({ sortKey, sortValue, page: 1 })
   }, [updateParams])
 
-  const clearSortParams = () => {
+  const clearSortParams = (): void => {
     const newParams = new URLSearchParams(searchParams)
     newParams.delete('sortKey')
     newParams.delete('sortValue')
     setSearchParams(newParams)
   }
 
-  const handleFilterStatus = useCallback((status: string) => {
-    const urlFriendlyStatus = status.toLowerCase()
-    updateParams({ status: urlFriendlyStatus, page: 1 })
-  }, [updateParams])
-
   return {
-    dispatchArticleCategory,
-    filterStatus,
+    dispatchProduct,
+    products,
     pagination,
     keyword,
     sortKey: urlParams.sortKey,
@@ -139,17 +135,13 @@ export const useArticleCategory = () => {
     setSelectedIds,
     actionType,
     setActionType,
-    status: urlParams.status,
     updateParams,
     handleSubmit,
     handleSort,
     clearSortParams,
-    handleFilterStatus,
-    articleCategories,
-    role,
-    allArticleCategories,
-    handleConfirmDeleteAll,
+    open,
     handleClose,
-    open
+    handleConfirmDeleteAll,
+    role
   }
 }

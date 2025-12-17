@@ -3,31 +3,22 @@ import { useNavigate } from 'react-router-dom'
 import { fetchCreateArticleCategoryAPI } from '~/apis/admin/articleCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
-import type { ArticleCategoryInfoInterface } from '~/types/articleCategory.type'
+import type { ArticleCategoryForm } from '~/types/articleCategory.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
 export const useCreate = () => {
-  const initialArticleCategory: ArticleCategoryInfoInterface = {
-    _id: '',
+  const initialArticleCategory: ArticleCategoryForm = {
     title: '',
-    position: 0,
-    status: 'active',
+    status: 'ACTIVE',
     descriptionShort: '',
     descriptionDetail: '',
     thumbnail: '',
-    createdBy: {
-      account_id: ''
-      // createdAt: new Date()
-    },
-    updatedBy: [],
     children: [],
     slug: '',
-    parent_id: '',
-    createdAt: null,
-    updatedAt: null
+    parent_id: ''
   }
 
-  const [articleCategoryInfo, setArticleCategoryInfo] = useState<ArticleCategoryInfoInterface>(initialArticleCategory)
+  const [articleCategoryInfo, setArticleCategoryInfo] = useState<ArticleCategoryForm>(initialArticleCategory)
   const { stateArticleCategory } = useArticleCategoryContext()
   const { dispatchAlert } = useAlertContext()
   const { allArticleCategories } = stateArticleCategory
@@ -55,7 +46,6 @@ export const useCreate = () => {
     }
     const response = await fetchCreateArticleCategoryAPI(formData)
     if (response.code === 201) {
-      setArticleCategoryInfo(response.data)
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }

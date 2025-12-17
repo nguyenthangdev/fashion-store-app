@@ -72,9 +72,9 @@ import DetailArticleClient from '~/pages/Client/Article/Detail'
 import MyOrders from '~/pages/Client/MyAccount/MyOrders'
 import HelpCenter from '~/pages/Client/HelpCenter/HelpCenter'
 import ScrollToTop from '~/components/ScrollToTop/ScrollToTop'
-import BrandAdmin from '~/pages/Admin/Brand/BrandAdmin'
-import CreateBrand from '~/pages/Admin/Brand/CreateBrand'
-import EditBrand from '~/pages/Admin/Brand/EditBrand'
+import BrandAdmin from '~/pages/Admin/Brand'
+import CreateBrand from '~/pages/Admin/Brand/Create'
+import EditBrand from '~/pages/Admin/Brand/Edit'
 import BrandPage from '~/pages/Client/Brand/Brand'
 import AdminChatPage from '~/pages/Admin/AdminChatPage/AdminChatPage'
 import GoogleCallback from './pages/Client/GoogleCallback/GoogleCallback'
@@ -82,6 +82,7 @@ import { Error404Page } from './pages/Error404Page/Error404Page'
 import UnauthorizedRoutesAdmin from './components/Admin/UnauthorizedRoutes/UnauthorizedRoutes'
 import TrashOrder from './pages/Admin/Order/TrashOrder'
 import TrashProductCategory from './pages/Admin/ProductCategory/TrashProductCategory'
+import TrashProduct from './pages/Admin/Product/TrashProduct'
 
 function App() {
 
@@ -166,6 +167,7 @@ function App() {
             <Route path='create' element={<CreateProduct />}/>
             <Route path='detail/:id' element={ <DetailProduct />}/>
             <Route path='edit/:id' element={<EditProduct />}/>
+            <Route path='trash' element={<TrashProduct />}/>
           </Route>
           <Route path='products-category'>
             <Route index element={<ProductCategoryAdmin />}/>

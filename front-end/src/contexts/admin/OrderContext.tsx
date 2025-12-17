@@ -31,7 +31,6 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         payload: {
           orders: res.orders,
           allOrders: res.allOrders,
-          accounts: res.accounts,
           pagination: res.pagination,
           filterOrder: res.filterOrder,
           keyword: res.keyword,

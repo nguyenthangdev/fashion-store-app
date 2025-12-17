@@ -4,7 +4,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import Checkbox from '@mui/material/Checkbox'
-import { useTableTrash, type Props } from '~/hooks/Admin/Order/useTableTrash'
+import { useTableTrash, type Props } from '~/hooks/Admin/Order/useTrashTable'
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } }
 import FormatDateTime from '../Moment/FormatDateTime'
 import TableContainer from '@mui/material/TableContainer'
@@ -16,6 +16,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import { getTotalBill } from '~/helpers/totalBill'
+import type { AccountInfoInterface } from '~/types/account.type'
 
 const OrderTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
 
@@ -30,8 +31,7 @@ const OrderTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     handleRecover,
     handlePermanentlyDelete,
-    pagination,
-    accounts
+    pagination
   } = useTableTrash({ selectedIds, setSelectedIds })
 
   if (loading) {
@@ -205,13 +205,11 @@ const OrderTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
                       <FormatDateTime time={order.createdAt}/>
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '6px 0px' }} className='font-[700] '>{(() => {
-                      const creator = accounts?.find(
-                        (account) => account._id === order.deletedBy?.account_id
-                      )
-                      return creator ? (
+                      const deletor = order.deletedBy.account_id as AccountInfoInterface
+                      return deletor ? (
                         <>
                           <span className="text-sm font-medium text-gray-800">
-                            {creator.fullName}
+                            {deletor.fullName}
                           </span>
                           <FormatDateTime time={order.deletedBy.deletedAt}/>
                         </>

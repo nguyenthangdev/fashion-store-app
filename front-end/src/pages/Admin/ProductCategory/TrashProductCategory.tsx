@@ -11,6 +11,7 @@ import { IoArrowBackSharp } from 'react-icons/io5'
 import { useProductCategoryTrash } from '~/hooks/Admin/ProductCategory/useProductCategoryTrash'
 import ProductCategoryTrashTable from '~/components/Admin/ItemTable/ProductCategoryTrashTable'
 import SortRecords from '~/components/Admin/Sort/SortRecords'
+import { PRODUCTCATEGORYTRASH_STATUSES_CHANGEMULTI } from '~/utils/constants'
 
 const TrashProductCategory = () => {
   const {
@@ -68,8 +69,9 @@ const TrashProductCategory = () => {
                 className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
               >
                 <option disabled value={''}>-- Chọn hành động --</option>
-                <option value="DELETEALL">Xóa vĩnh viễn</option>
-                <option value="RECOVER">Khôi phục</option>
+                {PRODUCTCATEGORYTRASH_STATUSES_CHANGEMULTI.map((status, idx) => (
+                  <option key={idx} value={status.value}>{status.label}</option>
+                ))}
               </select>
               <button
                 type="submit"

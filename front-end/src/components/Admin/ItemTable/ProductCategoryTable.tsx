@@ -22,7 +22,6 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
     loading,
     dispatchProductCategory,
     productCategories,
-    accounts,
     handleToggleStatus,
     handleDelete,
     handleCheckbox,
@@ -30,7 +29,8 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     open,
     handleOpen,
-    handleClose
+    handleClose,
+    pagination
   } = useTable({ selectedIds, setSelectedIds })
 
   if (loading) {
@@ -147,10 +147,10 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
                 <ProductTree
                   key={idx}
                   index={idx}
+                  pagination={pagination}
                   productCategory={productCategory}
                   level={1}
                   selectedIds={selectedIds}
-                  accounts={accounts}
                   handleCheckbox={handleCheckbox}
                   handleToggleStatus={handleToggleStatus}
                   handleDelete={handleDelete}
@@ -170,7 +170,7 @@ const ProductCategoryTable = ({ selectedIds, setSelectedIds }: Props) => {
               <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Bạn có chắc chắn muốn xóa danh mục này không?
+                  Bạn có chắc chắn muốn xóa danh mục này không? (Một khi xóa sẽ không thể khôi phục lại được.)
                 </DialogContentText>
               </DialogContent>
               <DialogActions>

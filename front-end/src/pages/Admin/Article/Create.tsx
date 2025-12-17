@@ -141,19 +141,6 @@ const CreateArticle = () => {
               )}
             </div>
 
-            <div className="form-group">
-              <label htmlFor="position">Vị trí</label>
-              <input
-                onChange={(event) => setArticleInfo({ ...articleInfo, position: Number(event.target.value) })}
-                type="number"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                className='text-[16px] py-[3px]'
-                min={1}
-              />
-            </div>
-
             <div className="flex items-center justify-start gap-[10px]">
               <div className="flex gap-[5px]">
                 <input

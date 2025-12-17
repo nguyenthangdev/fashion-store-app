@@ -7,7 +7,7 @@ export const fetchProductAPI = async (
   params: AllParams
 ): Promise<ProductAPIResponse> => {
   const queryParams = new URLSearchParams()
-  if (params.status) queryParams.set('status', params.status)
+  if (params.status) queryParams.set('status', params.status.toUpperCase())
   if (params.page) queryParams.set('page', params.page.toString())
   if (params.keyword) queryParams.set('keyword', params.keyword)
   if (params.sortKey) queryParams.set('sortKey', params.sortKey)
@@ -72,3 +72,44 @@ export const fetchCreateProductAPI = async (formData: FormData) => {
   return response.data
 }
 
+export const fetchProductTrashAPI = async (
+  params: AllParams
+): Promise<ProductAPIResponse> => {
+  const queryParams = new URLSearchParams()
+  if (params.page) queryParams.set('page', params.page.toString())
+  if (params.keyword) queryParams.set('keyword', params.keyword)
+  if (params.sortKey) queryParams.set('sortKey', params.sortKey)
+  if (params.sortValue) queryParams.set('sortValue', params.sortValue)
+
+  const response = await authorizedAxiosInstance.get(
+    `${API_ROOT}/admin/products/trash?${queryParams.toString()}`,
+    { withCredentials: true }
+  )
+  return response.data
+}
+
+export const fetchChangeMultiTrashAPI = async (data: { ids: string[], type: string }) => {
+  const response = await authorizedAxiosInstance.patch(
+    `${API_ROOT}/admin/products/trash/form-change-multi-trash`,
+    data,
+    { withCredentials: true }
+  )
+  return response.data
+}
+
+export const fetchPermanentlyDeleteProductAPI = async (id: string) => {
+  const response = await authorizedAxiosInstance.delete(
+    `${API_ROOT}/admin/products/trash/permanentlyDelete/${id}`,
+    { withCredentials: true }
+  )
+  return response.data
+}
+
+export const fetchRecoverProductAPI = async (id: string) => {
+  const response = await authorizedAxiosInstance.patch(
+    `${API_ROOT}/admin/products/trash/recover/${id}`,
+    {},
+    { withCredentials: true }
+  )
+  return response.data
+}

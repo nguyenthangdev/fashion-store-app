@@ -3,7 +3,6 @@ import type { OrderAction, OrderState } from '~/types/order.type'
 
 export const initialOrderState: OrderState = {
   orders: [],
-  accounts: [],
   allOrders: [],
   filterOrder: [],
   pagination: {
