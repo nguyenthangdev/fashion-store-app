@@ -11,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
+import { ARTICLE_STATUSES_CHANGEMULTI } from '~/utils/constants'
 
 const ArticleAdmin = () => {
   const {
@@ -24,8 +25,8 @@ const ArticleAdmin = () => {
     setSelectedIds,
     actionType,
     setActionType,
-    currentStatus,
-    updateSearchParams,
+    status,
+    updateParams,
     handleSubmit,
     handleSort,
     clearSortParams,
@@ -47,14 +48,14 @@ const ArticleAdmin = () => {
             <div className='flex items-center justify-between text-[15px]'>
               <FilterStatus
                 filterStatus={filterStatus}
-                currentStatus={currentStatus}
+                currentStatus={status}
                 handleFilterStatus={handleFilterStatus}
                 items={allArticles}
               />
               <Search
                 keyword={keyword}
                 handleChangeKeyword={(value) => dispatchArticle({ type: 'SET_DATA', payload: { keyword: value } })}
-                handleSearch={(keyword) => updateSearchParams('keyword', keyword)}/>
+                handleSearch={(keyword) => updateParams({ keyword })}/>
             </div>
           </div>
           <div className='flex items-center justify-between'>
@@ -66,9 +67,9 @@ const ArticleAdmin = () => {
                 className='cursor-pointer outline-none border rounded-[5px] border-[#9D9995] p-[5px]'
               >
                 <option disabled value={''}>-- Chọn hành động --</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Dừng hoạt động</option>
-                <option value="delete-all">Xóa tất cả</option>
+                {ARTICLE_STATUSES_CHANGEMULTI.map((status, idx) => (
+                  <option key={idx} value={status.value}>{status.label}</option>
+                ))}
               </select>
               <button
                 type='submit'
@@ -90,25 +91,28 @@ const ArticleAdmin = () => {
                 <DialogActions>
                   <Button onClick={handleClose}>Hủy</Button>
                   <Button onClick={handleConfirmDeleteAll} color="error" variant="contained">
-                    óa
+                    Xóa
                   </Button>
                 </DialogActions>
               </Dialog>
             </form>
-            <SortRecords
-              handleSort={handleSort}
-              sortKey={sortKey}
-              sortValue={sortValue}
-              clearSortParams={clearSortParams}
-            />
-            <div>
-              <Link
-                to={'/admin/articles/create'}
-                className='border rounded-[5px] px-[15px] py-[5px] border-[#607D00] font-[700] text-[#607D00] hover:bg-[#607D00] hover:text-white'
-              >
+            <div className='flex items-center justify-center gap-[15px]'>
+              <SortRecords
+                handleSort={handleSort}
+                sortKey={sortKey}
+                sortValue={sortValue}
+                clearSortParams={clearSortParams}
+              />
+              <div>
+                <Link
+                  to={'/admin/articles/create'}
+                  className='border rounded-[5px] px-[15px] py-[5px] border-[#607D00] font-[700] text-[#607D00] hover:bg-[#607D00] hover:text-white'
+                >
               + Thêm mới
-              </Link>
+                </Link>
+              </div>
             </div>
+
           </div>
           <ArticleTable
             selectedIds={selectedIds}
@@ -116,9 +120,9 @@ const ArticleAdmin = () => {
           />
           <Pagination
             pagination={pagination}
-            handlePagination={(page: number) => updateSearchParams('page', (page).toString())}
-            handlePaginationPrevious={(page: number) => updateSearchParams('page', (page - 1).toString())}
-            handlePaginationNext={(page: number) => updateSearchParams('page', (page + 1).toString())}
+            handlePagination={(page: number) => updateParams({ page: page })}
+            handlePaginationPrevious={(page: number) => updateParams({ page: page - 1 })}
+            handlePaginationNext={(page: number) => updateParams({ page: page + 1 })}
             items={articles}
           />
         </div>

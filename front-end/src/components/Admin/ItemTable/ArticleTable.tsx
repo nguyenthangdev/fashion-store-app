@@ -18,12 +18,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
+import type { AccountInfoInterface } from '~/types/account.type'
 
 const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
   const {
     loading,
     articles,
-    accounts,
     handleToggleStatus,
     handleCheckbox,
     handleCheckAll,
@@ -57,7 +57,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tên bài viết</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo /  Ngày tạo</TableCell>
+              <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Ngày tạo</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
               <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
             </TableRow>
@@ -132,7 +132,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hình ảnh</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '0px' }}>Tên bài viết</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Trạng thái</TableCell>
-                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Người tạo / Ngày tạo</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Cập nhật lần cuối</TableCell>
                 <TableCell align='center' sx={{ backgroundColor: '#003459', color: 'white', padding: '6px 0px' }}>Hành động</TableCell>
               </TableRow>
@@ -163,27 +163,24 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                       <button
                         onClick={() => handleToggleStatus(article._id ?? '', article.status)}
                         className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
-                          ${article.status === 'active' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
+                          ${article.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
                       >
-                        {article.status === 'active' ? 'Hoạt động' : 'Ngừng hoạt động'}
+                        {article.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
                       </button>
                     </TableCell>
-                    <TableCell align='center' className='font-[700]' sx={{ padding: '6px 0px' }}>
-                      {(() => {
-                        const creator = accounts.find(
-                          (account) => account._id === article.createdBy?.account_id
-                        )
-                        return creator ? (
-                          <>
-                            <span className="text-sm font-medium text-gray-800">
-                              {creator.fullName}
-                            </span>
-                            <FormatDateTime time={article.createdAt}/>
-                          </>
-                        ) : (
-                          <span className="text-sm italic text-gray-400">Không xác định</span>
-                        )
-                      })()}
+                    <TableCell align='center' sx={{ padding: '6px 0px' }} className='font-[700] '>{(() => {
+                      const creator = article.createdBy.account_id as AccountInfoInterface
+                      return creator ? (
+                        <>
+                          <span className="text-sm font-medium text-gray-800">
+                            {creator.fullName}
+                          </span>
+                          <FormatDateTime time={article.createdAt}/>
+                        </>
+                      ) : (
+                        <span className="text-sm italic text-gray-400">Không xác định</span>
+                      )
+                    })()}
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '6px 0px' }}>
                       {(() => {
@@ -196,7 +193,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                           )
                         }
                         if (Array.isArray(article.updatedBy) && article.updatedBy.length > 0) {
-                          const updater = accounts.find((account) => account._id === updatedBy.account_id)
+                          const updater = updatedBy?.account_id as AccountInfoInterface
                           return updater ? (
                             <>
                               <span className="text-sm font-medium text-gray-800">
@@ -205,7 +202,9 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                               <FormatDateTime time={updatedBy.updatedAt}/>
                             </>
                           ) : (
-                            <span className="text-sm italic text-gray-400">Không xác định</span>
+                            <span className="text-sm italic text-gray-400">
+                            Không xác định
+                            </span>
                           )
                         }
                       })()}

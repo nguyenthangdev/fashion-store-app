@@ -4,31 +4,21 @@ import { fetchCreateArticleAPI } from '~/apis/admin/article.api'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { ArticleInfoInterface } from '~/types/article.type'
+import type { ArticleForm } from '~/types/article.type'
 
 export const useCreate = () => {
-  const initialArticle: ArticleInfoInterface = {
-    _id: '',
+  const initialArticle: ArticleForm = {
     title: '',
-    position: 0,
-    status: 'active',
+    status: 'ACTIVE',
     descriptionShort: '',
     descriptionDetail: '',
     featured: '1',
     thumbnail: '',
-    accountFullName: '',
-    createdBy: {
-      account_id: ''
-      // createdAt: new Date()
-    },
-    updatedBy: [],
-    article_category_id: '',
     slug: '',
-    createdAt: null,
-    updatedAt: null
+    article_category_id: ''
   }
 
-  const [articleInfo, setArticleInfo] = useState<ArticleInfoInterface>(initialArticle)
+  const [articleInfo, setArticleInfo] = useState<ArticleForm>(initialArticle)
   const { stateArticleCategory } = useArticleCategoryContext()
   const { allArticleCategories } = stateArticleCategory
   const { dispatchAlert } = useAlertContext()
@@ -57,7 +47,6 @@ export const useCreate = () => {
     }
     const response = await fetchCreateArticleAPI(formData)
     if (response.code === 201) {
-      setArticleInfo(response.data)
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }

@@ -93,7 +93,7 @@ const ArticleCategoryAdmin = () => {
                   <DialogActions>
                     <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleConfirmDeleteAll} color="error" variant="contained">
-                    óa
+                    Xóa
                     </Button>
                   </DialogActions>
                 </Dialog>

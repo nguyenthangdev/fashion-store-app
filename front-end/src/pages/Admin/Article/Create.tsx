@@ -1,4 +1,5 @@
 import { Editor } from '@tinymce/tinymce-react'
+import { Link } from 'react-router-dom'
 import SelectTreeArticle from '~/components/Admin/TableTree/SelectTreeArticle'
 import { useCreate } from '~/hooks/Admin/article/useCreate'
 import { API_KEY } from '~/utils/constants'
@@ -149,8 +150,8 @@ const CreateArticle = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusActive"
                   name="status"
-                  value={'active'}
-                  checked={articleInfo.status === 'active' ? true : false}
+                  value={'ACTIVE'}
+                  checked={articleInfo.status === 'ACTIVE' ? true : false}
                 />
                 <label htmlFor="statusActive">Hoạt động</label>
               </div>
@@ -162,19 +163,26 @@ const CreateArticle = () => {
                   className="border rounded-[5px] border-[#192335]"
                   id="statusInActive"
                   name="status"
-                  value={'inactive'}
-                  checked={articleInfo.status === 'inactive' ? true : false}
+                  value={'INACTIVE'}
+                  checked={articleInfo.status === 'INACTIVE' ? true : false}
                 />
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>
             </div>
-
-            <button
-              type="submit"
-              className="w-[5%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
-            >
-            Tạo mới
-            </button>
+            <div className='flex items-center justify-start gap-[5px]'>
+              <Link
+                to={'/admin/articles'}
+                className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[80px] text-center'
+              >
+                Quay lại
+              </Link>
+              <button
+                type="submit"
+                className="nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white w-[80px] text-center"
+              >
+                Tạo mới
+              </button>
+            </div>
           </form>
         )
       )}

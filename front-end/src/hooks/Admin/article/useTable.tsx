@@ -1,8 +1,6 @@
 import { fetchChangeStatusAPI, fetchDeleteArticleAPI } from '~/apis/admin/article.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import { useAuth } from '~/contexts/admin/AuthContext'
 import { useSearchParams } from 'react-router-dom'
-import type { UpdatedBy } from '~/types/helper.type'
 import { useArticleContext } from '~/contexts/admin/ArticleContext'
 import { useState } from 'react'
 
@@ -13,8 +11,7 @@ export interface Props {
 
 export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateArticle, dispatchArticle } = useArticleContext()
-  const { articles, accounts, loading } = stateArticle
-  const { myAccount } = useAuth()
+  const { articles, loading } = stateArticle
   const { dispatchAlert } = useAlertContext()
   const [searchParams] = useSearchParams()
   const currentStatus = searchParams.get('status') || ''
@@ -32,21 +29,22 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   }
 
   const handleToggleStatus = async (id: string, currentStatus: string): Promise<void> => {
-    const currentUser: UpdatedBy = {
-      account_id: myAccount ? myAccount._id : '',
-      updatedAt: new Date()
-    }
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
+    // const currentUser: UpdatedBy = {
+    //   account_id: myAccount ? myAccount._id : '',
+    //   updatedAt: new Date()
+    // }
+    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
     const response = await fetchChangeStatusAPI(newStatus, id)
     if (response.code === 200) {
+      const updateArticle = response
       const updatedAllArticles = stateArticle.allArticles.map(article =>
         article._id === id
-          ? { ...article, status: newStatus, updatedBy: [...(article.updatedBy || []), currentUser] }
+          ? updateArticle.updater
           : article
       )
       const updatedArticles = stateArticle.articles.map(article =>
         article._id === id
-          ? { ...article, status: newStatus, updatedBy: [...(article.updatedBy || []), currentUser] }
+          ? updateArticle.updater
           : article
       )
       dispatchArticle({
@@ -114,7 +112,6 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     currentStatus,
     articles,
     dispatchArticle,
-    accounts,
     handleToggleStatus,
     handleCheckbox,
     handleCheckAll,

@@ -41,3 +41,9 @@ export const ARTICLECATEGORY_STATUSES_CHANGEMULTI = [
   { value: 'INACTIVE', label: 'Ngừng hoạt động' },
   { value: 'DELETEALL', label: 'Xóa tất cả' }
 ]
+
+export const ARTICLE_STATUSES_CHANGEMULTI = [
+  { value: 'ACTIVE', label: 'Hoạt động' },
+  { value: 'INACTIVE', label: 'Ngừng hoạt động' },
+  { value: 'DELETEALL', label: 'Xóa tất cả' }
+]

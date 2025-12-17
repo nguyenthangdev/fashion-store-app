@@ -44,7 +44,6 @@ export const useEdit = () => {
     formData.set('featured', articleInfo.featured)
     formData.set('descriptionShort', articleInfo.descriptionShort)
     formData.set('descriptionDetail', articleInfo.descriptionDetail)
-    formData.set('position', articleInfo.position.toString())
 
     const response = await fetchEditArticleAPI(id, formData)
     if (response.code === 200) {

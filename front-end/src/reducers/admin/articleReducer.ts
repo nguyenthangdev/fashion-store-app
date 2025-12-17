@@ -16,8 +16,7 @@ export const initialState: ArticleStates = {
   sortKey: '',
   sortValue: '',
   loading: false,
-  allArticles: [],
-  date: ''
+  allArticles: []
 }
 
 export function articleReducer(
@@ -29,8 +28,6 @@ export function articleReducer(
       return { ...stateArticle, loading: actionArticle.payload }
     case 'SET_DATA':
       return { ...stateArticle, ...actionArticle.payload }
-    case 'RESET':
-      return initialState
     default:
       return stateArticle
   }
