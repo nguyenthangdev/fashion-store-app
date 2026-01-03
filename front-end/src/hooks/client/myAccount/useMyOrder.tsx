@@ -37,7 +37,6 @@ const useMyOrder = () => {
 
   const { addToCart } = useCart()
 
-  // === THÊM STATE CHO POPUP ĐÁNH GIÁ ===
   const [openReview, setOpenReview] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [productToReview, setProductToReview] = useState<any | null>(null)

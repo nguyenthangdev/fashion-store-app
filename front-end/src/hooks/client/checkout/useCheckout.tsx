@@ -15,7 +15,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 
-// ĐỊNH NGHĨA SCHEMA
 const checkoutSchema = z.object({
   fullName: z.string()
     .trim()
@@ -48,7 +47,6 @@ const useCheckout = () => {
   const { accountUser } = useAuth()
   const { dispatchAlert } = useAlertContext()
 
-  // KHỞI TẠO REACT HOOK FORM
   const {
     register,
     handleSubmit,
