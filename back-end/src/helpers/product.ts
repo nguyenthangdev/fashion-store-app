@@ -1,7 +1,7 @@
 export interface OneProduct {
-  price: number;
-  discountPercentage: number;
-  priceNew?: number;
+  price: number
+  discountPercentage: number
+  priceNew?: number
 }
 
 // Tính giá mới cho 1 mảng sản phẩm

@@ -43,7 +43,6 @@ export const index = async (req: Request, res: Response) => {
         status: 'ACTIVE',
         deleted: false
       })
-      console.log("🚀 ~ product.controller.ts ~ index ~ category:", category);
 
       if (category) {
       // SỬ DỤNG HÀM ĐỆ QUY `getSubCategory`
@@ -75,7 +74,7 @@ export const index = async (req: Request, res: Response) => {
     }
 
     const currentPage = parseInt(req.query.page as string) || 1
-    const limitItems = 16 // Số sản phẩm mỗi trang
+    const limitItems = 18 // Số sản phẩm mỗi trang
     const skip = (currentPage - 1) * limitItems
     const sort = {}
     const sortKey = req.query.sortKey as string
@@ -164,7 +163,7 @@ export const getFilters = async (req: Request, res: Response) => {
           $or: [{ parent_id: null }, { parent_id: '' }] // Chỉ lấy danh mục gốc
         })
         .select('title slug _id')
-        .sort({ position: 1, title: 1 })
+        .sort({ title: 1 })
         .lean(),
 
       // Tác vụ 2: Chạy aggregation trên sản phẩm
@@ -249,7 +248,7 @@ export const category = async (req: Request, res: Response) => {
         deleted: false,
         product_category_id: { $in: [category.id, ...listSubCategoryId] }
       })
-      .sort({ position: 'desc' })
+      .sort({ createdAt: -1 })
 
     const newProducts = productsHelper.priceNewProducts(
       products as OneProduct[]
@@ -281,7 +280,14 @@ export const detail = async (req: Request, res: Response) => {
     const product = await Product
       .findOne(find)
       .populate('comments.user_id')
+      .lean()
 
+    if (product.comments && product.comments.length > 0) {
+        product.comments.sort((a: any, b: any) => {
+            // Sắp xếp giảm dần (descending) theo thời gian
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        })
+    }
     if (product.product_category_id) {
       const category = await ProductCategory.findOne({
         _id: product.product_category_id,
@@ -386,7 +392,7 @@ export const createReview = async (req: Request, res: Response) => {
     const { rating, content, color, size } = req.body
     const images = req['fileUrls'] || [] // Lấy URL ảnh từ middleware uploadCloud
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId)
     if (!product) {
       return res.json({ code: 404, message: 'Không tìm thấy sản phẩm.' })
     }
@@ -398,7 +404,7 @@ export const createReview = async (req: Request, res: Response) => {
       images: images,
       color: color,
       size: size,
-      status: 'APPROVED' // Hoặc 'pending' nếu bạn muốn duyệt
+      status: 'APPROVED', // Hoặc 'pending' nếu bạn muốn duyệt
     }
 
     // Thêm đánh giá mới vào sản phẩm
@@ -437,7 +443,7 @@ export const getTopRatedReviews = async (req: Request, res: Response) => {
     {
       $match: {
       'comments.rating': 5,
-      'comments.status': 'approved'
+      'comments.status': 'APPROVED'
       }
     },
     // 4. Sắp xếp (ví dụ: mới nhất)
@@ -449,29 +455,29 @@ export const getTopRatedReviews = async (req: Request, res: Response) => {
     // 7. Lấy thông tin người dùng (tên)
     {
       $lookup: {
-      from: 'users', // Tên collection của User model
-      localField: 'user_id',
-      foreignField: '_id',
-      as: 'commentUser'
+        from: 'users', // Tên collection của User model
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'commentUser'
       }
     },
     // 8. Định dạng lại output
     {
     $project: {
-      _id: 0,
-      // Giả sử model User có 'fullName'. Nếu không, hãy đổi thành 'username' v.v.
-      name: { $arrayElemAt: ['$commentUser.fullName', 0] },
-      quote: '$content',
-      rating: '$rating',
-      verified: { $literal: true } // Mặc định là đã xác minh (vì đã mua)
+        _id: 0,
+        // Giả sử model User có 'fullName'. Nếu không, hãy đổi thành 'username' v.v.
+        name: { $arrayElemAt: ['$commentUser.fullName', 0] },
+        quote: '$content',
+        rating: '$rating',
+        verified: { $literal: true } // Mặc định là đã xác minh (vì đã mua)
       }
     }
    ])
 
    // Xử lý trường hợp không tìm thấy tên
    const formattedReviews = topReviews.map((review) => ({
-    ...review,
-    name: review.name || 'Người dùng ẩn danh'
+      ...review,
+      name: review.name || 'Người dùng ẩn danh'
    }))
 
    res.json({

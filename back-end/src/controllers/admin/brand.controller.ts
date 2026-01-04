@@ -26,7 +26,7 @@ export const index = async (req: Request, res: Response) => {
 
     const brands = await Brand
       .find(find)
-      .sort({ position: 'desc' })
+      .sort({ createdAt: -1 })
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip)
     

@@ -237,7 +237,7 @@ export const editPatch = (req: Request, res: Response, next: NextFunction) => {
         "string.empty": "Email không được để trống!",
         "string.email": "Email không đúng định dạng!"
       }),
-    password: Joi.string()
+    phone: Joi.string()
       .trim()
       .optional() // Cho phép không gửi trường password lên
       .allow('', null) // Cho phép gửi trường password lên là: '' hoặc null

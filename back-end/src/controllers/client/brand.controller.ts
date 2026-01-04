@@ -9,7 +9,7 @@ export const getAllBrands = async (req: Request, res: Response) => {
  
     const brands = await Brand
       .find(find)
-      .sort({ position: 'desc' })
+      .sort({ createdAt: -1 })
       .lean()
 
     res.json({

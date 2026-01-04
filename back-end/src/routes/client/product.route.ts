@@ -5,17 +5,20 @@ import * as controller from '~/controllers/client/product.controller'
 import multer from 'multer'
 import { uploadCloud } from '~/middlewares/admin/uploadCloud.middleware'
 // Upload ảnh
+import * as authMiddleware from '~/middlewares/client/auth.middleware'
+
 router.get('/', controller.index)
 router.get('/suggestions', controller.getSearchSuggestions)
 router.get('/filters', controller.getFilters)
 router.get('/:slugCategory', controller.category)
 router.get('/detail/:slugProduct', controller.detail)
-router.get('/related/:productId', controller.getRelatedProducts); // <-- THÊM DÒNG NÀY
+router.get('/related/:productId', controller.getRelatedProducts)
 router.post(
   '/:productId/reviews',
+  authMiddleware.requireAuth,
   multer().array('images', 5), // Cho phép upload tối đa 5 ảnh
   uploadCloud,
-  controller.createReview // Một controller mới
+  controller.createReview 
 )
 router.get('/reviews/top-rated', controller.getTopRatedReviews)
 export const productRoutes: Router = router
