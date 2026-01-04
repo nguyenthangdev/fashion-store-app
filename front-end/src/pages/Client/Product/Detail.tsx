@@ -27,7 +27,10 @@ const DetailProductClient = () => {
     setSelectedSize,
     reviewFilter,
     quantity,
-    selectedSize
+    selectedSize,
+    handleLoadMore,
+    displayedComments,
+    visibleCount
   } = useDetail()
 
   if (loading) {
@@ -266,7 +269,7 @@ const DetailProductClient = () => {
 
           {/* Danh sách bình luận */}
           <div className="mt-6">
-            {filteredComments.map((comment, index) => (
+            {displayedComments.map((comment, index) => (
               <ReviewCard
                 key={index}
                 comment={comment}
@@ -275,6 +278,17 @@ const DetailProductClient = () => {
               />
             ))}
           </div>
+          {/* Logic: Chỉ hiện khi số lượng đang hiện < tổng số comment sau khi lọc */}
+          {filteredComments.length > visibleCount && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleLoadMore}
+                className="px-8 py-3 bg-white border border-black text-black font-semibold rounded-full hover:bg-black hover:text-white transition-all duration-300 shadow-sm"
+              >
+                Xem thêm bình luận ({filteredComments.length - visibleCount})
+              </button>
+            </div>
+          )}
         </div>
       )}
 

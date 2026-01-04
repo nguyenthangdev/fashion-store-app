@@ -33,7 +33,6 @@ export interface OrderInfoInterface {
       size: string
     }[]
     status: OrderStatus,
-    position: number,
     createdBy: CreatedBy
     updatedBy: UpdatedBy[],
     deletedBy: DeletedBy,

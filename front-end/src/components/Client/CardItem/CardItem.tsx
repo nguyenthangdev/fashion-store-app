@@ -36,6 +36,7 @@ const CardItem = ({ item }: CardItemProps) => {
   const discountedPrice = (price > 0 && discountPercentage > 0)
     ? Math.floor(price * (100 - discountPercentage) / 100)
     : price
+
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }} // Hiệu ứng hover mượt mà hơn

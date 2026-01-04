@@ -93,7 +93,7 @@ export const availableColors = [
 ]
 
 export const sortOptions = [
-  { name: 'Mặc định (Nổi bật)', key: 'position', value: 'desc' },
+  { name: 'Mặc định (Nổi bật)', key: 'createdAt', value: 'desc' },
   { name: 'Giá: Cao đến Thấp', key: 'discountedPrice', value: 'desc' },
   { name: 'Giá: Thấp đến Cao', key: 'discountedPrice', value: 'asc' },
   { name: 'Tên: A-Z', key: 'title', value: 'asc' },

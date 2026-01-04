@@ -13,8 +13,9 @@ const useDetail = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [loading, setLoading] = useState(true)
 
-  // === THÊM STATE ĐỂ QUẢN LÝ BỘ LỌC ĐÁNH GIÁ ===
+  // === STATE ĐỂ QUẢN LÝ BỘ LỌC ĐÁNH GIÁ ===
   const [reviewFilter, setReviewFilter] = useState<'all' | 'media' | number>('all')
+  const [visibleCount, setVisibleCount] = useState<number>(10)
 
   // === CẬP NHẬT STATE CHO MÀU SẮC VÀ ẢNH HIỂN THỊ ===
   const [selectedColor, setSelectedColor] = useState<ProductInfoInterface['colors'][0] | null>(null)
@@ -26,6 +27,11 @@ const useDetail = () => {
   const { dispatchAlert } = useAlertContext()
   const { addToCart } = useCart()
   const [relatedProducts, setRelatedProducts] = useState<ProductInfoInterface[]>([])
+
+  // RESET VỀ 10 KHI ĐỔI BỘ LỌC (Rất quan trọng)
+  useEffect(() => {
+    setVisibleCount(10)
+  }, [reviewFilter])
 
   useEffect(() => {
     if (!slugProduct) return
@@ -141,6 +147,15 @@ const useDetail = () => {
     return productDetail.comments.filter(c => c.rating === reviewFilter)
   }, [productDetail?.comments, reviewFilter])
 
+  //  CẮT MẢNG ĐỂ HIỂN THỊ (Lấy từ 0 đến visibleCount)
+  const displayedComments = useMemo(() => {
+    return filteredComments.slice(0, visibleCount)
+  }, [filteredComments, visibleCount])
+
+  // HÀM XỬ LÝ NÚT "XEM THÊM"
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 10)
+  }
   return {
     loading,
     setReviewFilter,
@@ -157,7 +172,10 @@ const useDetail = () => {
     setSelectedSize,
     reviewFilter,
     quantity,
-    selectedSize
+    selectedSize,
+    handleLoadMore,
+    displayedComments,
+    visibleCount
   }
 }
 
