@@ -66,7 +66,7 @@ The project is divided into two separate parts: front-end (Client) and back-end 
 
 - Authorization: Integrates role_id logic into the JWT payload to control API access (e.g., Admin, Product, Order,..).
 
-- Statistic: Overview of revenue, orders, and new users.
+- Statistic: Overview of revenue, orders.
 
 - Full CRUD Management:
 
@@ -110,7 +110,7 @@ The project is divided into two separate parts: front-end (Client) and back-end 
 
 - Components: Material-UI (MUI) (for Skeletons, Menus, Dialogs), Swiper.js (for sliders)
 
-- Validator: zod, react-hook-form
+- Validator: Zod, react-hook-form
 
 2.2. Backend
 
@@ -128,7 +128,7 @@ The project is divided into two separate parts: front-end (Client) and back-end 
 
 - File Upload: Multer (file handling), Cloudinary (image storage)
 
-- Validator: joi
+- Validator: Joi
 
 - Others: exceljs (Excel Export), mongoose-slug-updater
 
