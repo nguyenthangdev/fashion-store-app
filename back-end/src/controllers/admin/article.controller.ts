@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Article from '~/models/article.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
-import * as articleService from '~/services/article.service'
+import * as articleService from '~/services/admin/article.service'
 
 // [GET] /admin/articles
 export const index = async (req: Request, res: Response) => {

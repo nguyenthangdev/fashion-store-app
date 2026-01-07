@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 
-export const loginPost = (
+export const loginAdmin = (
   req: Request,
   res: Response,
   next: NextFunction

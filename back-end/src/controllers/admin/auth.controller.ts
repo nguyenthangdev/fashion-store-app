@@ -1,65 +1,22 @@
 import Account from '~/models/account.model'
 import { Request, Response } from 'express'
-import bcrypt from 'bcrypt' 
 import { JWTProvider } from '~/providers/jwt.provider'
-import ms from 'ms'
 import { StatusCodes } from 'http-status-codes'
 import Session from '~/models/session.model'
 import crypto from 'crypto'
 import { getCookieOptions } from '~/utils/constants'
-import Role from '~/models/role.model'
+import * as authService from '~/services/admin/auth.service'
 
 // [POST] /admin/auth/login
-export const loginPost = async (req: Request, res: Response) => {
+export const loginAdmin = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const {
+      accessToken,
+      refreshToken,
+      role,
+      accountAdmin
+    } = await authService.loginAdmin(req.body)
 
-    const accountAdmin = await Account.findOne({
-      email: email,
-      deleted: false
-    }).select('+password')
-    if (!accountAdmin) {
-      res.json({
-        code: 401,
-        message: 'Tài khoản hoặc mật khẩu không chính xác!'
-      })
-      return
-    }
-
-    const isMatch = await bcrypt.compare(password, accountAdmin.password)
-    if (!isMatch) {
-      res.json({
-        code: 401,
-        message: 'Tài khoản hoặc mật khẩu không chính xác!'
-      })
-      return
-    }
-
-    if (accountAdmin.status === 'INACTIVE') {
-      res.json({
-        code: 403,
-        message: 'Tài khoản đã bị khóa!'
-      })
-      return
-    }
-
-    const payload = {
-      accountId: accountAdmin._id,
-      email: accountAdmin.email,
-      role_id: accountAdmin.role_id 
-    }
-
-    const accessToken = await JWTProvider.generateToken(
-      payload,
-      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN, 
-      '1h'
-    )
-
-    const refreshToken = await JWTProvider.generateToken(
-      payload,
-      process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
-      '14d'
-    )
     // const parser = new UAParser(req.get("User-Agent"))
     // const device = parser.getDevice()
     // const os = parser.getOS()
@@ -77,7 +34,7 @@ export const loginPost = async (req: Request, res: Response) => {
 
     res.cookie('accessToken', accessToken, getCookieOptions('14 days'))
     res.cookie('refreshToken', refreshToken, getCookieOptions('14 days'))
-    const role = await Role.findOne({ _id: accountAdmin.role_id, deleted: false })
+
     res.json({ 
       code: 200, 
       message: 'Đăng nhập thành công!', 
@@ -87,7 +44,8 @@ export const loginPost = async (req: Request, res: Response) => {
 
   } catch (error) {
     res.json({
-      code: 400,
+      code: error.statusCode || 400,
+      message: error.message || 'Lỗi',
       error: error
     })
   }
@@ -95,30 +53,8 @@ export const loginPost = async (req: Request, res: Response) => {
 
 // [POST] /admin/auth/refresh-token
 export const refreshToken = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.refreshToken
-
-  if (!refreshToken) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Không tồn tại refreshToken!' })
-    return
-  }
   try {
-    const refreshTokenDecoded = await JWTProvider.verifyToken(
-      refreshToken, 
-      process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN
-    ) as {
-      accountId: string,
-      email: string,
-      role_id: string
-    }
-    const account = await Account.findOne({
-      _id: refreshTokenDecoded.accountId,
-      deleted: false,
-      status: "ACTIVE"
-    })
-    if (!account) {
-      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Account không tồn tại!' })
-      return
-    }
+    const newAccessToken = await authService.refreshTokenAdmin(req.cookies?.refreshToken)
     // const session = await Session.findOne({
     //   accountId: new mongoose.Types.ObjectId(refreshTokenDecoded.accountId),
     //   refreshTokenHash: hashToken(refreshToken)
@@ -132,17 +68,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     // // Xóa phiên cũ, tạo phiên mới + accessToken mới
     // await session.deleteOne()
 
-    const payload = { 
-      accountId: refreshTokenDecoded.accountId, 
-      email: refreshTokenDecoded.email, 
-      role_id: refreshTokenDecoded.role_id, 
-    }
-
-    const newAccessToken = await JWTProvider.generateToken(
-      payload,
-      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN,
-      '1h'
-    )
+    
 
     // const newRefreshToken = await JWTProvider.generateToken(
     //   payload,

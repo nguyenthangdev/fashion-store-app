@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Account from '~/models/account.model'
-import * as accountService from '~/services/account.service'
+import * as accountService from '~/services/admin/account.service'
 
 // [GET] /admin/accounts
 export const index = async (req: Request, res: Response) => {
