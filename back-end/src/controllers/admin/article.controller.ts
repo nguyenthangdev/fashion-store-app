@@ -1,67 +1,18 @@
 import { Request, Response } from 'express'
 import Article from '~/models/article.model'
-import Account from '~/models/account.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
-import searchHelpers from '~/helpers/search'
-import paginationHelpers from '~/helpers/pagination'
+import * as articleService from '~/services/article.service'
 
 // [GET] /admin/articles
 export const index = async (req: Request, res: Response) => {
   // Bộ lọc
   try {
-    const find: any = { deleted: false }
-
-    if (req.query.status) {
-      find.status = req.query.status.toString()
-    }
-
-    // Search
-    const objectSearch = searchHelpers(req.query)
-    if (objectSearch.regex || objectSearch.slug) {
-      find.$or = [
-        { title: objectSearch.regex },
-        { slug: objectSearch.slug }
-      ]
-    }
-    // End search
-
-    // Sort
-    let sort: Record<string, 1 | -1> = { }
-    if (req.query.sortKey) {
-      const key = req.query.sortKey.toString()
-      const dir = req.query.sortValue === 'asc' ? 1 : -1
-      sort[key] = dir
-    }
-    // luôn sort phụ theo createdAt
-    if (!sort.createdAt) {
-      sort.createdAt = -1
-    }
-    // End Sort
-
-    // Pagination
-    const countArticles = await Article.countDocuments(find)
-    const objectPagination = paginationHelpers(
-      {
-        currentPage: 1,
-        limitItems: 5
-      },
-      req.query,
-      countArticles
-    )
-    // End Pagination
-    const [articles, allArticles] = await Promise.all([
-      Article
-        .find(find)
-        .sort(sort)
-        .limit(objectPagination.limitItems)
-        .skip(objectPagination.skip)
-        .populate('createdBy.account_id', 'fullName email')
-        .populate('updatedBy.account_id', 'fullName email')
-        .lean(),
-      Article
-        .find({ deleted: false })
-        .lean()
-    ])
+    const {
+      articles,
+      objectSearch,
+      objectPagination,
+      allArticles
+    } = await articleService.getArticles(req.query)
 
     res.json({
       code: 200,
@@ -82,13 +33,10 @@ export const index = async (req: Request, res: Response) => {
 }
 
 // [POST] /admin/articles/create
-export const createPost = async (req: Request, res: Response) => {
+export const createArticle = async (req: Request, res: Response) => {
   try {
-    req.body.createdBy = {
-      account_id: req['accountAdmin'].id
-    }
-    const article = new Article(req.body)
-    await article.save()
+    const article = await articleService.createArticle(req.body, req['accountAdmin'].id)
+
     res.json({
       code: 201,
       message: 'Thêm thành công bài viết!',
@@ -104,14 +52,10 @@ export const createPost = async (req: Request, res: Response) => {
 }
 
 // [GET] /admin/articles/detail/:id
-export const detail = async (req: Request, res: Response) => {
+export const detailArticle = async (req: Request, res: Response) => {
   try {
-    const find = {
-      deleted: false,
-      _id: req.params.id
-    }
+    const article = await articleService.detailArticle(req.params.id)
 
-    const article = await Article.findOne(find)
     res.json({
       code: 200,
       message: 'Thành công!',
@@ -127,21 +71,10 @@ export const detail = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/articles/edit/:id
-export const editPatch = async (req: Request, res: Response) => {
+export const editArticle = async (req: Request, res: Response) => {
   try {
-    const updatedBy = {
-      account_id: req['accountAdmin'].id,
-      updatedAt: new Date()
-    }
-    await Article.updateOne(
-      { _id: req.params.id },
-      {
-        ...req.body,
-        $push: {
-          updatedBy: updatedBy
-        }
-      }
-    )
+    await articleService.editArticle(req.body, req.params.id, req['accountAdmin'].id)
+
     res.json({
       code: 200,
       message: 'Cập nhật thành công bài viết!'
@@ -156,26 +89,13 @@ export const editPatch = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/articles/change-status/:status/:id
-export const changeStatus = async (req: Request, res: Response) => {
+export const changeStatusArticle = async (req: Request, res: Response) => {
   try {
-    const status: string = req.params.status
-    const id: string = req.params.id
-
-    const updatedBy = {
-      account_id: req['accountAdmin'].id,
-      updatedAt: new Date()
-    }
-    const updater = await Article
-      .findByIdAndUpdate(
-        { _id: id },
-        {
-          status: status,
-          $push: { updatedBy: updatedBy }
-        },
-        { new: true } // Trả về document sau update
-      )
-      .populate('updatedBy.account_id', 'fullName email')
-      .lean() 
+    const updater = await articleService.changeStatusArticle(
+      req.params.status, 
+      req.params.id, 
+      req['accountAdmin'].id
+    )
 
     res.json({
       code: 200,
@@ -254,19 +174,10 @@ export const changeMulti = async (req: Request, res: Response) => {
 }
 
 // [DELETE] /admin/articles/delete/:id
-export const deleteItem = async (req: Request, res: Response) => {
+export const deleteArticle = async (req: Request, res: Response) => {
   try {
-    const id: string = req.params.id
-    await Article.updateOne(
-      { _id: id },
-      {
-        deleted: true,
-        deletedBy: {
-          account_id: req['accountAdmin'].id,
-          deletedAt: new Date()
-        }
-      }
-    )
+    await articleService.deleteArticle(req.params.id, req['accountAdmin'].id)
+    
     res.json({
       code: 204,
       message: 'Xóa thành công bài viết!'
