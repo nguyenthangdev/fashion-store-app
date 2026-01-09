@@ -1,8 +1,8 @@
 import { API_ROOT } from '~/utils/constants'
-import type { ClientChatResponse } from '~/types/chat.type'
+import type { ClientChatAPIResponse } from '~/types/chat.type'
 import authorizedAxiosInstance from '~/utils/authorizedAxiosClient'
 
-export const fetchClientChatAPI = async (): Promise<ClientChatResponse> => {
+export const fetchClientChatAPI = async (): Promise<ClientChatAPIResponse> => {
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/chats`
   )

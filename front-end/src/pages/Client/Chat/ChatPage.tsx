@@ -46,24 +46,20 @@ const ChatPage = () => {
             </header>
 
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-              {/* Logic hiển thị 3 trạng thái */}
               {!accountUser ? (
-                // Trạng thái: Chưa đăng nhập
                 <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 p-8">
                   <p className="mb-4">
-                    Vui lòng<Link to="/user/login" className="text-blue-600 font-semibold underline">đăng nhập</Link>để bắt đầu trò chuyện.
+                    Vui lòng<Link to="/user/login" className="text-blue-600 font-semibold underline"> đăng nhập </Link>để bắt đầu trò chuyện.
                   </p>
                   <p className="text-xs">Việc đăng nhập giúp chúng tôi hỗ trợ bạn tốt hơn.</p>
                 </div>
               ) : loading ? (
-                // Trạng thái: Đang tải (đã đăng nhập)
                 <div className="space-y-4">
                   <Skeleton variant="rounded" width="60%" height={40} />
                   <Skeleton variant="rounded" width="70%" height={50} sx={{ ml: 'auto' }} />
                   <Skeleton variant="rounded" width="50%" height={40} />
                 </div>
               ) : (
-                // Trạng thái: Đã tải xong, sẵn sàng chat
                 messages.map((msg, index) => (
                   <div
                     key={msg._id || index}
@@ -96,7 +92,7 @@ const ChatPage = () => {
               <button
                 type="submit"
                 className="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center disabled:bg-gray-400"
-                disabled={loading || !newMessage.trim() || !accountUser}
+                disabled={loading || !newMessage.trim() || !accountUser} // Vô hiệu hóa nếu đang tải hoặc chưa login
               >
                 <IoIosSend />
               </button>

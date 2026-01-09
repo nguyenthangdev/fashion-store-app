@@ -1,15 +1,15 @@
 import { API_ROOT } from '~/utils/constants'
-import type { AdminChatRoomsResponse, AdminChatHistoryResponse } from '~/types/chat.type'
+import type { AdminChatRoomsAPIResponse, AdminChatHistoryAPIResponse } from '~/types/chat.type'
 import authorizedAxiosInstance from '~/utils/authorizedAxiosAdmin'
 
-export const fetchAdminChatRoomsAPI = async (): Promise<AdminChatRoomsResponse> => {
+export const fetchAdminChatRoomsAPI = async (): Promise<AdminChatRoomsAPIResponse> => {
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/chats`
   )
   return response.data
 }
 
-export const fetchAdminChatHistoryAPI = async (userId: string): Promise<AdminChatHistoryResponse> => {
+export const fetchAdminChatHistoryAPI = async (userId: string): Promise<AdminChatHistoryAPIResponse> => {
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/chats/${userId}`
   )

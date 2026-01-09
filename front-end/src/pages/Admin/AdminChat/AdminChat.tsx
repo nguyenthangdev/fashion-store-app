@@ -2,9 +2,9 @@ import Skeleton from '@mui/material/Skeleton'
 import { FaArrowLeft, FaUserCircle } from 'react-icons/fa'
 import { IoIosSend } from 'react-icons/io'
 import clsx from 'clsx'
-import useChatPage from '~/hooks/Admin/adminChatPage/useChatPage'
+import useAdminChat from '~/hooks/Admin/adminChat/useAdminChat'
 
-const AdminChatPage = () => {
+const AdminChat = () => {
   const {
     rooms,
     loadingRooms,
@@ -17,7 +17,7 @@ const AdminChatPage = () => {
     messagesEndRef,
     newMessage,
     setNewMessage
-  } = useChatPage()
+  } = useAdminChat()
 
   return (
     <div className="flex h-[calc(100vh-80px)] bg-gray-100] w-full overflow-hidden">
@@ -153,5 +153,5 @@ const AdminChatPage = () => {
   )
 }
 
-export default AdminChatPage
+export default AdminChat
 

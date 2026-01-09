@@ -8,7 +8,9 @@ import io from 'socket.io-client'
 import type { ChatRoom, Message } from '~/types/chat.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
-const useChatPage = () => {
+const useAdminChat = () => {
+  const { myAccount } = useAuth()
+
   const [rooms, setRooms] = useState<ChatRoom[]>([])
   const [activeRoom, setActiveRoom] = useState<ChatRoom | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -16,10 +18,9 @@ const useChatPage = () => {
   const [loadingRooms, setLoadingRooms] = useState(true)
   const [loadingMessages, setLoadingMessages] = useState(false)
 
+  // Lưu socket xuyên suốt vòng đời component
   const socketRef = useRef<ReturnType<typeof io> | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  const { myAccount } = useAuth()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -32,7 +33,7 @@ const useChatPage = () => {
     const getRooms = async () => {
       try {
         setLoadingRooms(true)
-        // API này sẽ tự động gửi cookie 'tokenAdmin'
+        // API này sẽ tự động gửi cookie 'accessToken'
         const res = await fetchAdminChatRoomsAPI()
         if (res.code === 200) {
           setRooms(res.chatRooms)
@@ -43,6 +44,7 @@ const useChatPage = () => {
         setLoadingRooms(false)
       }
     }
+
     getRooms()
   }, [myAccount])
 
@@ -55,9 +57,9 @@ const useChatPage = () => {
     } as any)
     socketRef.current = socket
 
-    socket.emit('ADMIN_JOIN_ROOM', 'ADMIN_ROOM')
+    socket.emit('ADMIN_CLIENT_JOIN_ROOM', 'ADMIN_ROOM') // event: 'ADMIN_CLIENT_JOIN_ROOM', data: 'ADMIN_ROOM'
 
-    socket.on('SERVER_RECEIVE_MESSAGE', (newMessage: Message & { user_id: string }) => {
+    socket.on('SERVER_RETURN_MESSAGE', (newMessage: Message & { user_id: string }) => {
       setActiveRoom(prevRoom => {
         // Chỉ thêm tin nhắn nếu admin đang mở đúng phòng
         if (prevRoom && newMessage.user_id === prevRoom.user_id._id) {
@@ -67,6 +69,7 @@ const useChatPage = () => {
       })
     })
 
+    // Đưa tin nhắn mới nhất lên đầu tiên của lịch sử chat
     socket.on('NEW_MESSAGE_NOTIFICATION', (data: { chatRoom: ChatRoom }) => {
       setRooms(prevRooms => {
         const existingRoom = prevRooms.find(r => r._id === data.chatRoom._id)
@@ -88,7 +91,7 @@ const useChatPage = () => {
     if (!myAccount || (activeRoom && activeRoom._id === room._id)) return
 
     if (activeRoom && socketRef.current) {
-      socketRef.current.emit('ADMIN_LEAVE_ROOM', activeRoom.user_id._id)
+      socketRef.current.emit('ADMIN_CLIENT_LEAVE_ROOM', activeRoom.user_id._id)
     }
 
     setActiveRoom(room)
@@ -98,7 +101,7 @@ const useChatPage = () => {
       const res = await fetchAdminChatHistoryAPI(room.user_id._id)
       if (res.code === 200) {
         setMessages(res.chat.messages)
-        socketRef.current?.emit('ADMIN_JOIN_ROOM', room.user_id._id)
+        socketRef.current?.emit('ADMIN_CLIENT_JOIN_ROOM', room.user_id._id)
       }
     } catch (error) {
       console.error('Lỗi khi lấy lịch sử chat:', error)
@@ -111,7 +114,7 @@ const useChatPage = () => {
     e.preventDefault()
     if (!newMessage.trim() || !socketRef.current || !activeRoom) return
 
-    socketRef.current.emit('ADMIN_SEND_MESSAGE', {
+    socketRef.current.emit('ADMIN_CLIENT_SEND_MESSAGE', {
       userId: activeRoom.user_id._id,
       content: newMessage
     })
@@ -121,6 +124,7 @@ const useChatPage = () => {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
   return {
     rooms,
     loadingRooms,
@@ -136,4 +140,4 @@ const useChatPage = () => {
   }
 }
 
-export default useChatPage
+export default useAdminChat

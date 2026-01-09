@@ -7,6 +7,8 @@ import type { Message } from '~/types/chat.type'
 import { useAuth } from '~/contexts/client/AuthContext'
 
 const useChat = () => {
+  const { accountUser } = useAuth()
+
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -14,18 +16,11 @@ const useChat = () => {
   const socketRef = useRef<ReturnType<typeof io> | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { accountUser } = useAuth()
-  // useEffect(() => {
-  //   fetchInfoUserAPI().then((response: UserDetailInterface) => {
-  //     setAccountUser(response.accountUser)
-  //   })
-  // }, [setAccountUser])
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Logic kết nối Socket và lấy lịch sử chat
-  // Sẽ CHỈ chạy khi người dùng MỞ cửa sổ chat (isOpen = true)
+  // Logic kết nối Socket và lấy lịch sử chat. Sẽ CHỈ chạy khi người dùng MỞ cửa sổ chat (isOpen = true)
   useEffect(() => {
     if (isOpen) {
       // Nếu không có user (chưa đăng nhập), chỉ cần tắt loading
@@ -56,10 +51,10 @@ const useChat = () => {
           socketRef.current = socket
 
           // Yêu cầu join phòng (backend sẽ tự đọc cookie để biết user_id)
-          socket.emit('CLIENT_JOIN_ROOM')
+          socket.emit('USER_CLIENT_JOIN_ROOM')
 
           // Lắng nghe tin nhắn mới từ server
-          socket.on('SERVER_RECEIVE_MESSAGE', (newMessage: Message & { user_id: string }) => {
+          socket.on('SERVER_RETURN_MESSAGE', (newMessage: Message & { user_id: string }) => {
             setMessages((prevMessages) => [...prevMessages, newMessage])
           })
 
@@ -76,7 +71,15 @@ const useChat = () => {
         socketRef.current?.disconnect()
       }
     }
-  }, [isOpen, accountUser]) // Phụ thuộc vào `isOpen` và `accountUser`
+  }, [isOpen, accountUser])
+
+  // Gửi tin nhắn
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!newMessage.trim() || !socketRef.current || !accountUser) return
+    socketRef.current.emit('USER_CLIENT_SEND_MESSAGE', newMessage)
+    setNewMessage('')
+  }
 
   // Tự động cuộn khi có tin nhắn mới
   useEffect(() => {
@@ -84,14 +87,6 @@ const useChat = () => {
       scrollToBottom()
     }
   }, [messages, isOpen])
-
-  // Gửi tin nhắn
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!newMessage.trim() || !socketRef.current || !accountUser) return
-    socketRef.current.emit('CLIENT_SEND_MESSAGE', newMessage)
-    setNewMessage('')
-  }
 
   return {
     setIsOpen,

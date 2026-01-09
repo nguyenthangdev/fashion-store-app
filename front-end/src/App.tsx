@@ -74,7 +74,7 @@ import BrandAdmin from '~/pages/Admin/Brand'
 import CreateBrand from '~/pages/Admin/Brand/Create'
 import EditBrand from '~/pages/Admin/Brand/Edit'
 import BrandPage from '~/pages/Client/Brand/Brand'
-import AdminChatPage from '~/pages/Admin/AdminChatPage/AdminChatPage'
+import AdminChat from '~/pages/Admin/AdminChat/AdminChat'
 import GoogleCallback from './pages/Client/GoogleCallback/GoogleCallback'
 import { Error404Page } from './pages/Error404Page/Error404Page'
 import UnauthorizedRoutesAdmin from './components/Admin/UnauthorizedRoutes/UnauthorizedRoutes'
@@ -243,7 +243,7 @@ function App() {
             <Route index element={ <MyAccountAdmin />}/>
             <Route path='edit' element={ <EditMyAccount />}/>
           </Route>
-          <Route path='chats' element={ <AdminChatPage />}/>
+          <Route path='chats' element={ <AdminChat />}/>
           <Route path='settings'>
             <Route path='general'>
               <Route index element={<General />}/>

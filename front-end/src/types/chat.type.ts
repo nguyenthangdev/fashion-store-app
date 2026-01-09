@@ -23,19 +23,19 @@ export interface ChatRoom {
   lastMessageAt: string
 }
 
-export interface ClientChatResponse {
+export interface ClientChatAPIResponse {
   code: number
   message?: string
   chat: Chat
 }
 
-export interface AdminChatRoomsResponse {
+export interface AdminChatRoomsAPIResponse {
   code: number
   message?: string
   chatRooms: ChatRoom[]
 }
 
-export interface AdminChatHistoryResponse {
+export interface AdminChatHistoryAPIResponse {
   code: number
   message?: string
   chat: Chat
