@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import Joi from 'joi'
 
-export const editPatch = (
+export const editMyAccount = (
   req: Request,
   res: Response,
   next: NextFunction

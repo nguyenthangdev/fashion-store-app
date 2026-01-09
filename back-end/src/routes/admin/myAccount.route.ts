@@ -12,8 +12,8 @@ router.patch(
   '/edit',
   multer().single('avatar'),
   uploadWithOneImageToCloud,
-  validate.editPatch, // middleware
-  controller.editPatch
+  validate.editMyAccount, // middleware
+  controller.editMyAccount
 )
 
 export const myAccountRoutes: Router = router
