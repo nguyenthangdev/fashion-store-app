@@ -4,6 +4,6 @@ import * as controller from '~/controllers/client/article.controller'
 
 router.get('/', controller.index)
 router.get('/:slugCategory', controller.category)
-router.get('/detail/:slugArticle', controller.detail)
+router.get('/detail/:slugArticle', controller.detailArticle)
 
 export const articleRoutes: Router = router
