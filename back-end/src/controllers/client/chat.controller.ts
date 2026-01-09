@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import Chat from '~/models/chat.model'
 import * as chatService from '~/services/client/chat.service'
 
 // Lấy hoặc tạo phòng chat cho client đang đăng nhập

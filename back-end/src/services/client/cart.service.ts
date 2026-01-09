@@ -15,9 +15,9 @@ export const getCart = async (cartId: any) => {
     
     // Nếu không có giỏ hàng, trả về an toàn
     if (!cart) {
-        const error: any = new Error('Giỏ hàng trống!')
-        error.statusCode = 200
-        throw error
+      const error: any = new Error('Giỏ hàng trống!')
+      error.statusCode = 200
+      throw error
     }
     // Tính toán tổng tiền sau khi đã có đầy đủ thông tin
     let totalsPrice = 0
