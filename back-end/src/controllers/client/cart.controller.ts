@@ -1,8 +1,5 @@
 import { Request, Response } from 'express'
 import Cart from '~/models/cart.model'
-import * as productsHelper from '~/helpers/product'
-import { OneProduct } from '~/helpers/product'
-import mongoose from 'mongoose'
 import * as cartService from '~/services/client/cart.service'
 
 // [GET] /cart
