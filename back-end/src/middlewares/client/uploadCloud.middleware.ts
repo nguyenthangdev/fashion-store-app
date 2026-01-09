@@ -56,7 +56,7 @@ const streamUpload = (fileBuffer: Buffer): Promise<any> => {
 }
 
 // Middleware đã được nâng cấp để xử lý nhiều ảnh
-export const uploadCloud = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const uploadCloudWithManyImagesToCloud = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Kiểm tra xem `req.files` có phải là một mảng và có chứa file không
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {

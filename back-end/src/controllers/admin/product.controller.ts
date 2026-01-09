@@ -3,65 +3,18 @@ import Product from '~/models/product.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
+import * as productService from '~/services/admin/product.service'
 
 // [GET] /admin/products
 export const index = async (req: Request, res: Response) => {
   try {
-    const find: any = { deleted: false }
+    const {
+      products,
+      allProducts,
+      objectSearch,
+      objectPagination
+    } = await productService.getProducts(req.query)
 
-    if (req.query.status) {
-      find.status = req.query.status.toString()
-    }
-
-    // Search
-    const objectSearch = searchHelpers(req.query)
-    if (objectSearch.regex || objectSearch.slug) {
-      find.$or = [
-        { title: objectSearch.regex },
-        { slug: objectSearch.slug }
-      ]
-    }
-    // End search
-
-    // Sort
-    let sort: Record<string, 1 | -1> = { }
-    if (req.query.sortKey) {
-      const key = req.query.sortKey.toString()
-      const dir = req.query.sortValue === 'asc' ? 1 : -1
-      sort[key] = dir
-    }
-    // luôn sort phụ theo createdAt
-    if (!sort.createdAt) {
-      sort.createdAt = -1
-    }
-    // End Sort
-
-    // Pagination
-    const countProducts = await Product.countDocuments(find)
-    const objectPagination = paginationHelpers(
-      {
-        currentPage: 1,
-        limitItems: 5
-      },
-      req.query,
-      countProducts
-    )
-    // End Pagination
-    
-    const [products, allProducts] = await Promise.all([
-      Product
-        .find(find)
-        .sort(sort)
-        .limit(objectPagination.limitItems)
-        .skip(objectPagination.skip)
-        .populate('createdBy.account_id', 'fullName email')
-        .populate('updatedBy.account_id', 'fullName email')
-        .lean(),
-      Product
-        .find({ deleted: false })
-        .lean()
-    ])
-   
     res.json({
       code: 200,
       message: 'Thành công!',
@@ -81,27 +34,13 @@ export const index = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/products/change-status/:status/:id
-export const changeStatus = async (req: Request, res: Response) => {
+export const changeStatusProduct = async (req: Request, res: Response) => {
   try {
-    const status: string = req.params.status
-    const id: string = req.params.id
-
-    const updatedBy = {
-      account_id: req['accountAdmin'].id,
-      updatedAt: new Date()
-    }
-
-    const updater = await Product
-      .findByIdAndUpdate(
-        { _id: id },
-        {
-          status: status,
-          $push: { updatedBy: updatedBy }
-        },
-        { new: true } // Trả về document sau update
-      )
-      .populate('updatedBy.account_id', 'fullName email')
-      .lean() 
+    const updater = await productService.changeStatusProduct(
+      req.params.id, 
+      req.params.status, 
+      req['accountAdmin'].id
+    )
 
     res.json({
       code: 200,
@@ -180,19 +119,10 @@ export const changeMulti = async (req: Request, res: Response) => {
 }
 
 // [DELETE] /admin/products/delete/:id
-export const deleteItem = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const id: string = req.params.id
-    await Product.updateOne(
-      { _id: id },
-      {
-        deleted: true,
-        deletedBy: {
-          account_id: req['accountAdmin'].id,
-          deletedAt: new Date()
-        }
-      }
-    )
+    await productService.deleteProduct(req.params.id, req['accountAdmin'].id)
+
     res.json({
       code: 204,
       message: 'Xóa thành công sản phẩm!'
@@ -207,50 +137,14 @@ export const deleteItem = async (req: Request, res: Response) => {
 }
 
 // [POST] /admin/products/create
-export const createPost = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response) => {
   try {
-    // 1. Parse dữ liệu sản phẩm từ chuỗi JSON
-    const productData = req.body
+    const records = await productService.createProduct(
+      req.body, 
+      req['accountAdmin'].id, 
+      req['fileUrls']
+    )
 
-    // 2. Lấy mảng URL đã được upload từ middleware
-    const uploadedUrls = req['fileUrls'] || []
-    let urlIndex = 0
-
-    // 3. Xử lý ảnh đại diện (thumbnail)
-    if (productData.thumbnail === '__THUMBNAIL_PLACEHOLDER__') {
-      productData.thumbnail = uploadedUrls[urlIndex]
-      urlIndex++
-    }
-    
-    // 4. Lắp ráp URL vào đúng vị trí trong mảng colors
-    for (const color of productData.colors) {
-      const imageCount = color.images.length // Số lượng ảnh cần cho màu này
-      if (imageCount > 0) {
-        // Lấy đúng số lượng URL từ mảng đã upload
-        const colorImages = uploadedUrls.slice(urlIndex, urlIndex + imageCount)
-        color.images = colorImages
-        urlIndex += imageCount
-      }
-    }
-
-    productData.price = parseInt(productData.price) || 0
-    productData.discountPercentage = parseInt(productData.discountPercentage) || 0
-    productData.stock = parseInt(productData.stock) || 0
-    
-    // let position: number
-    // if (!productData.position) {
-    //   const count = await Product.countDocuments({ deleted: false })
-    //   position = count + 1
-    // } else {
-    //   position = parseInt(productData.position)
-    // }
-    // productData.position = position
-    productData.createdBy = {
-      account_id: req['accountAdmin'].id
-    }
-
-    const records = new Product(productData)
-    await records.save()
     res.json({
       code: 201,
       message: 'Thêm thành công sản phẩm!',
@@ -268,54 +162,15 @@ export const createPost = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/products/edit/:id
-export const editPatch = async (req: Request, res: Response) => {
+export const editProduct = async (req: Request, res: Response) => {
   try {
-    // 1. Parse dữ liệu sản phẩm từ chuỗi JSON
-    const productData = req.body
-
-    // 2. Lấy mảng URL của các ảnh MỚI đã được upload
-    const uploadedUrls = req['fileUrls'] || []
-    let urlIndex = 0
-
-    // 3. Xử lý ảnh đại diện (thumbnail)
-    if (productData.thumbnail === '__THUMBNAIL_PLACEHOLDER__') {
-      productData.thumbnail = uploadedUrls[urlIndex]
-      urlIndex++
-    }
- 
-    // 4. Lắp ráp lại mảng ảnh cho từng màu
-    for (const color of productData.colors) {
-      // Thay thế các placeholder bằng URL mới
-      color.images = color.images.map((image: string) => {
-        if (image === '__IMAGE_PLACEHOLDER__') {
-          const newUrl = uploadedUrls[urlIndex]
-          urlIndex++
-          return newUrl
-        }
-        // Giữ nguyên các URL ảnh cũ
-        return image
-      })
-    }
-
-    // Logic parseInt không đổi
-    productData.price = parseInt(productData.price) || 0
-    productData.discountPercentage = parseInt(productData.discountPercentage) || 0
-    productData.stock = parseInt(productData.stock) || 0
-    // productData.position = parseInt(productData.position) || 0
-
-    const updatedBy = {
-      account_id: req['accountAdmin'].id,
-      updatedAt: new Date()
-    }
-    delete productData.updatedBy
-
-    await Product.updateOne(
-      { _id: req.params.id },
-      {
-        ...productData, // Dùng productData đã được lắp ráp hoàn chỉnh
-        $push: { updatedBy: updatedBy }
-      }
+    await productService.editProduct(
+      req.body, 
+      req['accountAdmin'].id,
+      req.params.id,
+      req['fileUrls']
     )
+
     res.json({
       code: 200,
       message: 'Cập nhật thành công sản phẩm!'
@@ -327,13 +182,10 @@ export const editPatch = async (req: Request, res: Response) => {
 }
 
 // [GET] /admin/products/detail/:id
-export const detail = async (req: Request, res: Response) => {
+export const detaiProduct = async (req: Request, res: Response) => {
   try {
-    const find = {
-      deleted: false,
-      _id: req.params.id
-    }
-    const product = await Product.findOne(find)
+    const product = await productService.detaiProduct(req.params.id)
+
     res.json({
       code: 200,
       message: 'Lấy thành công chi tiết sản phẩm!',
@@ -351,56 +203,11 @@ export const detail = async (req: Request, res: Response) => {
 // [GET] /admin/products/trash
 export const productTrash = async (req: Request, res: Response) => {
   try {
-    const find: any = {
-      deleted: true
-    }
-
-    // Search
-    const objectSearch = searchHelpers(req.query)
-    if (objectSearch.regex || objectSearch.slug) {
-      find.$or = [
-        { title: objectSearch.regex },
-        { slug: objectSearch.slug }
-      ]
-    }
-    // End search
-
-    // Sort
-    let sort: Record<string, 1 | -1> = { }
-    if (req.query.sortKey) {
-      const key = req.query.sortKey.toString()
-      const dir = req.query.sortValue === 'asc' ? 1 : -1
-      sort[key] = dir
-    }
-    // luôn sort phụ theo createdAt
-    if (!sort.createdAt) {
-      sort.createdAt = -1
-    }
-    // End Sort
-
-
-    // Pagination
-    const countOrders = await Product.countDocuments(find)
-
-    const objectPagination = paginationHelpers(
-      {
-        currentPage: 1,
-        limitItems: 10
-      },
-      req.query,
-      countOrders
-    )
-    // End Pagination
-
-    const products = await Product
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .lean()
-      .populate('createdBy.account_id', 'fullName email')
-      .populate('deletedBy.account_id', 'fullName email') // Lấy thông tin người tạo
-      .lean()
+    const {
+      products,
+      objectSearch,
+      objectPagination
+    } = await productService.productTrash(req.query)
 
     res.json({
       code: 200,
@@ -465,10 +272,8 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
 // [DELETE] /admin/products/trash/permanentlyDelete/:id
 export const permanentlyDeleteProduct = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id
-    await Product.deleteOne(
-      { _id: id }
-    )
+    await productService.permanentlyDeleteProduct(req.params.id)
+
     res.json({
       code: 204,
       message: 'Đã xóa vĩnh viễn thành công sản phẩm!'
@@ -485,11 +290,8 @@ export const permanentlyDeleteProduct = async (req: Request, res: Response) => {
 // [PATCH] /admin/products/trash/recover/:id
 export const recoverProduct = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id
-    await Product.updateOne(
-      { _id: id },
-      { deleted: false, recoveredAt: new Date() }
-    )
+    await productService.recoverProduct(req.params.id)
+    
     res.json({
       code: 200,
       message: 'Đã khôi phục thành công sản phẩm!'

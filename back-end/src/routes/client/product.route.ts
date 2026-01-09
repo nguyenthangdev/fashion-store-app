@@ -3,7 +3,7 @@ const router: Router = Router()
 import * as controller from '~/controllers/client/product.controller'
 // Upload ảnh
 import multer from 'multer'
-import { uploadCloud } from '~/middlewares/admin/uploadCloud.middleware'
+import { uploadCloudWithManyImagesToCloud } from '~/middlewares/admin/uploadCloud.middleware'
 // Upload ảnh
 import * as authMiddleware from '~/middlewares/client/auth.middleware'
 
@@ -17,7 +17,7 @@ router.post(
   '/:productId/reviews',
   authMiddleware.requireAuth,
   multer().array('images', 5), // Cho phép upload tối đa 5 ảnh
-  uploadCloud,
+  uploadCloudWithManyImagesToCloud,
   controller.createReview 
 )
 router.get('/reviews/top-rated', controller.getTopRatedReviews)

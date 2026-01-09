@@ -1,7 +1,4 @@
 import { Request, Response } from 'express'
-import Brand from '~/models/brand.model'
-import paginationHelpers from '~/helpers/pagination'
-import searchHelpers from '~/helpers/search'
 import * as brandService from '~/services/admin/brand.service'
 
 // [GET] /admin/brands

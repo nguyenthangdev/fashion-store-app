@@ -1,4 +1,3 @@
-import Account from '~/models/account.model'
 import { Request, Response } from 'express'
 import { JWTProvider } from '~/providers/jwt.provider'
 import { StatusCodes } from 'http-status-codes'

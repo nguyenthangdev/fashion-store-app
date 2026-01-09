@@ -3,9 +3,9 @@ import { v2 as cloudinary } from 'cloudinary'
 import streamifier from 'streamifier'
 
 cloudinary.config({
- cloud_name: process.env.CLOUD_NAME,
- api_key: process.env.CLOUD_KEY,
- api_secret: process.env.CLOUD_SECRET
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET
 })
 
 export const uploadWithOneImageToCloud = (
@@ -52,7 +52,7 @@ const streamUpload = (fileBuffer: Buffer): Promise<any> => {
   })
 }
 
-export const uploadCloud = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const uploadCloudWithManyImagesToCloud = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // req.files bây giờ là một mảng: Express.Multer.File[]
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {

@@ -2,7 +2,7 @@ import { Router } from 'express'
 const router: Router = Router()
 // Upload ảnh
 import multer from 'multer'
-import { uploadCloud } from '~/middlewares/admin/uploadCloud.middleware'
+import { uploadCloudWithManyImagesToCloud } from '~/middlewares/admin/uploadCloud.middleware'
 // Upload ảnh
 import * as controller from '~/controllers/admin/product.controller'
 import * as validate from '~/validations/admin/product.validation'
@@ -13,22 +13,22 @@ router.patch('/change-multi', controller.changeMulti)
 router.post(
   '/create',
   multer().array('files', 15), // Nhận tối đa 15 files với tên trường là 'files'
-  uploadCloud,
+  uploadCloudWithManyImagesToCloud,
   parseProductData,
-  validate.createPost, // middleware
-  controller.createPost
+  validate.createProduct, // middleware
+  controller.createProduct
 )
-router.patch('/change-status/:status/:id', controller.changeStatus)
-router.delete('/delete/:id', controller.deleteItem)
+router.patch('/change-status/:status/:id', controller.changeStatusProduct)
+router.delete('/delete/:id', controller.deleteProduct)
 router.patch(
   '/edit/:id',
   multer().array('files', 15), // Nhận tối đa 15 files với tên trường là 'files'
-  uploadCloud,
+  uploadCloudWithManyImagesToCloud,
   parseProductData,
-  validate.editPatch, // middleware
-  controller.editPatch
+  validate.editProduct, // middleware
+  controller.editProduct
 )
-router.get('/detail/:id', controller.detail)
+router.get('/detail/:id', controller.detaiProduct)
 
 router.get('/trash', controller.productTrash)
 router.patch('/trash/form-change-multi-trash', controller.changeMultiTrash)

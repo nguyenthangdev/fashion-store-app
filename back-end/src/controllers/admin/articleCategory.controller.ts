@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import ArticleCategory from '~/models/articleCategory.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
-
-import { deleteManyStatusFast, updateManyStatusFast, updateStatusRecursiveForOneItem } from '~/helpers/updateStatusRecursive'
+import { deleteManyStatusFast, updateManyStatusFast } from '~/helpers/updateStatusRecursive'
 import * as articleCategoryService from '~/services/admin/articleCategory.service'
+
 // [GET] /admin/articles-category
 export const index = async (req: Request, res: Response) => {
   try {

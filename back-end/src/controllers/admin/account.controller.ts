@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import Account from '~/models/account.model'
 import * as accountService from '~/services/admin/account.service'
 
 // [GET] /admin/accounts
