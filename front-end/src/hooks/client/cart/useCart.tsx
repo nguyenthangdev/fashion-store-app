@@ -67,6 +67,7 @@ const useCart = () => {
       handleCloseDeleteDialog()
     } else {
       dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Xóa thất bại!', severity: 'error' } })
+      return
     }
   }
 
