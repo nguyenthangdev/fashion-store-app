@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { SettingGeneralAPIResponse } from '~/types/setting.type'
 import { fetchSettingGeneralAPI } from '~/apis/client/settingGeneral.api'
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'
 import CircularProgress from '@mui/material/CircularProgress'
 
 interface SettingGeneralContextType {
