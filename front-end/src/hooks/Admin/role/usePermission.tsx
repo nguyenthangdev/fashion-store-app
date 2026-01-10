@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
 import { fetchPermissions, fetchRoleAPI } from '~/apis/admin/role.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -49,7 +51,10 @@ const usePermission = () => {
         })
       }
     } catch (error) {
-      alert('error'+ error)
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Lỗi submit!', severity: 'error' }
+      })
     }
   }
   return {

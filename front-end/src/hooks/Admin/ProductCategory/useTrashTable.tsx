@@ -42,9 +42,11 @@ export const useTableTrash = ({ selectedIds, setSelectedIds }: Props) => {
         payload: { message: response.message, severity: 'success' }
       })
       setOpenPermanentlyDelete(false)
-    } else if (response.code === 400) {
-      alert('error: ' + response.error)
-      return
+    } else {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: response.message, severity: 'error' }
+      })
     }
   }
 
@@ -63,9 +65,11 @@ export const useTableTrash = ({ selectedIds, setSelectedIds }: Props) => {
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }
       })
-    } else if (response.code === 400) {
-      alert('error: ' + response.error)
-      return
+    } else {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: response.message, severity: 'error' }
+      })
     }
   }
   const handleCheckbox = (id: string, checked: boolean) => {

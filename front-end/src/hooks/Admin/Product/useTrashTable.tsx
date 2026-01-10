@@ -10,7 +10,7 @@ export interface Props {
 
 export const useTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateProduct, dispatchProduct } = useProductTrashContext()
-  const { products, loading, pagination } = stateProduct
+  const { products, isLoading, pagination } = stateProduct
   const { dispatchAlert } = useAlertContext()
   const [openPermanentlyDelete, setOpenPermanentlyDelete] = useState(false)
   const [selectedIdPermanentlyDelete, setSelectedIdPermanentlyDelete] = useState<string | null>(null)
@@ -92,7 +92,7 @@ export const useTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
 
   return {
     products,
-    loading,
+    isLoading,
     openPermanentlyDelete,
     handleOpenPermanentlyDelete,
     handleClosePermanentlyDelete,

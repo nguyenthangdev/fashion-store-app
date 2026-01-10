@@ -11,7 +11,7 @@ export interface Props {
 
 export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateProduct, dispatchProduct } = useProductContext()
-  const { products, loading, pagination } = stateProduct
+  const { products, isLoading, pagination } = stateProduct
   const { dispatchAlert } = useAlertContext()
   const [searchParams] = useSearchParams()
   const currentStatus = searchParams.get('status') || ''
@@ -107,7 +107,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   return {
     currentStatus,
     products,
-    loading,
+    isLoading,
     dispatchProduct,
     handleToggleStatus,
     open,

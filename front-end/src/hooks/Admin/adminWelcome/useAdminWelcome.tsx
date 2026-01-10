@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 import { BarChart3, FileText, Calendar, Bell, Settings, Clock, Sparkles, Zap, Target } from 'lucide-react'
 
@@ -49,6 +50,7 @@ const useAdminWelcome = () => {
     }, 5000)
     return () => clearInterval(tipTimer)
   }, [])
+
   return {
     Bell,
     Target,

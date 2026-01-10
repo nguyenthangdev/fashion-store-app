@@ -23,7 +23,7 @@ import type { AccountInfoInterface } from '~/types/account.type'
 const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
   const {
     products,
-    loading,
+    isLoading,
     handleToggleStatus,
     open,
     handleOpen,
@@ -35,7 +35,7 @@ const ProductTable = ({ selectedIds, setSelectedIds }: Props) => {
     pagination
   } = useTable({ selectedIds, setSelectedIds })
 
-  if (loading) {
+  if (isLoading) {
     return (
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table size='small' sx={{

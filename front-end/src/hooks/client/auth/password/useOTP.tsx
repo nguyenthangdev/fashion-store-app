@@ -29,12 +29,7 @@ const useOTP = () => {
         setTimeout(() => {
           navigate('/user/password/reset')
         }, 1500)
-      } else if (response.code === 401) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: response.message, severity: 'error' }
-        })
-      } else if (response.code === 400) {
+      } else {
         dispatchAlert({
           type: 'SHOW_ALERT',
           payload: { message: response.message, severity: 'error' }

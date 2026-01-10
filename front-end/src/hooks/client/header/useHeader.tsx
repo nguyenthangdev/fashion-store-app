@@ -120,8 +120,11 @@ const useHeader = () => {
       // setAccountUser(null)
       await logout()
       navigate('/')
-    } else if (response.code === 400) {
-      alert('error: ' + response.error)
+    } else {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: response.message, severity: 'error' }
+      })
     }
   }
 

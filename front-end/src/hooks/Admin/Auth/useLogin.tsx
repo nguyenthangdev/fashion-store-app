@@ -43,12 +43,16 @@ export const useLoginAdmin = () => {
         })
       }
     } catch (error: any) {
-      if (error.status === 429) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: error.response.data.message, severity: 'error' }
-        })
-      }
+      // if (error.status === 429) {
+      //   dispatchAlert({
+      //     type: 'SHOW_ALERT',
+      //     payload: { message: error.response.data.message, severity: 'error' }
+      //   })
+      // }
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error.response.data.message, severity: 'error' }
+      })
       // dispatchAlert({
       //   type: 'SHOW_ALERT',
       //   payload: { message: 'Đã xảy ra lỗi, vui lòng thử lại.', severity: 'error' }
