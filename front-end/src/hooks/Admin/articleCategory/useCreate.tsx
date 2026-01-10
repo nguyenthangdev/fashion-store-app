@@ -6,7 +6,7 @@ import { fetchCreateArticleCategoryAPI } from '~/apis/admin/articleCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
-import { createArticleCategorySchema, type CreateArticleCategoryFormData } from '~/validations/admin/article-category.validate'
+import { createArticleCategorySchema, type CreateArticleCategoryFormData } from '~/validations/admin/articleCategory.validate'
 
 export const useCreate = () => {
   const {

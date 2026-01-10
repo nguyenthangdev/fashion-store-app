@@ -1,5 +1,5 @@
 
-import { useEditMyAccount } from '~/hooks/Admin/MyAccount/useEdit'
+import { useEditMyAccount } from '~/hooks/admin/myAccount/useEdit'
 import Skeleton from '@mui/material/Skeleton'
 
 const EditMyAccount = () => {

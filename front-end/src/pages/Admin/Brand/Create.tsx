@@ -1,6 +1,6 @@
 
 import { Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
-import useCreate from '~/hooks/Admin/brand/useCreate'
+import useCreate from '~/hooks/admin/brand/useCreate'
 
 const CreateBrand = () => {
   const {

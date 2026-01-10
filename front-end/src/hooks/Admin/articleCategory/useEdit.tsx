@@ -9,7 +9,7 @@ import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
 import type { ArticleCategoryDetailInterface } from '~/types/articleCategory.type'
 import { useAuth } from '~/contexts/admin/AuthContext'
-import { editArticleCategorySchema, type EditArticleCategoryFormData } from '~/validations/admin/article-category.validate'
+import { editArticleCategorySchema, type EditArticleCategoryFormData } from '~/validations/admin/articleCategory.validate'
 
 export const useEdit = () => {
   const params = useParams()

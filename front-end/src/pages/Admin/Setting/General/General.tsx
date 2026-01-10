@@ -1,6 +1,6 @@
 import Skeleton from '@mui/material/Skeleton'
 import { Link } from 'react-router-dom'
-import useSettingsGeneral from '~/hooks/Admin/settingsGeneral/useSettingsGeneral'
+import useSettingsGeneral from '~/hooks/admin/settingsGeneral/useSettingsGeneral'
 
 const General = () => {
   const {

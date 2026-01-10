@@ -1,4 +1,4 @@
-import useCreate from '~/hooks/Admin/account/useCreate'
+import useCreate from '~/hooks/admin/account/useCreate'
 
 const CreateAccount = () => {
   const {

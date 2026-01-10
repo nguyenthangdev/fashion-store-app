@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import type { ArticleInfoInterface } from '~/types/article.type'
 import Skeleton from '@mui/material/Skeleton'
-import ArticleCard from '../ArticleCard/ArticleCard'
+import ArticleCard from '../articleCard/ArticleCard'
 
 interface BrandSliderProps {
   items: ArticleInfoInterface[],

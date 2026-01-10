@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Link } from 'react-router-dom'
-import FormatDateTime from '~/components/Admin/Moment/FormatDateTime'
+import FormatDateTime from '~/components/admin/moment/FormatDateTime'
 import type { UpdatedBy } from '~/types/helper.type'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -9,7 +9,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
-import useRole from '~/hooks/Admin/role/useRole'
+import useRole from '~/hooks/admin/role/useRole'
 
 const Role = () => {
   const {

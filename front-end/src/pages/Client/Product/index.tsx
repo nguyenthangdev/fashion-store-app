@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
-import BoxHead from '~/components/Client/BoxHead/BoxHead'
-import CardItem from '~/components/Client/CardItem/CardItem'
-import Pagination from '~/components/Admin/Pagination/Pagination'
+import BoxHead from '~/components/client/boxHead/BoxHead'
+import CardItem from '~/components/client/cardItem/CardItem'
+import Pagination from '~/components/admin/pagination/Pagination'
 import Skeleton from '@mui/material/Skeleton'
-import { FilterSidebar } from '~/components/Client/FilterSidebar/FilterSidebar'
+import { FilterSidebar } from '~/components/client/filterSidebar/FilterSidebar'
 import { FaFilter, FaTimes, FaSort } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SortDropdown } from '~/components/Client/SortDropdown/SortDropdown'
+import { SortDropdown } from '~/components/client/sortDropdown/SortDropdown'
 import useProduct from '~/hooks/client/product/useProduct'
 
 const CardItemSkeleton = () => (

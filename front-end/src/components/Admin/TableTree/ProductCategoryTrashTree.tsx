@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { TableRow, TableCell, Checkbox } from '@mui/material'
-import FormatDateTime from '../Moment/FormatDateTime'
+import FormatDateTime from '../moment/FormatDateTime'
 import type { ProductCategoryActions, ProductCategoryInfoInterface } from '~/types/productCategory.type'
 import type { AccountInfoInterface } from '~/types/account.type'
 

@@ -12,7 +12,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
-import useUser from '~/hooks/Admin/user/useUser'
+import useUser from '~/hooks/admin/user/useUser'
 
 const User = () => {
   const {

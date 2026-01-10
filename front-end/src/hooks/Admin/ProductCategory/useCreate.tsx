@@ -6,7 +6,7 @@ import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryConte
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { productCategorySchema, type ProductCategoryFormData } from '~/validations/admin/product-category.validate'
+import { productCategorySchema, type ProductCategoryFormData } from '~/validations/admin/productCategory.validate'
 
 export const useCreate = () => {
   const { stateProductCategory } = useProductCategoryContext()

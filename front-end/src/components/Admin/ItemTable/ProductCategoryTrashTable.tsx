@@ -5,7 +5,7 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import Checkbox from '@mui/material/Checkbox'
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } }
-import type { Props } from '~/hooks/Admin/ProductCategory/useTable'
+import type { Props } from '~/hooks/admin/productCategory/useTable'
 import TableContainer from '@mui/material/TableContainer'
 import Skeleton from '@mui/material/Skeleton'
 import Dialog from '@mui/material/Dialog'
@@ -14,8 +14,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
-import { useTableTrash } from '~/hooks/Admin/ProductCategory/useTrashTable'
-import ProductCategoryTrashTree from '../TableTree/ProductCategoryTrashTree'
+import { useTableTrash } from '~/hooks/admin/productCategory/useTrashTable'
+import ProductCategoryTrashTree from '../tableTree/ProductCategoryTrashTree'
 
 const ProductCategoryTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
   const {

@@ -1,4 +1,4 @@
-import { useStatistic } from '~/hooks/Admin/Statistic/useStatistic'
+import { useStatistic } from '~/hooks/admin/statistic/useStatistic'
 import { FaProductHunt } from 'react-icons/fa'
 import { PiUserListBold } from 'react-icons/pi'
 import { RiBillLine } from 'react-icons/ri'

@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
-import useAccount from '~/hooks/Admin/account/useAccount'
+import useAccount from '~/hooks/admin/account/useAccount'
 
 const Account = () => {
   const {

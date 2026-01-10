@@ -1,6 +1,6 @@
 import Skeleton from '@mui/material/Skeleton'
 import { Link } from 'react-router-dom'
-import { useDetail } from '~/hooks/Admin/Product/useDetail'
+import { useDetail } from '~/hooks/admin/product/useDetail'
 
 const DetailProduct = () => {
   const {

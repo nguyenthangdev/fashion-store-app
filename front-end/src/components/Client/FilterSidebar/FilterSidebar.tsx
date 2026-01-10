@@ -3,7 +3,7 @@ import { useState, type ChangeEvent, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchFilterDataAPI } from '~/apis/client/product.api'
 import Skeleton from '@mui/material/Skeleton'
-import { FilterSection } from '../FilterSection/FilterSection'
+import { FilterSection } from '../filterSection/FilterSection'
 
 // Định nghĩa kiểu dữ liệu cho bộ lọc
 interface Color { name: string; code: string }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import ArticleCard from '~/components/Client/ArticleCard/ArticleCard'
-import BoxHead from '~/components/Client/BoxHead/BoxHead'
+import ArticleCard from '~/components/client/articleCard/ArticleCard'
+import BoxHead from '~/components/client/boxHead/BoxHead'
 import Skeleton from '@mui/material/Skeleton'
 import useArticlesNew from '~/hooks/client/article/useArticlesNew'
 

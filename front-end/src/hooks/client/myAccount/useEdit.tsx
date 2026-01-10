@@ -4,7 +4,7 @@ import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useAuth } from '~/contexts/client/AuthContext'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { editProfileSchema, type EditProfileFormData } from '~/validations/client/my-account.validate'
+import { editProfileSchema, type EditProfileFormData } from '~/validations/client/myAccount.validate'
 
 const useEdit = () => {
   const { accountUser, setAccountUser } = useAuth()

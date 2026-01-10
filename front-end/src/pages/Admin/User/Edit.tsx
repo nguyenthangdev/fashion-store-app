@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import Skeleton from '@mui/material/Skeleton'
-import useEdit from '~/hooks/Admin/user/useEdit'
+import useEdit from '~/hooks/admin/user/useEdit'
 
 
 const EditUser = () => {

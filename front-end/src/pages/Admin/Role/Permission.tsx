@@ -5,7 +5,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Skeleton from '@mui/material/Skeleton'
-import usePermission from '~/hooks/Admin/role/usePermission'
+import usePermission from '~/hooks/admin/role/usePermission'
 
 
 const Permission = () => {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material'
-import useEdit from '~/hooks/Admin/brand/useEdit'
+import useEdit from '~/hooks/admin/brand/useEdit'
 
 const EditBrand = () => {
   const {

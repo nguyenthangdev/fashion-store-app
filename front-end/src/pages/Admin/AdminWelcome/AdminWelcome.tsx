@@ -1,5 +1,5 @@
 import { Clock, Sparkles } from 'lucide-react'
-import useAdminWelcome from '~/hooks/Admin/adminWelcome/useAdminWelcome'
+import useAdminWelcome from '~/hooks/admin/adminWelcome/useAdminWelcome'
 
 export default function AdminWelcome() {
   const {

@@ -1,7 +1,7 @@
 import { Editor } from '@tinymce/tinymce-react'
 import { Link } from 'react-router-dom'
-import SelectTreeArticle from '~/components/Admin/TableTree/SelectTreeArticle'
-import { useCreate } from '~/hooks/Admin/article/useCreate'
+import SelectTreeArticle from '~/components/admin/tableTree/SelectTreeArticle'
+import { useCreate } from '~/hooks/admin/article/useCreate'
 import { API_KEY } from '~/utils/constants'
 
 const CreateArticle = () => {

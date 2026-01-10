@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
-import useBrand from '~/hooks/Admin/brand/useBrand'
+import useBrand from '~/hooks/admin/brand/useBrand'
 
 const BrandAdmin = () => {
   const {

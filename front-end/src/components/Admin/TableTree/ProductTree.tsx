@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { TableRow, TableCell, Checkbox } from '@mui/material'
 import { Link } from 'react-router-dom'
-import FormatDateTime from '../Moment/FormatDateTime'
+import FormatDateTime from '../moment/FormatDateTime'
 import type { ProductCategoryActions, ProductCategoryInfoInterface } from '~/types/productCategory.type'
 import type { PaginationInterface } from '~/types/helper.type'
 

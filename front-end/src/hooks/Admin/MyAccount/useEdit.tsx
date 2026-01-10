@@ -7,7 +7,7 @@ import type { MyAccountAPIResponse } from '~/types/account.type'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
-import { editMyAccountSchema, type EditMyAccountFormData } from '~/validations/admin/my-account.validate'
+import { editMyAccountSchema, type EditMyAccountFormData } from '~/validations/admin/myAccount.validate'
 
 export const useEditMyAccount = () => {
   const { dispatchAlert } = useAlertContext()

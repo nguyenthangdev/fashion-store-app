@@ -6,7 +6,7 @@ import type { UserAPIResponse, UserInfoInterface } from '~/types/user.type'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { changePasswordSchema, type changePasswordFormData } from '~/validations/client/my-account.validate'
+import { changePasswordSchema, type changePasswordFormData } from '~/validations/client/myAccount.validate'
 
 const useChangePassword = () => {
   const [myAccount, setMyAccount] = useState<UserInfoInterface | null>(null)

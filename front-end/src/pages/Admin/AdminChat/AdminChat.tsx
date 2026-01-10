@@ -2,7 +2,7 @@ import Skeleton from '@mui/material/Skeleton'
 import { FaArrowLeft, FaUserCircle } from 'react-icons/fa'
 import { IoIosSend } from 'react-icons/io'
 import clsx from 'clsx'
-import useAdminChat from '~/hooks/Admin/adminChat/useAdminChat'
+import useAdminChat from '~/hooks/admin/adminChat/useAdminChat'
 
 const AdminChat = () => {
   const {

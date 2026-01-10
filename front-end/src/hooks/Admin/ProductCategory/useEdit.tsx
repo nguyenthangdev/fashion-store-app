@@ -9,7 +9,7 @@ import type { ProductCategoryDetailInterface } from '~/types/productCategory.typ
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { editProductCategorySchema, type EditProductCategoryFormData } from '~/validations/admin/product-category.validate'
+import { editProductCategorySchema, type EditProductCategoryFormData } from '~/validations/admin/productCategory.validate'
 
 export const useEdit = () => {
   const params = useParams()

@@ -1,5 +1,5 @@
 import Skeleton from '@mui/material/Skeleton'
-import { useDetail } from '~/hooks/Admin/Order/useDetail'
+import { useDetail } from '~/hooks/admin/order/useDetail'
 import { formatDateForInput } from '~/helpers/formatDateForInput'
 import { Link } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'

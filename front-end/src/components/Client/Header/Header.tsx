@@ -10,13 +10,13 @@ import { IoLogOutOutline } from 'react-icons/io5'
 import { CgProfile } from 'react-icons/cg'
 import { IoIosLogIn } from 'react-icons/io'
 import { FaRegRegistered } from 'react-icons/fa'
-import SubMenu from '../SubMenu/SubMenu'
+import SubMenu from '../subMenu/SubMenu'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IoChevronDown } from 'react-icons/io5'
 import { RiBillLine } from 'react-icons/ri'
 import SearchInput from './SearchInput'
 import useHeader from '~/hooks/client/header/useHeader'
-import SubMenuArticle from '../SubMenuArticle/SubMenuArticle'
+import SubMenuArticle from '../subMenuArticle/SubMenuArticle'
 
 const Header = () => {
   const {

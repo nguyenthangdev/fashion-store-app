@@ -1,6 +1,6 @@
 import { Editor } from '@tinymce/tinymce-react'
 import { Link } from 'react-router-dom'
-import useCreate from '~/hooks/Admin/role/useCreate'
+import useCreate from '~/hooks/admin/role/useCreate'
 import { API_KEY } from '~/utils/constants'
 
 const CreateRole = () => {
