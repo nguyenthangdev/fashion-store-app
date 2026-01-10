@@ -116,7 +116,7 @@ export const changeMulti = async (req: Request, res: Response) => {
           { _id: { $in: ids } },
           { deleted: 'true', deletedAt: new Date() }
         )
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Đã xóa thành công ${ids.length} đơn hàng!`
         })
@@ -141,7 +141,7 @@ export const deleteOrder = async (req: Request, res: Response) => {
   try {
     await orderService.deleteOrder(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Đã xóa thành công đơn hàng!'
     })
@@ -272,7 +272,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
     switch (type) {
       case Key.DELETEALL:
         await Order.deleteMany({ _id: { $in: ids } })
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Đã xóa vĩnh viễn thành công ${ids.length} đơn hàng!`
         })
@@ -307,7 +307,7 @@ export const permanentlyDeleteOrder = async (req: Request, res: Response) => {
   try {
     await orderService.permanentlyDeleteOrder(req.params.id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Đã xóa vĩnh viễn thành công đơn hàng!'
     })

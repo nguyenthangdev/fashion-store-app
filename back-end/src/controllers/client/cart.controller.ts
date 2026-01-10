@@ -68,7 +68,7 @@ export const deleteInCart = async (req: Request, res: Response) => {
   try {
     await cartService.deleteInCart(req['cartId'], req.body)
 
-    res.status(StatusCodes.NO_CONTENT).json({ 
+    res.json({ 
       code: 204, 
       message: 'Xóa thành công sản phẩm khỏi giỏ hàng!' 
     })
@@ -106,7 +106,7 @@ export const changeMulti = async (req: Request, res: Response) => {
             $pull: { products: { product_id: { $in: arrayId } } }
           }
         )
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} sản phẩm!`
         })

@@ -115,7 +115,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         break
       case Key.DELETEALL:
         await deleteManyStatusFast(ArticleCategory, ids)
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} danh mục bài viết!`
         })
@@ -140,7 +140,7 @@ export const deleteArticleCategory = async (req: Request, res: Response) => {
   try {
     await articleCategoryService.deleteArticleCategory(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công danh mục bài viết!'
     })

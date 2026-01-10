@@ -83,7 +83,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     await userService.deleteUser(req.params.id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công người dùng!'
     })

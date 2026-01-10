@@ -94,7 +94,7 @@ export const changeMulti = async (req: Request, res: Response) => {
           { _id: { $in: ids } },
           { deleted: true, deletedAt: new Date() }
         )
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} sản phẩm!`
         })
@@ -119,7 +119,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   try {
     await productService.deleteProduct(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công sản phẩm!'
     })
@@ -230,7 +230,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
     switch (type) {
       case Key.DELETEALL:
         await Product.deleteMany({ _id: { $in: ids } })
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Đã xóa vĩnh viễn thành công ${ids.length} sản phẩm!`
         })
@@ -265,7 +265,7 @@ export const permanentlyDeleteProduct = async (req: Request, res: Response) => {
   try {
     await productService.permanentlyDeleteProduct(req.params.id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Đã xóa vĩnh viễn thành công sản phẩm!'
     })

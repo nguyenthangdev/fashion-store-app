@@ -82,7 +82,7 @@ export const deleteBrand = async (req: Request, res: Response) => {
   try {
     await brandService.deleteBrand(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({ 
+    res.json({ 
         code: 204, 
         message: 'Xóa thành công!' 
     })

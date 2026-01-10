@@ -148,7 +148,7 @@ export const changeMulti = async (req: Request, res: Response) => {
           { _id: { $in: ids } },
           { deleted: 'true', deletedAt: new Date() }
         )
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} bài viết!`
         })
@@ -173,7 +173,7 @@ export const deleteArticle = async (req: Request, res: Response) => {
   try {
     await articleService.deleteArticle(req.params.id, req['accountAdmin'].id)
     
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công bài viết!'
     })

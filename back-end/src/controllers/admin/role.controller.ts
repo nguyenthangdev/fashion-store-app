@@ -61,7 +61,7 @@ export const deleteRole = async (req: Request, res: Response) => {
   try {
     await roleService.deleteRole(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công nhóm quyền!'
     })

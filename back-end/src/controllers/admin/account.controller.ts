@@ -111,7 +111,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
   try {
     await accountService.deleteAccount(req.params.id)
     
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công tài khoản!'
     })

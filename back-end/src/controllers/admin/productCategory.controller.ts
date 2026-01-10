@@ -118,7 +118,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         break
       case Key.DELETEALL:
         await deleteManyStatusFast(ProductCategory, ids)
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} danh mục sản phẩm!`
         })
@@ -143,7 +143,7 @@ export const deleteProductCategory = async (req: Request, res: Response) => {
   try {
     await productCategoryService.deleteProductCategory(req.params.id, req['accountAdmin'].id)
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: 'Xóa thành công danh mục sản phẩm!'
     })
@@ -296,7 +296,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
         // Xóa tất cả danh mục
         await ProductCategory.deleteMany({ _id: { $in: allIdsToDelete } })
         
-        res.status(StatusCodes.NO_CONTENT).json({
+        res.json({
           code: 204,
           message: `Đã xóa vĩnh viễn thành công ${allIdsToDelete.length} danh mục (bao gồm ${ids.length} danh mục đã chọn và các danh mục con)!`
         })
@@ -338,7 +338,7 @@ export const permanentlyDeleteProductCategory = async (req: Request, res: Respon
     }
     const { allIdsToDelete } = result
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.json({
       code: 204,
       message: `Đã xóa vĩnh viễn ${allIdsToDelete.length} danh mục (bao gồm danh mục con)!`
     })
