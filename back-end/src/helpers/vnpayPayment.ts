@@ -19,8 +19,6 @@ export const vnpaybuildPaymentUrl = new VNPay({
 })
 
 export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: string,  res: Response) => {
-  console.log("req.ip", req.ip)
-  console.log("req.headers['x-forwarded-for']?.toString()", req.headers['x-forwarded-for']?.toString())
   const now = new Date()
   const expire = new Date(now.getTime() + 30 * 60 * 1000) // +30 phút
 
@@ -28,15 +26,7 @@ export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: strin
   const txnRef = `${orderId}-${Date.now()}`
   const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000)
   const vnExpire = new Date(expire.getTime() + 7 * 60 * 60 * 1000)
-  // ✅ LOG ĐỂ KIỂM TRA
-  console.log("=== KIỂM TRA THỜI GIAN ===")
-  console.log("Current time UTC:", now.toString())
-  console.log("Current time VN:", vnNow.toString())
-  console.log("Expire time UTC:", expire.toString())
-  console.log("Expire time VN:", vnExpire.toString())
-  console.log("CreateDate formatted:", dateFormat(vnNow))   // ✅ Log vnNow
-  console.log("ExpireDate formatted:", dateFormat(vnExpire)) // ✅ Log vnExpire
-  console.log("========================")
+
   const vnpayResponse = vnpaybuildPaymentUrl.buildPaymentUrl({
     vnp_Amount: totalBill,
     vnp_IpAddr: req.ip || req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || '127.0.0.1',
@@ -49,8 +39,6 @@ export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: strin
     vnp_CreateDate: dateFormat(vnNow),    // Truyền Date object đã convert
     vnp_ExpireDate: dateFormat(vnExpire), // Truyền Date object đã convert
   })
-  console.log("Vao vnpayCreateOrder")
-  console.log("🚀 ~ vnpayPayment.ts ~ vnpayCreateOrder ~ vnpayResponse:", vnpayResponse);
   return res.status(StatusCodes.CREATED).json({ 
     code: 201,  
     message: 'Tạo link thanh toán thành công!', 
@@ -63,7 +51,6 @@ export const vnpayReturn = async (req: Request, res: Response) => {
   try {
     delete req.query['vnp_SecureHashType']  
     delete req.query['vnp_SecureHash'] 
-    console.log("vao vnpayReturn")
     // Verify query từ VNPay
     const verified = vnpaybuildPaymentUrl.verifyReturnUrl(req.query as unknown as ReturnQueryFromVNPay)
     if (verified.isVerified) {
@@ -74,7 +61,6 @@ export const vnpayReturn = async (req: Request, res: Response) => {
       const orderId = txnRef.split('-')[0]
       
       const order = await Order.findById(orderId)
-      console.log("🚀 ~ vnpayPayment.ts ~ vnpayReturn ~ order:", order);
       if (!order) {
         return res.status(StatusCodes.NOT_FOUND).json({ 
           code: 404,  
