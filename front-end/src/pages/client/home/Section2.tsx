@@ -1,8 +1,8 @@
-import partner1 from '~/assets/images/Home/partner-1.svg'
-import partner2 from '~/assets/images/Home/partner-2.svg'
-import partner3 from '~/assets/images/Home/partner-3.svg'
-import partner4 from '~/assets/images/Home/partner-4.svg'
-import partner5 from '~/assets/images/Home/partner-5.svg'
+import partner1 from '~/assets/images/home/partner-1.svg'
+import partner2 from '~/assets/images/home/partner-2.svg'
+import partner3 from '~/assets/images/home/partner-3.svg'
+import partner4 from '~/assets/images/home/partner-4.svg'
+import partner5 from '~/assets/images/home/partner-5.svg'
 import { Element } from 'react-scroll'
 
 const Section2 = () => {

@@ -4,7 +4,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { IoIosLogOut, IoIosNotificationsOutline } from 'react-icons/io'
 import Skeleton from '@mui/material/Skeleton'
-import logo from '~/assets/images/Header/logo.jpg'
+import logo from '~/assets/images/header/logo.jpg'
 import { CgProfile } from 'react-icons/cg'
 import { IoSettingsOutline } from 'react-icons/io5'
 

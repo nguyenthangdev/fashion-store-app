@@ -1,6 +1,6 @@
 import { useInView } from 'react-intersection-observer'
-import backgroundHome from '~/assets/images/Home/background-home.png'
-import star from '~/assets/images/Home/star.svg'
+import backgroundHome from '~/assets/images/home/background-home.png'
+import star from '~/assets/images/home/star.svg'
 import CountUp from 'react-countup'
 import { Link } from 'react-scroll'
 
