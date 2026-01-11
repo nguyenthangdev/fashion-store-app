@@ -40,7 +40,6 @@ export const zalopayCreateOrder = async (
     callback_url: `${process.env.API_ROOT}/checkout/zalopay-callback`
   }
 
-  console.log('hello zalopayCreateOrder')
   const data = [
     orderInfo.app_id,
     orderInfo.app_trans_id,
@@ -55,7 +54,6 @@ export const zalopayCreateOrder = async (
     .digest('hex')
 
   const zaloRes  = await axios.post(process.env.ZALOPAY_ENDPOINT_CREATE, null, { params: orderInfo })
-  console.log("🚀 ~ zalopayPayment.ts ~ zalopayCreateOrder ~ zaloRes:", zaloRes);
   if (zaloRes.data.return_code !== 1) {
     // Thất bại
     return res.status(StatusCodes.BAD_REQUEST).json({ 
@@ -79,7 +77,6 @@ export const zalopayCreateOrder = async (
 export const zalopayCallback = async (req: Request, res: Response) => {
   try {
     let { data, mac } = req.body
-      console.log('hello zalopayCallback')
     const macVerify = crypto.createHmac("sha256", process.env.ZALOPAY_KEY2)
       .update(data)
       .digest("hex")
@@ -97,7 +94,6 @@ export const zalopayCallback = async (req: Request, res: Response) => {
       'userInfo.phone': phone,
       deleted: false,
     })
-    console.log("🚀 ~ zalopayPayment.ts ~ zalopayCallback ~ order:", order);
     if (!order) {
       return res.json({ 
         return_code: 0, 

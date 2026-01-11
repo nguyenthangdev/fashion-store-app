@@ -35,6 +35,8 @@ export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: strin
     vnp_CreateDate: dateFormat(new Date()),
     vnp_ExpireDate: dateFormat(expire),
   })
+  console.log("Vao vnpayCreateOrder")
+  console.log("🚀 ~ vnpayPayment.ts ~ vnpayCreateOrder ~ vnpayResponse:", vnpayResponse);
   return res.status(StatusCodes.CREATED).json({ 
     code: 201,  
     message: 'Tạo link thanh toán thành công!', 
@@ -47,7 +49,7 @@ export const vnpayReturn = async (req: Request, res: Response) => {
   try {
     delete req.query['vnp_SecureHashType']  
     delete req.query['vnp_SecureHash'] 
-
+    console.log("vao vnpayReturn")
     // Verify query từ VNPay
     const verified = vnpaybuildPaymentUrl.verifyReturnUrl(req.query as unknown as ReturnQueryFromVNPay)
     if (verified.isVerified) {
@@ -58,6 +60,7 @@ export const vnpayReturn = async (req: Request, res: Response) => {
       const orderId = txnRef.split('-')[0]
       
       const order = await Order.findById(orderId)
+      console.log("🚀 ~ vnpayPayment.ts ~ vnpayReturn ~ order:", order);
       if (!order) {
         return res.status(StatusCodes.NOT_FOUND).json({ 
           code: 404,  
