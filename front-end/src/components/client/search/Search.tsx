@@ -7,7 +7,7 @@ import Pagination from '~/components/admin/pagination/Pagination'
 
 const Search = () => {
   const { stateProduct, fetchProduct } = useProductContext()
-  const { products, loading, pagination } = stateProduct
+  const { products, isLoading, pagination } = stateProduct
 
   // Dùng useSearchParams để đọc `keyword` từ URL
   const [searchParams, setSearchParams] = useSearchParams()
@@ -46,7 +46,7 @@ const Search = () => {
         Kết quả tìm kiếm cho: {keyword}
       </h1>
 
-      {loading && (
+      {isLoading && (
         // Hiển thị skeleton UI khi đang tải
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from(new Array(8)).map((_, index) => (
@@ -55,7 +55,7 @@ const Search = () => {
         </div>
       )}
 
-      {!loading && products.length > 0 && (
+      {!isLoading && products.length > 0 && (
         // Hiển thị danh sách sản phẩm
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -75,7 +75,7 @@ const Search = () => {
         </>
       )}
 
-      {!loading && products.length === 0 && (
+      {!isLoading && products.length === 0 && (
         // Hiển thị thông báo khi không tìm thấy
         <div className="text-center text-gray-500 mt-10">
           <p>Không tìm thấy sản phẩm nào phù hợp với từ khóa của bạn.</p>
