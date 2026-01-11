@@ -34,6 +34,9 @@ export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: strin
   console.log("========================")
     //  Sinh mã giao dịch mới mỗi lần thanh toán
   const txnRef = `${orderId}-${Date.now()}`
+  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+  const vnExpire = new Date(expire.getTime() + 7 * 60 * 60 * 1000)
+
   const vnpayResponse = vnpaybuildPaymentUrl.buildPaymentUrl({
     vnp_Amount: totalBill,
     vnp_IpAddr: req.ip || req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || '127.0.0.1',
@@ -43,8 +46,8 @@ export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: strin
     // Thay API_ROOT = link ngrok
     vnp_ReturnUrl: `${process.env.API_ROOT}/checkout/vnpay-return`,
     vnp_Locale: VnpLocale.VN,
-    vnp_CreateDate: dateFormat(now),
-    vnp_ExpireDate: dateFormat(expire),
+    vnp_CreateDate: dateFormat(vnNow),    // Truyền Date object đã convert
+    vnp_ExpireDate: dateFormat(vnExpire), // Truyền Date object đã convert
   })
   console.log("Vao vnpayCreateOrder")
   console.log("🚀 ~ vnpayPayment.ts ~ vnpayCreateOrder ~ vnpayResponse:", vnpayResponse);
