@@ -19,22 +19,22 @@ export const vnpaybuildPaymentUrl = new VNPay({
 })
 
 export const vnpayCreateOrder = (req: Request, totalBill: number, orderId: string,  res: Response) => {
-  console.log(req.ip)
-  console.log(req.headers['x-forwarded-for']?.toString())
-  const expire = new Date()
-  expire.setMinutes(expire.getMinutes() + 15) 
+  console.log("req.ip", req.ip)
+  console.log("req.headers['x-forwarded-for']?.toString()", req.headers['x-forwarded-for']?.toString())
+  const now = new Date()
+  const expire = new Date(now.getTime() + 30 * 60 * 1000) // +30 phút
     //  Sinh mã giao dịch mới mỗi lần thanh toán
   const txnRef = `${orderId}-${Date.now()}`
   const vnpayResponse = vnpaybuildPaymentUrl.buildPaymentUrl({
     vnp_Amount: totalBill,
-    vnp_IpAddr: req.ip || req.headers['x-forwarded-for']?.toString().split(',')[0] || '127.0.0.1',
+    vnp_IpAddr: req.ip || req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || '127.0.0.1',
     vnp_TxnRef: txnRef,
     vnp_OrderInfo: `Thanh toán đơn hàng: ${txnRef}`,
     vnp_OrderType: ProductCode.Other,
     // Thay API_ROOT = link ngrok
     vnp_ReturnUrl: `${process.env.API_ROOT}/checkout/vnpay-return`,
     vnp_Locale: VnpLocale.VN,
-    vnp_CreateDate: dateFormat(new Date()),
+    vnp_CreateDate: dateFormat(now),
     vnp_ExpireDate: dateFormat(expire),
   })
   console.log("Vao vnpayCreateOrder")
