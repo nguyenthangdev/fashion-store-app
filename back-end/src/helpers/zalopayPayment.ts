@@ -94,6 +94,7 @@ export const zalopayCallback = async (req: Request, res: Response) => {
       'userInfo.phone': phone,
       deleted: false,
     })
+    console.log("🚀 ~ zalopayPayment.ts ~ zalopayCallback ~ order:", order);
     if (!order) {
       return res.json({ 
         return_code: 0, 

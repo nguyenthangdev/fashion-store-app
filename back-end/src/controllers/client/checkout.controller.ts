@@ -50,6 +50,7 @@ export const order = async (req: Request, res: Response) => {
       return
     }
     const { newOrder, paymentMethod } = result
+    console.log("🚀 ~ checkout.controller.ts ~ order ~ paymentMethod:", paymentMethod);
 
     if (paymentMethod === 'COD') {
       await Cart.updateOne({ _id: cartId }, { products: [] })
