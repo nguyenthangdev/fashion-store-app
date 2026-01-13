@@ -211,6 +211,7 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
 export const resetPasswordPost = async (req: Request, res: Response) => {
   try {
     const result = await userSerivice.resetPasswordPost(req.body)
+    console.log("🚀 ~ user.controller.ts ~ resetPasswordPost ~ result:", result);
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.NOT_FOUND
       return res.status(statusCode).json({

@@ -190,7 +190,7 @@ export const forgotPasswordPost = async (email: string) => {
   const resetToken = await JWTProvider.generateToken(
     payload,
     process.env.JWT_SECRET_RESET_PASSWORD,
-    '15m'
+    '2m'
   )
   const clientUrl = process.env.CLIENT_URL
   const resetLink = `${clientUrl}/user/password/reset?resetToken=${resetToken}`
@@ -199,7 +199,7 @@ export const forgotPasswordPost = async (email: string) => {
     const html = `
     <p>Bạn đã yêu cầu lấy lại mật khẩu. Vui lòng nhấp vào đường link dưới đây:</p>
       <a href="${resetLink}" target="_blank">Lấy lại mật khẩu</a>
-    <p>Đường link này sẽ hết hạn sau 15 phút.</p>
+    <p>Đường link này sẽ hết hạn sau 2 phút.</p>
     `
   sendMailHelper.sendMail(email, subject, html)
   return { success: true }
@@ -244,6 +244,7 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
       { _id: user._id },
       { $set: { password: hashedPassword } }
    )
+  return { success: true }
 }
 
 export const editUser = async (account_id: string, data: UserInterface) => {
