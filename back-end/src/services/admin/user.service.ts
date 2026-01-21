@@ -1,14 +1,14 @@
-import User from '~/models/user.model'
+import UserModel from '~/models/user.model'
 import bcrypt from 'bcrypt'
 import { UserInterface } from '~/interfaces/admin/user.interface'
 
 export const getUsers = async () => {
-  const users = await User.find({ deleted: false })
+  const users = await UserModel.find({ deleted: false })
   return users
 }
 
 export const changeStatusUser = async (status: string, id: string) => {
-  await User.updateOne(
+  await UserModel.updateOne(
     { _id: id }, 
     { $set: { status } }
   )
@@ -24,7 +24,7 @@ export const editUser = async (data: UserInterface, id: string) => {
     address: data.address,
     status: data.status
   }
-  const isEmailExist = await User.findOne({
+  const isEmailExist = await UserModel.findOne({
     _id: { $ne: id }, // $ne ($notequal) -> Tránh trường hợp khi tìm bị lặp và không cập nhật lại lên đc.
     email: dataTemp.email,
     deleted: false
@@ -43,17 +43,17 @@ export const editUser = async (data: UserInterface, id: string) => {
   } else {
     delete dataTemp.password // Xóa value password, tránh cập nhật lại vào db xóa mất mật khẩu cũ
   }
-  await User.updateOne({ _id: id }, { $set: dataTemp })
+  await UserModel.updateOne({ _id: id }, { $set: dataTemp })
   return { success: true }
 }
 
 export const detailUser = async (user_id: string) => {
-  const accountUser = await User.findOne({  _id: user_id, deleted: false })
+  const accountUser = await UserModel.findOne({  _id: user_id, deleted: false })
   return accountUser
 }
 
 export const deleteUser = async (user_id: string) => {
-  await User.updateOne(
+  await UserModel.updateOne(
     { _id: user_id }, 
     { $set: { deleted: true, deletedAt: new Date() } }
   )

@@ -14,7 +14,7 @@ import { articleCategoryRoutes } from './articleCategory.route'
 import { orderRoutes } from './order.route'
 import { settingRoutes } from './setting.route'
 import { brandRoutes } from './brand.route'
-import { chatAdminRoutes } from './chat.route'
+import { chatRoutes } from './chat.route'
 import { noCache } from '~/middlewares/admin/noCache.middleware'
 import { requirePermission } from '~/middlewares/admin/role.middleware'
 
@@ -29,7 +29,7 @@ const routeAdmin = (app: Express): void => {
   app.use(PATH_ADMIN + '/accounts', authMiddleware.requireAuth,requirePermission(['Admin']), accountRoutes)
   app.use(PATH_ADMIN + '/users', authMiddleware.requireAuth,requirePermission(['Admin']), userRoutes)
 
-  app.use(PATH_ADMIN + '/chats', authMiddleware.requireAuth,requirePermission(['Admin', 'Product']), chatAdminRoutes)
+  app.use(PATH_ADMIN + '/chats', authMiddleware.requireAuth,requirePermission(['Admin', 'Product']), chatRoutes)
   app.use(PATH_ADMIN + '/products-category', authMiddleware.requireAuth,requirePermission(['Admin', 'Product']), productCategoryRoutes)
   app.use(PATH_ADMIN + '/products', authMiddleware.requireAuth, requirePermission(['Admin', 'Product']), productRoutes)
 

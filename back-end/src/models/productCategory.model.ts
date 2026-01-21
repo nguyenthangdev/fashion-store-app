@@ -54,10 +54,10 @@ productCategorySchema.index({ title: 1, deleted: 1 })
 productCategorySchema.index({ deleted: 1, status: 1, createdAt: -1 })
 
 
-const ProductCategory = mongoose.model(
+const ProductCategoryModel = mongoose.model(
   'ProductCategory',
   productCategorySchema,
   'products-category'
 )
 
-export default ProductCategory
+export default ProductCategoryModel

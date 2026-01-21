@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import ProductCategory from '~/models/productCategory.model'
-import ArticleCategory from '~/models/articleCategory.model'
+import ProductCategoryModel from '~/models/productCategory.model'
+import ArticleCategoryModel from '~/models/articleCategory.model'
 import { buildTreeForItems } from '~/helpers/createChildForAllParents'
 import { TreeInterface } from '~/interfaces/admin/general.interface'
 
@@ -9,7 +9,7 @@ export const categoryProduct = async (
   res: Response,
   next: NextFunction
 ) => {
-  const productsCategory = await ProductCategory.find({
+  const productsCategory = await ProductCategoryModel.find({
     deleted: false
   }).lean()
   const newProductsCategory = buildTreeForItems(productsCategory as unknown as TreeInterface[])
@@ -22,7 +22,7 @@ export const categoryArticle = async (
   res: Response,
   next: NextFunction
 ) => {
-  const articlesCategory = await ArticleCategory.find({
+  const articlesCategory = await ArticleCategoryModel.find({
     deleted: false
   }).lean()
   const newArticlesCategory = buildTreeForItems(articlesCategory as unknown as TreeInterface[])

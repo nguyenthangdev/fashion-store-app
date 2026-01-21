@@ -1,7 +1,7 @@
-import Chat from "~/models/chat.model"
+import ChatModel from "~/models/chat.model"
 
 export const getAdminChatRooms = async () => {
-  const chatRooms = await Chat
+  const chatRooms = await ChatModel
     .find()
     .populate('user_id', 'fullName avatar') // Lấy thông tin user
     .sort({ lastMessageAt: -1 }) // Sắp xếp theo tin nhắn mới nhất
@@ -10,7 +10,7 @@ export const getAdminChatRooms = async () => {
 }
 
 export const getAdminChatHistory = async (userId: string) => {
-  const chat = await Chat
+  const chat = await ChatModel
     .findOne({ user_id: userId })
     .populate('user_id', 'fullName avatar')
     .lean()

@@ -1,12 +1,12 @@
-import Account from '~/models/account.model'
+import AccountModel from '~/models/account.model'
 import bcrypt from 'bcrypt' 
 import { JWTProvider } from '~/providers/jwt.provider'
-import Role from '~/models/role.model'
+import RoleModel from '~/models/role.model'
 
 export const loginAdmin = async (data: any) => {
   const { email, password } = data
 
-  const accountAdmin = await Account.findOne({
+  const accountAdmin = await AccountModel.findOne({
     email: email,
     deleted: false
   }).select('+password')
@@ -54,7 +54,7 @@ export const loginAdmin = async (data: any) => {
     process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
     '14d'
   )
-  const role = await Role.findOne({ 
+  const role = await RoleModel.findOne({ 
     _id: accountAdmin.role_id, 
     deleted: false 
   }).lean()
@@ -89,7 +89,7 @@ export const refreshTokenAdmin = async (refreshToken: string) => {
     role_id: string
   }
 
-  const account = await Account.findOne({
+  const account = await AccountModel.findOne({
     _id: refreshTokenDecoded.accountId,
     deleted: false,
     status: "ACTIVE"

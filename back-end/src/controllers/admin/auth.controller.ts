@@ -7,26 +7,25 @@ import { getCookieOptions } from '~/utils/constants'
 import * as authService from '~/services/admin/auth.service'
 
 // [POST] /admin/auth/login
-export const loginAdmin = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const result = await authService.loginAdmin(req.body)
 
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.FORBIDDEN
-      res.status(statusCode).json({
+      return res.status(statusCode).json({
         code: result.code,
         message: result.message
       })
-      return
     }
-    // const parser = new UAParser(req.get("User-Agent"))
+    // const parser = new UAParser(req.get("UserModel-Agent"))
     // const device = parser.getDevice()
     // const os = parser.getOS()
     // const browser = parser.getBrowser()
     // const session = new Session({
     //   accountId: accountAdmin._id,
     //   refreshTokenHash: hashToken(refreshToken),
-    //   userAgent: req.get('User-Agent'),
+    //   userAgent: req.get('UserModel-Agent'),
     //   ip: req.ip,
     //   // deviceName: `${device.vendor || "Unknown"} ${device.model || ""} - ${os.name} - ${browser.name}`,
     //   deviceName: "Unknow",
@@ -75,11 +74,10 @@ export const refreshToken = async (req: Request, res: Response) => {
     const result = await authService.refreshTokenAdmin(req.cookies.refreshToken)
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.NOT_FOUND
-      res.status(statusCode).json({ 
+      return res.status(statusCode).json({ 
         code: result.code, 
         message: result.message
       })
-      return
     }
     const { newAccessToken } = result
 
@@ -117,7 +115,12 @@ export const logout = async (req: Request, res: Response) => {
 export const logoutALL = async (req: Request, res: Response) => {
   try {
     const accessToken = req.cookies?.accessToken
-    if (!accessToken) return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Không tồn tại accessToken' })
+    if (!accessToken) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ 
+        code: 401, 
+        message: 'Không tồn tại accessToken!' 
+      })
+    }
     const accessTokenDecoded = await JWTProvider.verifyToken(
       accessToken,
       process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN
@@ -142,10 +145,15 @@ export const logoutALL = async (req: Request, res: Response) => {
       path: '/'
     })  
 
-    res.status(StatusCodes.OK).json({ message: 'Đăng xuất thành công tất cả thiết bị!' })
-
+    res.status(StatusCodes.OK).json({ 
+      code: 200,
+      message: 'Đăng xuất thành công tất cả thiết bị!' 
+    })
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      code: 500,
+      message: 'Đã xảy ra lỗi hệ thống!'
+    })
   }
 }
 

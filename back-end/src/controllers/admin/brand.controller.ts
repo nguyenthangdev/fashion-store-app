@@ -10,7 +10,7 @@ export const index = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
-      brands: brands,
+      brands,
       pagination: objectPagination
     })
   } catch (error) {
@@ -50,7 +50,7 @@ export const detailBrand = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({ 
         code: 200, 
         message: 'Thành công!', 
-        brand: brand 
+        brand 
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

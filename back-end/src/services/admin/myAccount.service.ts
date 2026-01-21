@@ -1,14 +1,14 @@
-import Account from '~/models/account.model'
-import Role from '~/models/role.model'
+import AccountModel from '~/models/account.model'
+import RoleModel from '~/models/role.model'
 import bcrypt from 'bcrypt'
 import { MyAccountInterface } from '~/interfaces/admin/myAccount.interface'
 
 export const getMyAccount = async (account_id: string) => {
-  const myAccount = await Account.findOne({ 
+  const myAccount = await AccountModel.findOne({ 
     _id: account_id, 
     deleted: false 
   })
-  const role = await Role.findOne({ 
+  const role = await RoleModel.findOne({ 
     _id: myAccount.role_id, 
     deleted: false 
   })
@@ -23,7 +23,7 @@ export const editMyAccount = async (data: MyAccountInterface, account_id: string
     phone: data.phone,
     avatar: data.avatar
   }
-  const isEmailExist = await Account.findOne({
+  const isEmailExist = await AccountModel.findOne({
     _id: { $ne: account_id }, // $ne ($notequal) -> Tránh trường hợp khi tìm bị lặp và không cập nhật lại lên đc.
     email: dataTemp.email,
     deleted: false
@@ -44,7 +44,7 @@ export const editMyAccount = async (data: MyAccountInterface, account_id: string
   } else {
     delete dataTemp.password // Xóa value password, tránh cập nhật lại vào db xóa mất mật khẩu cũ
   }
-  await Account.updateOne({ _id: account_id }, dataTemp)
+  await AccountModel.updateOne({ _id: account_id }, dataTemp)
   
   return { success: true }
 }

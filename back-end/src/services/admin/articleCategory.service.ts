@@ -3,8 +3,8 @@ import { buildTreeForItems } from '~/helpers/createChildForAllParents'
 import { addLogInfoToTree } from '~/helpers/addLogInfoToChildren'
 import paginationHelpers from '~/helpers/pagination'
 import { buildTreeForPagedItems } from '~/helpers/createChildForPagedParents'
-import Account from '~/models/account.model'
-import ArticleCategory from '~/models/articleCategory.model'
+import AccountModel from '~/models/account.model'
+import ArticleCategoryModel from '~/models/articleCategory.model'
 import { updateStatusRecursiveForOneItem } from '~/helpers/updateStatusItem'
 import { LogNodeInterface, TreeInterface } from '~/interfaces/admin/general.interface'
 import { ArticleCategoryInterface } from '~/interfaces/admin/articleCategory.interface'
@@ -40,7 +40,7 @@ export const getArticleCategories = async (query: any) => {
 
   // Pagination
   const parentFind = { ...find, parent_id: '' }
-  const countParents = await ArticleCategory.countDocuments(parentFind)
+  const countParents = await ArticleCategoryModel.countDocuments(parentFind)
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -55,15 +55,15 @@ export const getArticleCategories = async (query: any) => {
   // parentCategories: Các danh mục bài viết cấp cao nhất (Cấp 1) (đã được phân trang)
   // allCategories: Tất cả các danh mục bài viết cấp cao nhất (Cấp 1)
   const [parentCategories, accounts, allCategories] = await Promise.all([
-    ArticleCategory.find(parentFind)
+    ArticleCategoryModel.find(parentFind)
       .sort(sort)
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip)
       .lean(),
-    Account
+    AccountModel
       .find({ deleted: false })
       .lean(),
-    ArticleCategory
+    ArticleCategoryModel
       .find({ deleted: false })
       .sort(sort)
       .lean()
@@ -95,11 +95,11 @@ export const changeStatusWithChildren = async (status: string, category_id: stri
     updatedAt: new Date()
   }
   
-  await updateStatusRecursiveForOneItem(ArticleCategory, status, category_id, updatedBy)
+  await updateStatusRecursiveForOneItem(ArticleCategoryModel, status, category_id, updatedBy)
 }
 
 export const deleteArticleCategory = async (id: string, account_id: string) => {
-  await ArticleCategory.updateOne(
+  await ArticleCategoryModel.updateOne(
     { _id: id },
     {
       $set: {
@@ -125,7 +125,7 @@ export const createArticleCategory = async (data: ArticleCategoryInterface, acco
       account_id
     }
   }
-  const articleCategory = new ArticleCategory(dataTemp)
+  const articleCategory = new ArticleCategoryModel(dataTemp)
   await articleCategory.save()
   const articleCategoryToObject = articleCategory.toObject()
 
@@ -145,7 +145,7 @@ export const editArticleCategory = async (data: any, id: string, account_id: str
     status: data.status,
     thumbnail: data.thumbnail
   }
-  await ArticleCategory.updateOne(
+  await ArticleCategoryModel.updateOne(
     { _id: id },
     {
       $set: dataTemp,
@@ -157,7 +157,7 @@ export const editArticleCategory = async (data: any, id: string, account_id: str
 }
 
 export const detailArticleCategory = async (id: string) => {
-  const articleCategory = await ArticleCategory
+  const articleCategory = await ArticleCategoryModel
     .findOne({ _id: id, deleted: false })
     .lean()
     

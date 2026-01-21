@@ -1,9 +1,9 @@
-import Chat from '~/models/chat.model'
+import ChatModel from '~/models/chat.model'
 
 export const getChat = async (userId: string) => {
-  let chat = await Chat.findOne({ user_id: userId })
+  let chat = await ChatModel.findOne({ user_id: userId })
   if (!chat) {
-    chat = new Chat({ user_id: userId, messages: [] })
+    chat = new ChatModel({ user_id: userId, messages: [] })
     await chat.save()
   }
   return chat

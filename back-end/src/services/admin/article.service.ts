@@ -1,16 +1,16 @@
-import Article from '~/models/article.model'
+import ArticleModel from '~/models/article.model'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
 import { ArticleInterface } from '~/interfaces/admin/article.interface'
+import { FindInterface, QueryInterface } from '~/interfaces/admin/general.interface'
 
-export const getArticles = async (query: any) => {
-  const find: any = { deleted: false }
+export const getArticles = async (query: QueryInterface) => {
+  const find: FindInterface = { deleted: false }
 
   if (query.status) {
     find.status = query.status.toString()
   }
 
-  // Search
   const objectSearch = searchHelpers(query)
   if (objectSearch.regex || objectSearch.slug) {
     find.$or = [
@@ -18,23 +18,18 @@ export const getArticles = async (query: any) => {
       { slug: objectSearch.slug }
     ]
   }
-  // End search
 
-  // Sort
   let sort: Record<string, 1 | -1> = { }
   if (query.sortKey) {
     const key = query.sortKey.toString()
     const dir = query.sortValue === 'asc' ? 1 : -1
     sort[key] = dir
   }
-  // luôn sort phụ theo createdAt
   if (!sort.createdAt) {
     sort.createdAt = -1
   }
-  // End Sort
 
-  // Pagination
-  const countArticles = await Article.countDocuments(find)
+  const countArticles = await ArticleModel.countDocuments(find)
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -43,10 +38,9 @@ export const getArticles = async (query: any) => {
     query,
     countArticles
   )
-  // End Pagination
 
   const [articles, allArticles] = await Promise.all([
-    Article
+    ArticleModel
       .find(find)
       .sort(sort)
       .limit(objectPagination.limitItems)
@@ -54,7 +48,7 @@ export const getArticles = async (query: any) => {
       .populate('createdBy.account_id', 'fullName email')
       .populate('updatedBy.account_id', 'fullName email')
       .lean(),
-    Article
+    ArticleModel
       .find({ deleted: false })
       .lean()
   ])
@@ -81,15 +75,15 @@ export const createArticle = async (data: ArticleInterface, account_id: string) 
     }
   }
 
-  const article = new Article(dataTemp)
+  const article = new ArticleModel(dataTemp)
   await article.save()
   const articleToObject = article.toObject()
 
   return articleToObject
 }
 
-export const detailArticle = async (article_id: string) => {
-  const article = await Article
+export const articleDetail = async (article_id: string) => {
+  const article = await ArticleModel
     .findOne({ _id: article_id, deleted: false })
     .lean()
     
@@ -110,7 +104,7 @@ export const editArticle = async (data: ArticleInterface, article_id: string, ac
     status: data.status,
     thumbnail: data.thumbnail,
   }
-  await Article.updateOne(
+  await ArticleModel.updateOne(
     { _id: article_id },
     { 
       $set: dataTemp,
@@ -119,12 +113,12 @@ export const editArticle = async (data: ArticleInterface, article_id: string, ac
   )
 }
 
-export const changeStatusArticle = async (status: string, article_id: string, account_id: string) => {
+export const changeArticleStatus = async (status: string, article_id: string, account_id: string) => {
   const updatedBy = {
     account_id,
     updatedAt: new Date()
   }
-  const updater = await Article
+  const updater = await ArticleModel
     .findByIdAndUpdate(
       { _id: article_id },
       {
@@ -141,7 +135,7 @@ export const changeStatusArticle = async (status: string, article_id: string, ac
 }
 
 export const deleteArticle = async (article_id: string, account_id: string) => {
-  await Article.updateOne(
+  await ArticleModel.updateOne(
     { _id: article_id },
     {
       $set: {

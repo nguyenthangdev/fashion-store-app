@@ -1,5 +1,5 @@
 import cron from "node-cron"
-import Order from "../models/order.model"
+import OrderModel from "../models/order.model"
 
 // Hủy đơn hàng PENDING quá 15 phút 
 // 5p quét 1 lần
@@ -9,7 +9,7 @@ cron.schedule("*/5 * * * *", async () => {
     const now = new Date()
     const expiredAt = new Date(now.getTime() - timeoutMinutes * 60000)
 
-    const result = await Order.updateMany(
+    const result = await OrderModel.updateMany(
       {
         "paymentInfo.status": "PENDING",
         "paymentInfo.method": { $ne: "COD" },

@@ -7,7 +7,7 @@ const cartSchema = new mongoose.Schema(
       {
         product_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product' // Tham chiếu đến model 'Product'
+          ref: 'Product' // Tham chiếu đến model 'ProductModel'
         },
         quantity: { type: Number, min: 1, default: 1 },
         color: String,
@@ -22,6 +22,6 @@ const cartSchema = new mongoose.Schema(
   }
 )
 
-const Cart = mongoose.model('Cart', cartSchema, 'carts')
+const CartModel = mongoose.model('Cart', cartSchema, 'carts')
 
-export default Cart
+export default CartModel

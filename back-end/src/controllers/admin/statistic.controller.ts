@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import * as statisticService from '~/services/admin/statistic.service'
 
 // [GET] /admin/statistics
-export const statistic = async (req: Request, res: Response) => {
+export const index = async (req: Request, res: Response) => {
   try {
     const {
       statistic,

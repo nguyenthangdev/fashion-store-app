@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import * as brandService from '~/services/client/brand.service'
 
 // [GET] /brands
-export const getAllBrands = async (req: Request, res: Response) => {
+export const index = async (req: Request, res: Response) => {
   try {
     const brands = await brandService.getAllBrands()
 

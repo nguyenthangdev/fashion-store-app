@@ -10,8 +10,8 @@ export const index = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
-      myAccount: myAccount,
-      role: role
+      myAccount,
+      role
     })
 
   } catch (error) {
@@ -26,18 +26,18 @@ export const index = async (req: Request, res: Response) => {
 export const editMyAccount = async (req: Request, res: Response) => {
   try {
     const result = await myAccountService.editMyAccount( req.body, req['accountAdmin'].id)
+    
     if (!result.success) {
-      res.status(StatusCodes.CONFLICT).json({
+      return res.status(StatusCodes.CONFLICT).json({
         code: result.code,
         message: result.message
       })
-      return
     }
+
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Cập nhật thành công tài khoản!'
     })
-    
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       code: 500,

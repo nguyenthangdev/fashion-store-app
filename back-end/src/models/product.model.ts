@@ -8,8 +8,16 @@ const commentSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'User'
     },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    content: { type: String, required: true },
+    rating: { 
+      type: Number, 
+      required: true, 
+      min: 1, 
+      max: 5 
+    },
+    content: { 
+      type: String, 
+      required: true 
+    },
     status: { 
       type: String, 
       enum: ['PENDING', 'APPROVED', 'REJECTED'], 
@@ -113,6 +121,6 @@ const productSchema = new mongoose.Schema(
 productSchema.index({ title: 1, deleted: 1 })
 productSchema.index({ deleted: 1, status: 1, createdAt: -1 })
 
-const Product = mongoose.model('Product', productSchema, 'products')
+const ProductModel = mongoose.model('Product', productSchema, 'products')
 
-export default Product
+export default ProductModel

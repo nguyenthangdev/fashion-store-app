@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import Product from '~/models/product.model'
+import ProductModel from '~/models/product.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import * as productService from '~/services/admin/product.service'
 import { StatusCodes } from 'http-status-codes'
@@ -17,11 +17,11 @@ export const index = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
-      products: products,
+      products,
       filterStatus: filterStatusHelpers(req.query),
       keyword: objectSearch.keyword,
       pagination: objectPagination,
-      allProducts: allProducts
+      allProducts
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -43,7 +43,7 @@ export const changeStatusProduct = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Cập nhật thành công trạng thái sản phẩm!',
-      updater: updater
+      updater
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -70,7 +70,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.ACTIVE:
-        await Product.updateMany(
+        await ProductModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.ACTIVE, $push: { updatedBy: updatedBy } }
         )
@@ -80,7 +80,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.INACTIVE:
-        await Product.updateMany(
+        await ProductModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.INACTIVE, $push: { updatedBy: updatedBy } }
         )
@@ -90,7 +90,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.DELETEALL:
-        await Product.updateMany(
+        await ProductModel.updateMany(
           { _id: { $in: ids } },
           { deleted: true, deletedAt: new Date() }
         )
@@ -183,7 +183,7 @@ export const detaiProduct = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Lấy thành công chi tiết sản phẩm!',
-      product: product
+      product
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -205,7 +205,7 @@ export const productTrash = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Trả productTrash thành công!',
-      products: products,
+      products,
       keyword: objectSearch.keyword,
       pagination: objectPagination,
     })
@@ -229,14 +229,14 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.DELETEALL:
-        await Product.deleteMany({ _id: { $in: ids } })
+        await ProductModel.deleteMany({ _id: { $in: ids } })
         res.json({
           code: 204,
           message: `Đã xóa vĩnh viễn thành công ${ids.length} sản phẩm!`
         })
         break
       case Key.RECOVER:
-        await Product.updateMany(
+        await ProductModel.updateMany(
           { _id: { $in: ids } },
           { deleted: false, recoveredAt: new Date() }
         )

@@ -1,4 +1,4 @@
-import Product from '~/models/product.model'
+import ProductModel from '~/models/product.model'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
 import { ProductInterface } from '~/interfaces/admin/product.interface'
@@ -34,7 +34,7 @@ export const getProducts = async (query: any) => {
   // End Sort
 
   // Pagination
-  const countProducts = await Product.countDocuments(find)
+  const countProducts = await ProductModel.countDocuments(find)
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -46,7 +46,7 @@ export const getProducts = async (query: any) => {
   // End Pagination
   
   const [products, allProducts] = await Promise.all([
-    Product
+    ProductModel
       .find(find)
       .sort(sort)
       .limit(objectPagination.limitItems)
@@ -54,7 +54,7 @@ export const getProducts = async (query: any) => {
       .populate('createdBy.account_id', 'fullName email')
       .populate('updatedBy.account_id', 'fullName email')
       .lean(),
-    Product
+    ProductModel
       .find({ deleted: false })
       .lean()
   ])
@@ -73,7 +73,7 @@ export const changeStatusProduct = async (product_id: string, status: string, ac
     updatedAt: new Date()
   }
 
-  const updater = await Product
+  const updater = await ProductModel
     .findByIdAndUpdate(
       { _id: product_id },
       {
@@ -90,7 +90,7 @@ export const changeStatusProduct = async (product_id: string, status: string, ac
 }
 
 export const deleteProduct = async (product_id: string, account_id: string) => {
-  await Product.updateOne(
+  await ProductModel.updateOne(
     { _id: product_id },
     {
       $set: {
@@ -151,7 +151,7 @@ export const createProduct = async (data: ProductInterface, account_id: string, 
   //   account_id: account_id
   // }
 
-  const product = new Product(dataTemp)
+  const product = new ProductModel(dataTemp)
   await product.save()
   const productToObject = product.toObject()
   return productToObject
@@ -208,7 +208,7 @@ export const editProduct = async (data: ProductInterface, account_id: string, id
   }
   // delete dataTemp.updatedBy
 
-  await Product.updateOne(
+  await ProductModel.updateOne(
     { _id: id },
     {
       $set: dataTemp,
@@ -218,7 +218,7 @@ export const editProduct = async (data: ProductInterface, account_id: string, id
 }
 
 export const detaiProduct = async (id: string) => {
-  const product = await Product.findOne({ _id: id, deleted: false }).lean()
+  const product = await ProductModel.findOne({ _id: id, deleted: false }).lean()
   return product
 }
 
@@ -252,7 +252,7 @@ export const productTrash = async (query: any) => {
 
 
   // Pagination
-  const countOrders = await Product.countDocuments(find)
+  const countOrders = await ProductModel.countDocuments(find)
 
   const objectPagination = paginationHelpers(
     {
@@ -264,7 +264,7 @@ export const productTrash = async (query: any) => {
   )
   // End Pagination
 
-  const products = await Product
+  const products = await ProductModel
     .find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
@@ -282,11 +282,11 @@ export const productTrash = async (query: any) => {
 }
 
 export const permanentlyDeleteProduct = async (id: string) => {
-  await Product.deleteOne({ _id: id })
+  await ProductModel.deleteOne({ _id: id })
 }
 
 export const recoverProduct = async (id: string) => {
-  await Product.updateOne(
+  await ProductModel.updateOne(
     { _id: id },
     { $set: { deleted: false, recoveredAt: new Date() }}
   )

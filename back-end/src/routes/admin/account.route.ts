@@ -16,7 +16,7 @@ router.post(
   validate.createAccount, // middleware
   controller.createAccount
 )
-router.patch('/change-status/:status/:id', controller.changeStatusAccount)
+router.patch('/change-status/:status/:id', controller.changeAccountStatus)
 // Bắt đầu chỉnh sửa sản phẩm và gửi form đi.
 router.patch(
   '/edit/:id',
@@ -25,7 +25,7 @@ router.patch(
   validate.editAccount, // middleware
   controller.editAccount
 )
-router.get('/detail/:id', controller.detailAccount)
+router.get('/detail/:id', controller.accountDetail)
 router.delete('/delete/:id', controller.deleteAccount)
 
 export const accountRoutes: Router = router

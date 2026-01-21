@@ -1,6 +1,6 @@
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
-import Order from '~/models/order.model'
+import OrderModel from '~/models/order.model'
 import ExcelJS from 'exceljs'
 import { EstimatedConfirmedDayInterface, EstimatedDeliveryDayInterface } from '~/interfaces/admin/order.interface'
 
@@ -19,7 +19,7 @@ export const getOrders = async (query: any) => {
   // End search
 
   // Pagination
-  const countOrders = await Order.countDocuments(find)
+  const countOrders = await OrderModel.countDocuments(find)
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -44,7 +44,7 @@ export const getOrders = async (query: any) => {
   // End Sort
 
   const [orders, allOrders] = await Promise.all([
-    Order
+    OrderModel
       .find(find)
       .sort(sort)
       .limit(objectPagination.limitItems)
@@ -53,7 +53,7 @@ export const getOrders = async (query: any) => {
       .populate('createdBy.account_id', 'fullName email') // Lấy thông tin người tạo
       .populate('updatedBy.account_id', 'fullName email')
       .lean(),
-    Order
+    OrderModel
       .find({deleted: false})
       .lean()
   ])
@@ -70,7 +70,7 @@ export const changeStatusOrder = async (status: string, order_id: string, accoun
     account_id: account_id,
     updatedAt: new Date()
   }
-  const updater = await Order
+  const updater = await OrderModel
     .findByIdAndUpdate(
       { _id: order_id },
       {
@@ -86,7 +86,7 @@ export const changeStatusOrder = async (status: string, order_id: string, accoun
 }
 
 export const deleteOrder = async (order_id: string, account_id: string) => {
-  await Order.updateOne(
+  await OrderModel.updateOne(
     { _id: order_id },
     {
       $set: {
@@ -101,7 +101,7 @@ export const deleteOrder = async (order_id: string, account_id: string) => {
 }
 
 export const detailOrder = async (order_id: string) => {
-  const order = await Order.findOne({ _id: order_id, deleted: false })
+  const order = await OrderModel.findOne({ _id: order_id, deleted: false })
   return order
 }
 
@@ -114,7 +114,7 @@ export const estimatedDeliveryDay = async (data: EstimatedDeliveryDayInterface, 
     account_id: account_id,
     updatedAt: new Date()
   }
-  await Order.updateOne(
+  await OrderModel.updateOne(
     { _id: dataTemp.orderId },
     { 
       $set: { estimatedDeliveryDay: dataTemp.estimatedDeliveryDay }, 
@@ -132,7 +132,7 @@ export const estimatedConfirmedDay = async (data: EstimatedConfirmedDayInterface
     account_id: account_id,
     updatedAt: new Date()
   }
-  await Order.updateOne(
+  await OrderModel.updateOne(
     { _id: dataTemp.orderId },
     { 
       $set: { estimatedConfirmedDay: dataTemp.estimatedConfirmedDay }, 
@@ -150,7 +150,7 @@ export const exportOrder = async (query: any) => {
     }
 
   // Lấy TẤT CẢ đơn hàng (không phân trang) khớp với bộ lọc
-    const orders = await Order.find(find).sort({ createdAt: -1 })
+    const orders = await OrderModel.find(find).sort({ createdAt: -1 })
 
   // Tạo file Excel
     const workbook = new ExcelJS.Workbook()
@@ -218,7 +218,7 @@ export const orderTrash = async (query: any) => {
   // End search
 
   // Pagination
-  const countOrders = await Order.countDocuments(find)
+  const countOrders = await OrderModel.countDocuments(find)
 
   const objectPagination = paginationHelpers(
     {
@@ -243,7 +243,7 @@ export const orderTrash = async (query: any) => {
   }
   // End Sort
 
-  const orders = await Order
+  const orders = await OrderModel
     .find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
@@ -259,11 +259,11 @@ export const orderTrash = async (query: any) => {
 }
 
 export const permanentlyDeleteOrder = async (id: string) => {
-  await Order.deleteOne({ _id: id })
+  await OrderModel.deleteOne({ _id: id })
 }
 
 export const recoverOrder = async (id: string) => {
-  await Order.updateOne(
+  await OrderModel.updateOne(
     { _id: id },
     { $set: { deleted: false, recoveredAt: new Date() } }
   )

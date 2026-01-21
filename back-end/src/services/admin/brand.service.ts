@@ -1,4 +1,4 @@
-import Brand from '~/models/brand.model'
+import BrandModel from '~/models/brand.model'
 import paginationHelpers from '~/helpers/pagination'
 import searchHelpers from '~/helpers/search'
 import { BrandInterface } from '~/interfaces/admin/brand.interface'
@@ -14,7 +14,7 @@ export const getBrands = async (query: any) => {
     // End search
 
     // Pagination
-    const countBrands = await Brand.countDocuments(find)
+    const countBrands = await BrandModel.countDocuments(find)
     const objectPagination = paginationHelpers(
       { currentPage: 1, limitItems: 10 },
       query,
@@ -22,7 +22,7 @@ export const getBrands = async (query: any) => {
     )
     // End Pagination
 
-    const brands = await Brand
+    const brands = await BrandModel
       .find(find)
       .sort({ createdAt: -1 })
       .limit(objectPagination.limitItems)
@@ -43,14 +43,14 @@ export const createBrand = async (data: BrandInterface, account_id: string) => {
         }
     }
 
-    const brand = new Brand(dataTemp)
+    const brand = new BrandModel(dataTemp)
     await brand.save()
     const brandToObject = brand.toObject()
     return brandToObject
 }
 
 export const detailBrand = async (brand_id: string) => {
-    const brand = await Brand.findById(brand_id)
+    const brand = await BrandModel.findById(brand_id)
     return brand
 }
 
@@ -65,7 +65,7 @@ export const editBrand = async (data: BrandInterface, brand_id: string, account_
         thumbnail: data.thumbnail,
         createdBy: account_id
     }
-    await Brand.updateOne(
+    await BrandModel.updateOne(
       { _id: brand_id },
       { 
         $set: dataTemp,
@@ -79,7 +79,7 @@ export const deleteBrand = async (brand_id: string, account_id: string) => {
       account_id: account_id,
       deletedAt: new Date()
     }
-    await Brand.updateOne(
+    await BrandModel.updateOne(
       { _id: brand_id },
       { $set: { deleted: true, deletedBy }}
     )

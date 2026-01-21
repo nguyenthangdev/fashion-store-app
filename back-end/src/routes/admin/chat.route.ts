@@ -8,14 +8,14 @@ const router: Router = Router()
 router.get(
   '/',
   authMiddleware.requireAuth, // Bảo vệ route
-  controller.getAdminChatRooms
+  controller.getChatRooms
 )
 
 // Admin: Lấy lịch sử của 1 phòng chat
 router.get(
   '/:userId',
   authMiddleware.requireAuth, // Bảo vệ route
-  controller.getAdminChatHistory
+  controller.getChatHistory
 )
 
-export const chatAdminRoutes: Router = router
+export const chatRoutes: Router = router

@@ -4,7 +4,7 @@ import * as chatService from '~/services/client/chat.service'
 
 // Lấy hoặc tạo phòng chat cho client đang đăng nhập
 // [GET] /chats
-export const getChat = async (req: Request, res: Response) => {
+export const getChatHistory = async (req: Request, res: Response) => {
   try {
     const chat = await chatService.getChat(req['accountUser']._id)
     

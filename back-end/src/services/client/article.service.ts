@@ -1,5 +1,5 @@
-import Article from '~/models/article.model'
-import ArticleCategory from '~/models/articleCategory.model'
+import ArticleModel from '~/models/article.model'
+import ArticleCategoryModel from '~/models/articleCategory.model'
 import paginationHelpers from '~/helpers/pagination'
 
 export const getArticles = async (query: any) => {
@@ -11,7 +11,7 @@ export const getArticles = async (query: any) => {
   const find: Find = { deleted: false }
 
   // Pagination
-  const countProducts = await Article.countDocuments(find)
+  const countProducts = await ArticleModel.countDocuments(find)
   const objectPagination = paginationHelpers(
   { currentPage: 1, limitItems: 20 },
   query,
@@ -20,13 +20,13 @@ export const getArticles = async (query: any) => {
   // End Pagination
 
   const [articles, allArticles] = await Promise.all([
-    Article
+    ArticleModel
       .find(find)
       .sort({ createdAt: -1 })
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip)
       .lean(),
-    Article
+    ArticleModel
       .find(find)
       .sort({ createdAt: -1 })
       .lean()
@@ -40,13 +40,13 @@ export const getArticles = async (query: any) => {
 }
 
 export const category = async (slugCategory: string) => {
-  const category = await ArticleCategory.findOne({
+  const category = await ArticleCategoryModel.findOne({
     slug: slugCategory,
     status: 'ACTIVE',
     deleted: false
   })
   const getSubArticle = async (parentId) => {
-    const subs = await ArticleCategory.find({
+    const subs = await ArticleCategoryModel.find({
       deleted: false,
       status: 'ACTIVE',
       parent_id: parentId
@@ -62,7 +62,7 @@ export const category = async (slugCategory: string) => {
   const listSubCategory = await getSubArticle(category.id)
   const listSubCategoryId = listSubCategory.map((item) => item.id)
 
-  const articles = await Article
+  const articles = await ArticleModel
     .find({
       deleted: false,
       article_category_id: { $in: [category.id, ...listSubCategoryId] }
@@ -79,9 +79,9 @@ export const detailArticle = async (slugArticle: string) => {
     slug: slugArticle,
     status: 'ACTIVE'
   }
-  const article = await Article.findOne(find)
+  const article = await ArticleModel.findOne(find)
   if (article.article_category_id) {
-    const category = await ArticleCategory.findOne({
+    const category = await ArticleCategoryModel.findOne({
       _id: article.article_category_id,
       deleted: false,
       status: 'ACTIVE'

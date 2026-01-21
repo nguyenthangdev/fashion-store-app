@@ -1,9 +1,9 @@
-import User from '~/models/user.model'
-import Cart from '~/models/cart.model'
+import UserModel from '~/models/user.model'
+import CartModel from '~/models/cart.model'
 import * as sendMailHelper from '~/providers/mail.provider'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
-import Order from '~/models/order.model'
+import OrderModel from '~/models/order.model'
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import { JWTProvider } from '~/providers/jwt.provider'
@@ -16,7 +16,7 @@ export const register = async (data: UserRegisterInterface) => {
     password: data.password,
     confirmPassword: data.confirmPassword
   }
-    const isExistEmail = await User.findOne({
+    const isExistEmail = await UserModel.findOne({
       email: dataTemp.email
     })
     if (isExistEmail) {
@@ -29,7 +29,7 @@ export const register = async (data: UserRegisterInterface) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(dataTemp.password, salt)
 
-    const user = new User({
+    const user = new UserModel({
       fullName: dataTemp.fullName,
       email: dataTemp.email,
       password: hashedPassword
@@ -44,7 +44,7 @@ export const login = async (data: UserLoginInterface, cartId: string) => {
     email: data.email,
     password: data.password
   }
-    const user = await User.findOne({
+    const user = await UserModel.findOne({
       email: dataTemp.email,
       deleted: false
     }).select('+password')
@@ -86,36 +86,36 @@ export const login = async (data: UserLoginInterface, cartId: string) => {
     )
     let finalCartId: string
     const guestCartId = cartId
-    const userCart = await Cart.findOne({ user_id: user._id })
+    const userCart = await CartModel.findOne({ user_id: user._id })
 
-    // Case 1: User đã có giỏ hàng cũ (userCart)
+    // Case 1: UserModel đã có giỏ hàng cũ (userCart)
     if (userCart) {
       if (guestCartId && guestCartId !== userCart._id.toString()) {
-        // Case 1a: User có giỏ cũ VÀ có giỏ khách (guestCartId)
+        // Case 1a: UserModel có giỏ cũ VÀ có giỏ khách (guestCartId)
         // => Gộp sản phẩm từ giỏ khách vào giỏ cũ
-        const guestCart = await Cart.findById(guestCartId)
+        const guestCart = await CartModel.findById(guestCartId)
         if (guestCart && guestCart.products.length > 0) {
           userCart.products.push(...guestCart.products)
           await userCart.save()
-          await Cart.deleteOne({ _id: guestCartId })
+          await CartModel.deleteOne({ _id: guestCartId })
         }
       }
-      // Case 1b: User có giỏ cũ, không có giỏ khách
+      // Case 1b: UserModel có giỏ cũ, không có giỏ khách
       // => Chỉ cần set cookie về giỏ cũ
       finalCartId = userCart._id.toString()
-    } else { // Case 2: User chưa có giỏ hàng (user mới)
+    } else { // Case 2: UserModel chưa có giỏ hàng (user mới)
       if (guestCartId) {
-        // Case 2a: User chưa có giỏ, nhưng có giỏ khách
+        // Case 2a: UserModel chưa có giỏ, nhưng có giỏ khách
         // => Gán giỏ khách cho user
-        await Cart.updateOne(
+        await CartModel.updateOne(
           { _id: guestCartId }, 
           { $set: { user_id: user._id } }
         )
         finalCartId = guestCartId
       } else {
-        // Case 2b: User mới, không có giỏ nào
+        // Case 2b: UserModel mới, không có giỏ nào
         // => Tạo giỏ mới cho user
-        const newCart = new Cart({ user_id: user._id, products: [] })
+        const newCart = new CartModel({ user_id: user._id, products: [] })
         await newCart.save()
         finalCartId = newCart._id.toString()
       }
@@ -147,7 +147,7 @@ export const refreshToken = async (refreshTokenUser: string) => {
   ) as {
     userId: string
   }
-  const user = await User.findOne({
+  const user = await UserModel.findOne({
     _id: refreshTokenUserDecoded.userId,
     deleted: false,
     status: "ACTIVE"
@@ -156,7 +156,7 @@ export const refreshToken = async (refreshTokenUser: string) => {
     return { 
       success: false, 
       code: 404, 
-      message: 'User không tồn tại!' 
+      message: 'UserModel không tồn tại!' 
     }
   }
   const payload = { 
@@ -175,7 +175,7 @@ export const refreshToken = async (refreshTokenUser: string) => {
 }
 
 export const forgotPasswordPost = async (email: string) => {
-  const user = await User.findOne({ 
+  const user = await UserModel.findOne({ 
     email: email, 
     deleted: false 
   })
@@ -225,7 +225,7 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
   ) as {
     userId: string
   }
-  const user = await User.findOne({
+  const user = await UserModel.findOne({
     _id: resetTokenDecoded.userId,
     deleted: false,
     status: "ACTIVE"
@@ -240,7 +240,7 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
   // Băm mật khẩu mới
   const salt = await bcrypt.genSalt(10)
   const hashedPassword = await bcrypt.hash(dataTemp.password, salt)
-  await User.updateOne(
+  await UserModel.updateOne(
       { _id: user._id },
       { $set: { password: hashedPassword } }
    )
@@ -255,7 +255,7 @@ export const editUser = async (account_id: string, data: UserInterface) => {
     address: data.address,
     avatar: data.avatar
   }
-  const isExistEmail = await User.findOne({
+  const isExistEmail = await UserModel.findOne({
     _id: { $ne: account_id }, // $ne ($notequal) -> Tránh trường hợp khi tìm bị lặp và không cập nhật lại lên đc.
     email: dataTemp.email,
     deleted: false
@@ -267,7 +267,7 @@ export const editUser = async (account_id: string, data: UserInterface) => {
       message: `Email ${dataTemp.email} đã tồn tại, vui lòng chọn email khác!`
     }
   }
-  await User.updateOne({ _id: account_id }, { $set: dataTemp })
+  await UserModel.updateOne({ _id: account_id }, { $set: dataTemp })
   return { success: true }
 }
 
@@ -277,7 +277,7 @@ export const changePasswordUser = async (account_id: string, data: UserChangePas
     password: data.password,
     confirmPassword: data.confirmPassword
   }
-  const user = await User.findOne({
+  const user = await UserModel.findOne({
     _id: account_id,
     deleted: false
   }).select('+password')
@@ -298,7 +298,7 @@ export const changePasswordUser = async (account_id: string, data: UserChangePas
   }
   const salt = await bcrypt.genSalt(10)
   const newHashedPassword = await bcrypt.hash(dataTemp.password, salt)
-  await User.updateOne(
+  await UserModel.updateOne(
     { _id: account_id }, 
     { $set: { password: newHashedPassword } }
   )
@@ -337,7 +337,7 @@ export const getOrders = async (account_id: string, query: any) => {
   // End search
 
   // Pagination
-  const countOrders = await Order.countDocuments(find)
+  const countOrders = await OrderModel.countDocuments(find)
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -361,7 +361,7 @@ export const getOrders = async (account_id: string, query: any) => {
   }
   // End Sort
 
-  const orders = await Order
+  const orders = await OrderModel
     .find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
@@ -381,7 +381,7 @@ export const getOrders = async (account_id: string, query: any) => {
 }
 
 export const cancelOrder = async (order_id: string) => {
-  await Order.updateOne(
+  await OrderModel.updateOne(
     { _id: order_id },
     { $set: { status: 'CANCELED' } }
   )
@@ -391,17 +391,17 @@ export const googleCallback = async (cartId: string, user: any) => {
   // 2. Logic giỏ hàng 
   const guestCartId = cartId
   
-  const userCart = await Cart.findOne({ user_id: user._id })  
+  const userCart = await CartModel.findOne({ user_id: user._id })  
   let finalCartId: string
 
-  // TH1: User đã có giỏ hàng cũ(userCart)
+  // TH1: UserModel đã có giỏ hàng cũ(userCart)
   if (userCart) {
     finalCartId = userCart._id.toString()
 
     if (guestCartId && guestCartId !== finalCartId) {
-      // TH1a: User có giỏ cũ VÀ có giỏ khách(guestCartId)
+      // TH1a: UserModel có giỏ cũ VÀ có giỏ khách(guestCartId)
       // => Gộp sản phẩm từ giỏ khách vào giỏ cũ
-      const guestCart = await Cart.findById(guestCartId)
+      const guestCart = await CartModel.findById(guestCartId)
       if (guestCart && guestCart.products.length > 0) {
         // Chuyển đổi products sang Object thuần túy để tránh lỗi Mongoose
         const userProducts = userCart.toObject().products || []
@@ -445,24 +445,24 @@ export const googleCallback = async (cartId: string, user: any) => {
 
         userCart.set('products', Array.from(productMap.values()))
         await userCart.save()
-        await Cart.deleteOne({ _id: guestCartId })      
+        await CartModel.deleteOne({ _id: guestCartId })      
       }
     }
     
-    // TH1b: User có giỏ cũ, không có giỏ khách
+    // TH1b: UserModel có giỏ cũ, không có giỏ khách
     // => Chỉ cần set cookie về giỏ cũ
     //res.cookie('cartId', finalCartId, COOKIE_OPTIONS)
   } else {
-    // TH2: User chưa có giỏ hàng (user mới)
+    // TH2: UserModel chưa có giỏ hàng (user mới)
     if (guestCartId) {
-      // TH2a: User chưa có giỏ, nhưng có giỏ khách
+      // TH2a: UserModel chưa có giỏ, nhưng có giỏ khách
       // => Gán giỏ khách cho user
       finalCartId = guestCartId
-      await Cart.updateOne({ _id: guestCartId }, { $set: { user_id: user._id } })
+      await CartModel.updateOne({ _id: guestCartId }, { $set: { user_id: user._id } })
     } else {
-      // TH2b: User mới, không có giỏ nào
+      // TH2b: UserModel mới, không có giỏ nào
       // => Tạo giỏ mới cho user
-      const newCart = new Cart({ user_id: user._id, products: [] })
+      const newCart = new CartModel({ user_id: user._id, products: [] })
       await newCart.save()
       finalCartId = newCart._id.toString()
     }

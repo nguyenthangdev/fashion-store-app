@@ -1,14 +1,8 @@
 import { convertToSlug } from "./convertToSlug"
+import { SearchInterface, QueryInterface } from "~/interfaces/admin/general.interface"
 
-interface ObjectSearch {
-  slug?: RegExp,
-  keyword: string,
-  regex?: RegExp,
-  fullName?: RegExp
-}
-
-const searchHelpers = (query: Record<string, unknown>): ObjectSearch => {
-  const objectSearch: ObjectSearch = {
+const searchHelpers = (query: QueryInterface): SearchInterface => {
+  const objectSearch: SearchInterface = {
     keyword: ''
   }
 

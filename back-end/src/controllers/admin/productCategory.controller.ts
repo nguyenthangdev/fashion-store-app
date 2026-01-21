@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import ProductCategory from '~/models/productCategory.model'
+import ProductCategoryModel from '~/models/productCategory.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import { buildTreeForPagedItems } from '~/helpers/createChildForPagedParents'
 import { deleteManyStatusFast, updateManyStatusFast } from '~/helpers/updateStatusItem'
@@ -45,7 +45,7 @@ export const index = async (req: Request, res: Response) => {
 //       account_id: req['accountAdmin'].id,
 //       updatedAt: new Date()
 //     }
-//     await ProductCategory.updateOne(
+//     await ProductCategoryModel.updateOne(
 //       { _id: id },
 //       { status: status, $push: { updatedBy: updatedBy } }
 //     )
@@ -102,7 +102,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.ACTIVE:
-        await updateManyStatusFast(ProductCategory, Key.ACTIVE, ids, updatedBy)
+        await updateManyStatusFast(ProductCategoryModel, Key.ACTIVE, ids, updatedBy)
 
         res.status(StatusCodes.OK).json({
           code: 200,
@@ -110,14 +110,14 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.INACTIVE:
-        await updateManyStatusFast(ProductCategory, Key.INACTIVE, ids, updatedBy)
+        await updateManyStatusFast(ProductCategoryModel, Key.INACTIVE, ids, updatedBy)
         res.status(StatusCodes.OK).json({
           code: 200,
           message: `Cập nhật thành công trạng thái ${ids.length} danh mục sản phẩm!`
         })
         break
       case Key.DELETEALL:
-        await deleteManyStatusFast(ProductCategory, ids)
+        await deleteManyStatusFast(ProductCategoryModel, ids)
         res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} danh mục sản phẩm!`
@@ -251,7 +251,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
     switch (type) {
       case Key.DELETEALL:
         // Lấy tất cả danh mục để tìm con
-        const allCategories = await ProductCategory.find({}).lean()
+        const allCategories = await ProductCategoryModel.find({}).lean()
         
         // Hàm đệ quy lấy tất cả ID từ cây
         const getAllIdsFromTree = (items: TreeInterface[]): string[] => {
@@ -275,7 +275,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
         let allIdsToDelete: string[] = []
         
         for (const id of ids) {
-          const category = await ProductCategory.findOne({ _id: id }).lean()
+          const category = await ProductCategoryModel.findOne({ _id: id }).lean()
           
           if (category) {
             // Tạo cây cho từng danh mục
@@ -294,7 +294,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
         allIdsToDelete = [...new Set(allIdsToDelete)]
         
         // Xóa tất cả danh mục
-        await ProductCategory.deleteMany({ _id: { $in: allIdsToDelete } })
+        await ProductCategoryModel.deleteMany({ _id: { $in: allIdsToDelete } })
         
         res.json({
           code: 204,
@@ -302,7 +302,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
         })
         break
       case Key.RECOVER:
-        await ProductCategory.updateMany(
+        await ProductCategoryModel.updateMany(
           { _id: { $in: ids } },
           { deleted: false, recoveredAt: new Date() })
         res.status(StatusCodes.OK).json({

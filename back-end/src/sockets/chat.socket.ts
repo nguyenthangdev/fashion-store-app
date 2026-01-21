@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io'
 
-import Chat from '~/models/chat.model'
+import ChatModel from '~/models/chat.model'
 
 export const chatSocketBrain = (io: Server) => {
     io.on('connection', (socket: Socket) => {
@@ -28,7 +28,7 @@ export const chatSocketBrain = (io: Server) => {
                         createdAt: new Date()
                     }
                     
-                    const chat = await Chat.findOneAndUpdate(
+                    const chat = await ChatModel.findOneAndUpdate(
                         { user_id: data.userId },
                         { $push: { messages: messageData }, lastMessageAt: new Date() },
                         { upsert: true, new: true } // Không có thì tạo mới, có thì update – và luôn trả về dữ liệu mới nhất
@@ -56,7 +56,7 @@ export const chatSocketBrain = (io: Server) => {
             // Client tham gia phòng riêng của mình
             socket.on('USER_CLIENT_JOIN_ROOM', () => {
                 socket.join(userId) // Join phòng có tên là user_id của họ
-                console.log(`User ${userId} đã tham gia phòng chat.`)
+                console.log(`UserModel ${userId} đã tham gia phòng chat.`)
 
                 // Send confirmation back to client
                 socket.emit('ROOM_JOINED', { userId, room: userId })
@@ -71,7 +71,7 @@ export const chatSocketBrain = (io: Server) => {
                         createdAt: new Date()
                     }
 
-                    const chat = await Chat.findOneAndUpdate(
+                    const chat = await ChatModel.findOneAndUpdate(
                         { user_id: userId },
                         { $push: { messages: messageData }, lastMessageAt: new Date() },
                         { upsert: true, new: true }

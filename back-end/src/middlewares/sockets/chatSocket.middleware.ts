@@ -31,7 +31,7 @@ export const chatSocket = (io: Server) => {
         socket.data.role = 'admin'
         return next()
       } else if (tokenUser) {
-        // Xác thực Client (User)
+        // Xác thực Client (UserModel)
         const decoded = await JWTProvider.verifyToken(
           tokenUser,
           process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT

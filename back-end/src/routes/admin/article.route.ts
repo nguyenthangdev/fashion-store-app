@@ -17,8 +17,8 @@ router.post(
   controller.createArticle
 )
 router.delete('/delete/:id', controller.deleteArticle)
-router.patch('/change-status/:status/:id', controller.changeStatusArticle)
-router.get('/detail/:id', controller.detailArticle)
+router.patch('/change-status/:status/:id', controller.changeArticleStatus)
+router.get('/detail/:id', controller.articleDetail)
 router.patch(
   '/edit/:id',
   multer().single('thumbnail'),

@@ -1,12 +1,12 @@
-import Product from '~/models/product.model'
-import ProductCategory from '~/models/productCategory.model'
+import ProductModel from '~/models/product.model'
+import ProductCategoryModel from '~/models/productCategory.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import paginationHelpers from '~/helpers/pagination'
 import searchHelpers from '~/helpers/search'
 
 export const getSubCategory = async (parentId: string) => {
-  const subs = await ProductCategory.find({
+  const subs = await ProductCategoryModel.find({
     deleted: false,
     status: 'ACTIVE',
     parent_id: parentId
@@ -35,7 +35,7 @@ export const getProducts = async (query: any) => {
     
     if (query.category) {
         const categorySlug = query.category.toString()
-        const category = await ProductCategory.findOne({
+        const category = await ProductCategoryModel.findOne({
             slug: categorySlug,
             status: 'ACTIVE',
             deleted: false
@@ -101,7 +101,7 @@ export const getProducts = async (query: any) => {
 
     // CHẠY PIPELINE ĐỂ LẤY DỮ LIỆU VÀ TỔNG SỐ LƯỢNG
     // Dùng $facet để chạy 2 truy vấn con song song: 1. đếm, 2. lấy dữ liệu đã phân trang
-    const aggregationResult = await Product.aggregate([
+    const aggregationResult = await ProductModel.aggregate([
         ...pipeline,
         {
             $facet: {
@@ -143,7 +143,7 @@ export const getFilters = async () => {
     // Chạy 2 tác vụ lấy dữ liệu song song, thay vì nối tiếp
     const [categories, productAggregations] = await Promise.all([
         // Tác vụ 1: Lấy danh mục Cấp 1
-        ProductCategory
+        ProductCategoryModel
             .find({
                 deleted: false, status: 'ACTIVE',
                 $or: [{ parent_id: null }, { parent_id: '' }] // Chỉ lấy danh mục gốc
@@ -153,7 +153,7 @@ export const getFilters = async () => {
             .lean(),
 
         // Tác vụ 2: Chạy aggregation trên sản phẩm
-        Product.aggregate([
+        ProductModel.aggregate([
         { $match: { deleted: false, status: 'ACTIVE' } },
         // Dùng $facet để chạy 3 pipeline con song song mà không làm bùng nổ dữ liệu
         {
@@ -191,7 +191,7 @@ export const getFilters = async () => {
 }
 
 export const category = async (slugCategory: string) => {
-    const category = await ProductCategory.findOne({
+    const category = await ProductCategoryModel.findOne({
         slug: slugCategory,
         status: 'ACTIVE',
         deleted: false
@@ -201,7 +201,7 @@ export const category = async (slugCategory: string) => {
 
     const listSubCategoryId = listSubCategory.map((item) => item._id.toString())
 
-    const products = await Product
+    const products = await ProductModel
         .find({
             deleted: false,
             product_category_id: { $in: [category._id.toString(), ...listSubCategoryId] }
@@ -224,7 +224,7 @@ export const detail = async (slugProduct: string) => {
       slug: slugProduct,
       status: 'ACTIVE'
     }
-    const product = await Product
+    const product = await ProductModel
       .findOne(find)
       .populate('comments.user_id')
       .lean()
@@ -236,7 +236,7 @@ export const detail = async (slugProduct: string) => {
         })
     }
     if (product.product_category_id) {
-      const category = await ProductCategory.findOne({
+      const category = await ProductCategoryModel.findOne({
         _id: product.product_category_id,
         deleted: false,
         status: 'ACTIVE'
@@ -264,7 +264,7 @@ export const getSearchSuggestions = async (query: any) => {
         { slug: objectSearch.slug }
       ]
     }
-    const products = await Product
+    const products = await ProductModel
       .find(find)
       .select('title thumbnail price discountPercentage slug')
       .limit(10)
@@ -280,7 +280,7 @@ export const getSearchSuggestions = async (query: any) => {
 
 export const getRelatedProducts = async (productId: string) => {
     // 1. Tìm sản phẩm hiện tại để lấy category_id
-    const currentProduct = await Product.findById(productId)
+    const currentProduct = await ProductModel.findById(productId)
 
       // Nếu không tìm thấy sản phẩm hoặc sản phẩm không có danh mục, trả về mảng rỗng
     if (!currentProduct || !currentProduct.product_category_id) {
@@ -293,7 +293,7 @@ export const getRelatedProducts = async (productId: string) => {
     }
 
     // 2. Tìm các sản phẩm khác có cùng category_id
-    const relatedProducts = await Product.find({
+    const relatedProducts = await ProductModel.find({
       product_category_id: currentProduct.product_category_id,
       _id: { $ne: productId } // $ne: loại trừ chính sản phẩm đang xem
     }).limit(8) // Giới hạn 8 sản phẩm liên quan
@@ -313,7 +313,7 @@ export const createReview = async (data: any, productId: string, fileUrls: any, 
     const { rating, content, color, size } = data
     const images = fileUrls || [] // Lấy URL ảnh từ middleware uploadCloud
 
-    const product = await Product.findById(productId)
+    const product = await ProductModel.findById(productId)
     if (!product) {
         return { 
             success: false, 
@@ -353,7 +353,7 @@ export const createReview = async (data: any, productId: string, fileUrls: any, 
 }
 
 export const getTopRatedReviews = async () => {
-    const topReviews = await Product.aggregate([
+    const topReviews = await ProductModel.aggregate([
     // 1. Chỉ lấy sản phẩm có bình luận
     { $match: { 'comments.0': { $exists: true } } },
     // 2. Tách mảng comments thành các document riêng lẻ
@@ -374,7 +374,7 @@ export const getTopRatedReviews = async () => {
     // 7. Lấy thông tin người dùng (tên)
     {
       $lookup: {
-        from: 'users', // Tên collection của User model
+        from: 'users', // Tên collection của UserModel model
         localField: 'user_id',
         foreignField: '_id',
         as: 'commentUser'

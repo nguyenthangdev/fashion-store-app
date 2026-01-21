@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import Product from '~/models/product.model'
+import ProductModel from '~/models/product.model'
 import * as productService from '~/services/client/product.service'
 import { StatusCodes } from 'http-status-codes'
 

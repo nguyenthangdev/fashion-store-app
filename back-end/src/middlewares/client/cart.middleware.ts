@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import Cart from '~/models/cart.model'
+import CartModel from '~/models/cart.model'
 import { getCookieOptions } from '~/utils/constants'
 
 export const cartId = async (
@@ -11,18 +11,18 @@ export const cartId = async (
 
   if (!cartId) {
     // Tạo giỏ hàng
-    const cart = new Cart()
+    const cart = new CartModel()
     await cart.save()
     res.cookie('cartId', cart.id, getCookieOptions('30d'))
     req["cartId"] = cart.id,
     req['miniCart'] = cart
   } else {
     // Lấy ra
-    const cart = await Cart.findById(cartId)
+    const cart = await CartModel.findById(cartId)
     if (!cart) {
       // Nếu cookie có cartId nhưng CSDL không có (ví dụ: CSDL bị xóa)
       // => Tạo giỏ hàng mới
-      const newCart = new Cart()
+      const newCart = new CartModel()
       await newCart.save()
       res.cookie('cartId', newCart.id, getCookieOptions('30d'))
       req["cartId"] = newCart.id,

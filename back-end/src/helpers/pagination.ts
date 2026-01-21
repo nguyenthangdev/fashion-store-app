@@ -1,16 +1,10 @@
-interface ObjectPagination {
-  currentPage: number;
-  limitItems: number;
-  skip?: number;
-  totalPage?: number;
-  totalItems?: number
-}
+import { PaginationInterface, QueryInterface } from "~/interfaces/admin/general.interface";
 
 const paginationHelpers = (
-  objectPagination: ObjectPagination,
-  query: Record<string, unknown>,
+  objectPagination: PaginationInterface,
+  query: QueryInterface,
   countProducts: number
-): ObjectPagination => {
+): PaginationInterface => {
   if (query.page) {
     if (typeof query.page === 'string') {
       objectPagination.currentPage = parseInt(query.page)

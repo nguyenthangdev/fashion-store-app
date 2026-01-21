@@ -15,10 +15,10 @@ const forgotPasswordSchema = new mongoose.Schema(
   }
 )
 
-const ForgotPassword = mongoose.model(
+const ForgotPasswordModel = mongoose.model(
   'ForgotPassword',
   forgotPasswordSchema,
   'forgot-password'
 )
 
-export default ForgotPassword
+export default ForgotPasswordModel

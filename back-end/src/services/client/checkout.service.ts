@@ -1,17 +1,17 @@
-import Cart from '~/models/cart.model'
-import Product from '~/models/product.model'
-import Order from '~/models/order.model'
+import CartModel from '~/models/cart.model'
+import ProductModel from '~/models/product.model'
+import OrderModel from '~/models/order.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import "~/crons/order.cron"
 import { CheckoutInterface } from '~/interfaces/client/checkout.interface'
 
 export const getCheckout = async (cartId: string) => {
-  const cart = await Cart
+  const cart = await CartModel
     .findOne({ _id: cartId })
     .populate({
       path: 'products.product_id', // Đường dẫn đến trường cần làm đầy
-      model: 'Product', // Tên model tham chiếu
+      model: 'ProductModel', // Tên model tham chiếu
       select: 'title thumbnail slug price discountPercentage colors sizes stock' // Chỉ lấy các trường cần thiết
     })
   
@@ -58,9 +58,9 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
     phone: dataTemp.phone, 
     address: dataTemp.address
   }
-  const cart = await Cart.findById(cartId).populate({
+  const cart = await CartModel.findById(cartId).populate({
     path: 'products.product_id',
-    model: 'Product'
+    model: 'ProductModel'
   })
   if (!cart || cart.products.length === 0) {
     return { 
@@ -99,7 +99,7 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
     paymentInfo: { method: dataTemp.paymentMethod, status: 'PENDING' }
   }
 
-  const newOrder = new Order(orderInfo)
+  const newOrder = new OrderModel(orderInfo)
   await newOrder.save()
   return {
     success: true,
@@ -109,9 +109,9 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
 }
 
 export const success = async (orderId: string) => {
-  const order = await Order.findOne({ _id: orderId })
+  const order = await OrderModel.findOne({ _id: orderId })
   for (const product of order.products) {
-    const productInfo = await Product
+    const productInfo = await ProductModel
       .findOne({ _id: product.product_id })
       .select('title thumbnail')
     product['productInfo'] = productInfo

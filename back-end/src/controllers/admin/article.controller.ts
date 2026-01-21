@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
-import Article from '~/models/article.model'
+import ArticleModel from '~/models/article.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import * as articleService from '~/services/admin/article.service'
 import { StatusCodes } from 'http-status-codes'
+import { QueryInterface } from '~/interfaces/admin/general.interface'
 
 // [GET] /admin/articles
-export const index = async (req: Request, res: Response) => {
-  // Bộ lọc
+export const index = async (req: Request<{}, {}, {}, QueryInterface>, res: Response) => {
   try {
     const {
       articles,
@@ -17,12 +17,12 @@ export const index = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Thành công!',
-      articles: articles,
+      message: 'Lấy trang index của bài viết thành công!',
+      articles,
       filterStatus: filterStatusHelpers(req.query),
       keyword: objectSearch.keyword,
       pagination: objectPagination,
-      allArticles: allArticles
+      allArticles
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -39,7 +39,7 @@ export const createArticle = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
-      message: 'Thêm thành công bài viết!',
+      message: 'Thêm bài viết thành công!',
       data: articleToObject,
     })
   } catch (error) {
@@ -51,14 +51,14 @@ export const createArticle = async (req: Request, res: Response) => {
 }
 
 // [GET] /admin/articles/detail/:id
-export const detailArticle = async (req: Request, res: Response) => {
+export const articleDetail = async (req: Request, res: Response) => {
   try {
-    const article = await articleService.detailArticle(req.params.id)
+    const article = await articleService.articleDetail(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Thành công!',
-      article: article
+      message: 'Lấy trang chi tiết bài viết thành công!',
+      article
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -75,7 +75,7 @@ export const editArticle = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Cập nhật thành công bài viết!'
+      message: 'Cập nhật bài viết thành công!'
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -86,9 +86,9 @@ export const editArticle = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/articles/change-status/:status/:id
-export const changeStatusArticle = async (req: Request, res: Response) => {
+export const changeArticleStatus = async (req: Request, res: Response) => {
   try {
-    const updater = await articleService.changeStatusArticle(
+    const updater = await articleService.changeArticleStatus(
       req.params.status, 
       req.params.id, 
       req['accountAdmin'].id
@@ -96,8 +96,8 @@ export const changeStatusArticle = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Cập nhật thành công trạng thái bài viết!',
-      updater: updater
+      message: 'Cập nhật trạng thái bài viết thành công!',
+      updater
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -124,17 +124,17 @@ export const changeMulti = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.ACTIVE:
-        await Article.updateMany(
+        await ArticleModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.ACTIVE, $push: { updatedBy: updatedBy } }
         )
         res.status(StatusCodes.OK).json({
           code: 200,
-          message: `Cập nhật thành công trạng thái ${ids.length} bài viết!`
+          message: `Cập nhật trạng thái ${ids.length} bài viết thành công!`
         })
         break
       case Key.INACTIVE:
-        await Article.updateMany(
+        await ArticleModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.INACTIVE, $push: { updatedBy: updatedBy } }
         )
@@ -144,7 +144,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.DELETEALL:
-        await Article.updateMany(
+        await ArticleModel.updateMany(
           { _id: { $in: ids } },
           { deleted: 'true', deletedAt: new Date() }
         )

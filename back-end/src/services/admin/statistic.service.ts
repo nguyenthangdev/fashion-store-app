@@ -1,6 +1,6 @@
-import Product from '~/models/product.model'
-import User from '~/models/user.model'
-import Order from '~/models/order.model'
+import ProductModel from '~/models/product.model'
+import UserModel from '~/models/user.model'
+import OrderModel from '~/models/order.model'
 
 export const getStatistic = async () => {
   const statistic = {
@@ -17,7 +17,7 @@ export const getStatistic = async () => {
       total: 0,
     }
   }
-  const result = await Order.aggregate([
+  const result = await OrderModel.aggregate([
     { $match: { "paymentInfo.status": "PAID" } }, // chỉ tính đơn đã thanh toán
     {
       $group: {
@@ -35,15 +35,15 @@ export const getStatistic = async () => {
   const labels = result.map(month => `Tháng ${month._id}`)
   const data = result.map(revenue => revenue.totalRevenue)
 
-  statistic.user.total = await User.countDocuments({
+  statistic.user.total = await UserModel.countDocuments({
     deleted: false
   })
 
-  statistic.product.total = await Product.countDocuments({
+  statistic.product.total = await ProductModel.countDocuments({
     deleted: false
   })
 
-  statistic.order.total = await Order.countDocuments({
+  statistic.order.total = await OrderModel.countDocuments({
     deleted: false
   })
 

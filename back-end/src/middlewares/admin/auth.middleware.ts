@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
-import Account from '~/models/account.model'
+import AccountModel from '~/models/account.model'
 import { StatusCodes } from 'http-status-codes'
 import { JWTProvider } from '~/providers/jwt.provider'
-import Role from '~/models/role.model'
+import RoleModel from '~/models/role.model'
 
 export const requireAuth = async (
   req: Request,
@@ -27,7 +27,7 @@ export const requireAuth = async (
       res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ!!' })
       return
     }
-    const accountAdmin = await Account.findOne({
+    const accountAdmin = await AccountModel.findOne({
       _id: accessTokenDecoded.accountId,
       deleted: false,
       status: 'ACTIVE'
@@ -38,7 +38,7 @@ export const requireAuth = async (
       return
     }
 
-    const role = await Role.findOne({
+    const role = await RoleModel.findOne({
       _id: accountAdmin.role_id,
       deleted: false
     })

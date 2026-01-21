@@ -1,8 +1,8 @@
 import { Response } from 'express'
 import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat, HashAlgorithm } from 'vnpay'
 import { Request } from 'express'
-import Cart from '~/models/cart.model'
-import Order from '~/models/order.model'
+import CartModel from '~/models/cart.model'
+import OrderModel from '~/models/order.model'
 import { ReturnQueryFromVNPay } from 'vnpay'
 import { StatusCodes } from 'http-status-codes'
 
@@ -60,7 +60,7 @@ export const vnpayReturn = async (req: Request, res: Response) => {
       // Tách phần orderId gốc trước dấu '-'
       const orderId = txnRef.split('-')[0]
       
-      const order = await Order.findById(orderId)
+      const order = await OrderModel.findById(orderId)
       if (!order) {
         return res.status(StatusCodes.NOT_FOUND).json({ 
           code: 404,  
@@ -107,7 +107,7 @@ export const vnpayIpn = async (req: Request, res: Response) => {
 
       // Tách phần orderId gốc trước dấu '-'
       const orderId = txnRef.split('-')[0]
-      const order = await Order.findById(orderId)
+      const order = await OrderModel.findById(orderId)
 
       if (!order) {
         return res.status(StatusCodes.NOT_FOUND).json({ 
@@ -119,7 +119,7 @@ export const vnpayIpn = async (req: Request, res: Response) => {
       // Nếu thanh toán thành công
 
       if (req.query["vnp_ResponseCode"] === "00" && req.query["vnp_TransactionStatus"] === "00") {
-        await Cart.updateOne(
+        await CartModel.updateOne(
           { _id: order.cart_id },
           { products: [] }
         )

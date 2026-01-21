@@ -14,10 +14,10 @@ const settingGeneralSchema = new mongoose.Schema(
   }
 )
 
-const SettingsGeneral = mongoose.model(
+const SettingsGeneralModel = mongoose.model(
   'SettingsGeneral',
   settingGeneralSchema,
   'settings-general'
 )
 
-export default SettingsGeneral
+export default SettingsGeneralModel

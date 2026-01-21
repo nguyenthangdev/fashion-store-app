@@ -1,11 +1,8 @@
-export interface StatusItem {
-  name: string;
-  status: string;
-  class: string;
-}
+import { QueryInterface, StatusInterface } from "~/interfaces/admin/general.interface"
 
-const filterStatusHelpers = (query: Record<string, unknown>): StatusItem[] => {
-  const statuses: StatusItem[] = [
+
+const filterStatusHelpers = (query: QueryInterface): StatusInterface[] => {
+  const statuses: StatusInterface[] = [
     { name: 'Tất cả', status: '', class: '' },
     { name: 'Hoạt động', status: 'ACTIVE', class: '' },
     { name: 'Ngừng hoạt động', status: 'INACTIVE', class: '' }

@@ -1,11 +1,11 @@
-import Product from '~/models/product.model'
-import Article from '~/models/article.model'
+import ProductModel from '~/models/product.model'
+import ArticleModel from '~/models/article.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 
 export const home = async () => {
   // Lấy ra sản phẩm nổi bật
-  const productsFeatured = await Product.find({
+  const productsFeatured = await ProductModel.find({
     featured: '1',
     deleted: false,
     status: 'ACTIVE'
@@ -18,7 +18,7 @@ export const home = async () => {
   )
 
   // Lấy ra sản phẩm mới nhất
-  const productsNew = await Product.find({
+  const productsNew = await ProductModel.find({
     deleted: false,
     status: 'ACTIVE'
   })
@@ -30,7 +30,7 @@ export const home = async () => {
   )
 
   // Lấy ra bài viết nổi bật
-  const articlesFeatured = await Article.find({
+  const articlesFeatured = await ArticleModel.find({
     featured: '1',
     deleted: false,
     status: 'ACTIVE'
@@ -39,7 +39,7 @@ export const home = async () => {
     .limit(5)
 
   // Lấy ra bài viết mới nhất
-  const articlesNew = await Article.find({
+  const articlesNew = await ArticleModel.find({
     deleted: false,
     status: 'ACTIVE'
   })

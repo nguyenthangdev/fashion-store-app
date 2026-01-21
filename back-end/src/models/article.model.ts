@@ -65,6 +65,6 @@ articleSchema.index({ title: 1, deleted: 1 })
 articleSchema.index({ deleted: 1, status: 1, createdAt: -1 })
 
 
-const Article = mongoose.model('Article', articleSchema, 'articles')
+const ArticleModel = mongoose.model('Article', articleSchema, 'articles')
 
-export default Article
+export default ArticleModel

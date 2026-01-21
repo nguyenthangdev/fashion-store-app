@@ -3,8 +3,8 @@ import moment from 'moment'
 import axios from 'axios'
 import crypto from 'crypto'
 import { Request } from 'express'
-import Cart from '~/models/cart.model'
-import Order from '~/models/order.model'
+import CartModel from '~/models/cart.model'
+import OrderModel from '~/models/order.model'
 import { StatusCodes } from 'http-status-codes'
 
 export const zalopayCreateOrder = async (
@@ -89,7 +89,7 @@ export const zalopayCallback = async (req: Request, res: Response) => {
     }
     let dataJson = JSON.parse(data)
     const [phone, id] = dataJson.app_user.split("-");
-    const order = await Order.findOne({
+    const order = await OrderModel.findOne({
       _id: id,
       'userInfo.phone': phone,
       deleted: false,
@@ -101,7 +101,7 @@ export const zalopayCallback = async (req: Request, res: Response) => {
       })
     }
     // Thanh toán thành công
-    await Cart.updateOne({ _id: order.cart_id }, { products: [] })
+    await CartModel.updateOne({ _id: order.cart_id }, { products: [] })
     order.paymentInfo.status = "PAID"
     order.paymentInfo.details = {
       app_trans_id: dataJson.app_trans_id,

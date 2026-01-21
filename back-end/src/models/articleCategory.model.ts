@@ -53,10 +53,10 @@ const articleCategorySchema = new mongoose.Schema(
 articleCategorySchema.index({ title: 1, deleted: 1 })
 articleCategorySchema.index({ deleted: 1, status: 1, createdAt: -1 })
 
-const ArticleCategory = mongoose.model(
+const ArticleCategoryModel = mongoose.model(
   'ArticleCategory',
   articleCategorySchema,
   'articles-category'
 )
 
-export default ArticleCategory
+export default ArticleCategoryModel

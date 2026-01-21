@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import filterOrderHelpers from '~/helpers/filterOrder'
-import Order from '~/models/order.model'
+import OrderModel from '~/models/order.model'
 import * as orderService from '~/services/admin/order.service'
 
 // [GET] /admin/orders
@@ -17,11 +17,11 @@ export const index = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Trả về orders thành công!',
-      orders: orders,
+      orders,
       filterOrder: filterOrderHelpers(req.query),
       keyword: objectSearch.keyword,
       pagination: objectPagination,
-      allOrders: allOrders, // Tất cả những order ban đầu chưa có phân trang
+      allOrders
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -43,7 +43,7 @@ export const changeStatusOrder = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Cập nhật trạng thái thành công đơn hàng!',
-      updater: updater
+      updater
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -72,7 +72,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.PENDING:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.PENDING, $push: { updatedBy: updatedBy } }
         )
@@ -82,7 +82,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.TRANSPORTING:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.TRANSPORTING, $push: { updatedBy: updatedBy } }
         )
@@ -92,7 +92,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.CONFIRMED:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.CONFIRMED, $push: { updatedBy: updatedBy } }
         )
@@ -102,7 +102,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.CANCELED:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { status: Key.CANCELED, $push: { updatedBy: updatedBy } }
         )
@@ -112,7 +112,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         })
         break
       case Key.DELETEALL:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { deleted: 'true', deletedAt: new Date() }
         )
@@ -163,7 +163,7 @@ export const detailOrder = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Chi tiết đơn hàng!',
-      order: order
+      order
     })
     
   } catch (error) {
@@ -247,9 +247,9 @@ export const orderTrash = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Trả orderTrash thành công!',
-      orders: orders,
+      orders,
       keyword: objectSearch.keyword,
-      pagination: objectPagination,
+      pagination: objectPagination
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -271,14 +271,14 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.DELETEALL:
-        await Order.deleteMany({ _id: { $in: ids } })
+        await OrderModel.deleteMany({ _id: { $in: ids } })
         res.json({
           code: 204,
           message: `Đã xóa vĩnh viễn thành công ${ids.length} đơn hàng!`
         })
         break
       case Key.RECOVER:
-        await Order.updateMany(
+        await OrderModel.updateMany(
           { _id: { $in: ids } },
           { deleted: false, recoveredAt: new Date() }
         )

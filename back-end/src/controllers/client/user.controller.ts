@@ -143,10 +143,10 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
     //   otp: otp,
     //   expireAt: Date.now()
     // }
-    // const record = await ForgotPassword.findOne({
+    // const record = await ForgotPasswordModel.findOne({
     //   email: email
     // })
-    // const forgotPassword = new ForgotPassword(objectForgotPassword)
+    // const forgotPassword = new ForgotPasswordModel(objectForgotPassword)
     // // Tránh trường hợp gửi otp liên tục mà phải hết hạn otp đó thì mới gửi otp khác.
     // if (!record) {
     //   res.json({
@@ -179,7 +179,7 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
 //   try {
 //     const email = req.body.email
 //     const otp = req.body.otp
-//     const result = await ForgotPassword.findOne({
+//     const result = await ForgotPasswordModel.findOne({
 //       email: email,
 //       otp: otp
 //     })
@@ -190,7 +190,7 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
 //       })
 //       return
 //     }
-//     const user = await User.findOne({
+//     const user = await UserModel.findOne({
 //       email: email
 //     })
 //     res.cookie('tokenUser', user.tokenUser)

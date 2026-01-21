@@ -1,7 +1,7 @@
-import { StatusItem } from './filterStatus'
+import { QueryInterface, StatusInterface } from "~/interfaces/admin/general.interface"
 
-const filterOrderHelpers = (query: Record<string, unknown>): StatusItem[] => {
-  const filterOrder: StatusItem[] = [
+const filterOrderHelpers = (query: QueryInterface): StatusInterface[] => {
+  const filterOrder: StatusInterface[] = [
     {
       name: 'Tất cả',
       status: '',

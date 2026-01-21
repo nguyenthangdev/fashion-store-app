@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import Cart from '~/models/cart.model'
+import CartModel from '~/models/cart.model'
 import * as cartService from '~/services/client/cart.service'
 
 // [GET] /cart
@@ -98,7 +98,7 @@ export const changeMulti = async (req: Request, res: Response) => {
           const [id] = item.split('-')
           arrayId.push(id)
         }
-        await Cart.updateOne(
+        await CartModel.updateOne(
           {
             _id: cartId,
           },
@@ -114,7 +114,7 @@ export const changeMulti = async (req: Request, res: Response) => {
       case Key.CHANGEQUANTITY:
         for (const item of ids) {
           const [id, quantity] = item.split('-')
-          await Cart.updateOne(
+          await CartModel.updateOne(
             { _id: cartId,
               'products.product_id': id
             },

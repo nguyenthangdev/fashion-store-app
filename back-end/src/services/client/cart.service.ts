@@ -1,14 +1,14 @@
-import Cart from '~/models/cart.model'
+import CartModel from '~/models/cart.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import mongoose from 'mongoose'
 
 export const getCart = async (cartId: any) => {
-  const cart = await Cart
+  const cart = await CartModel
     .findOne({ _id: cartId })
     .populate({
       path: 'products.product_id', // Đường dẫn đến trường cần làm đầy
-      model: 'Product', // Tên model tham chiếu
+      model: 'ProductModel', // Tên model tham chiếu
       select: 'title thumbnail slug price discountPercentage colors sizes stock' // Chỉ lấy các trường cần thiết
     })
     .lean()
@@ -42,7 +42,7 @@ export const getCart = async (cartId: any) => {
 
 export const addToCart = async (productId: string, data: any, cartId: any) => {
   const { quantity, color, size } = data 
-  const result = await Cart.updateOne(
+  const result = await CartModel.updateOne(
     {
       _id: cartId,
       products: {
@@ -68,7 +68,7 @@ export const addToCart = async (productId: string, data: any, cartId: any) => {
     }
     
     // Thêm sản phẩm mới vào giỏ hàng
-  await Cart.updateOne(
+  await CartModel.updateOne(
       { _id: cartId },
       { $push: { products: productInfo } }
     )
@@ -78,7 +78,7 @@ export const addToCart = async (productId: string, data: any, cartId: any) => {
 export const updateQuantity = async (cartId: any, data: any) => {
   const { productId, color, size, quantity } = data
 
-  await Cart.updateOne(
+  await CartModel.updateOne(
     { 
       _id: cartId,
       'products.product_id': new mongoose.Types.ObjectId(productId),
@@ -92,7 +92,7 @@ export const updateQuantity = async (cartId: any, data: any) => {
 export const deleteInCart = async (cartId: any, data: any) => {
   const { productId, color, size } = data
   const productObjectId = mongoose.Types.ObjectId.createFromHexString(productId)
-  await Cart.updateOne(
+  await CartModel.updateOne(
     { _id: cartId },
     {
       $pull: { 
@@ -110,7 +110,7 @@ export const updateVariant = async (data: any, cartId: any) => {
   const { productId, oldColor, oldSize, newColor, newSize } = data
 
   // Tìm sản phẩm trong giỏ hàng với các thuộc tính cũ
-  const result = await Cart.updateOne(
+  const result = await CartModel.updateOne(
     {
       _id: cartId,
       'products.product_id': productId,

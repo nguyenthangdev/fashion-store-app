@@ -1,8 +1,8 @@
 import axios from 'axios'
 import crypto from 'crypto'
 import { Response } from 'express'
-import Cart from '~/models/cart.model'
-import Order from '~/models/order.model'
+import CartModel from '~/models/cart.model'
+import OrderModel from '~/models/order.model'
 import { Request } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
@@ -102,7 +102,7 @@ export const momoCallback = async (req: Request, res: Response) => {
   if (signature === signatureCheck) {
     // Hợp lệ
     const orderId = dataJson.orderId.split('-')[0]
-    const order = await Order.findOne({
+    const order = await OrderModel.findOne({
         _id: orderId,
         deleted: false,
     })
@@ -115,7 +115,7 @@ export const momoCallback = async (req: Request, res: Response) => {
     }
     if (dataJson.resultCode == 0) {
       // Thanh toán thành công
-      await Cart.updateOne(
+      await CartModel.updateOne(
         { _id: order.cart_id },
         { products: [] }
       )

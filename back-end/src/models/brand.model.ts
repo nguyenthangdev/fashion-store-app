@@ -44,6 +44,6 @@ const brandSchema = new mongoose.Schema(
   }
 )
 
-const Brand = mongoose.model('Brand', brandSchema, 'brands')
+const BrandModel = mongoose.model('Brand', brandSchema, 'brands')
 
-export default Brand
+export default BrandModel

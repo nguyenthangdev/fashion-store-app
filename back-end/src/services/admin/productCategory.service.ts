@@ -1,13 +1,12 @@
-import ProductCategory from '~/models/productCategory.model'
+import ProductCategoryModel from '~/models/productCategory.model'
 import searchHelpers from '~/helpers/search'
 import { buildTreeForPagedItems } from '~/helpers/createChildForPagedParents'
 import { addLogInfoToTree } from '~/helpers/addLogInfoToChildren'
-import Account from '~/models/account.model'
+import AccountModel from '~/models/account.model'
 import paginationHelpers from '~/helpers/pagination'
 import { updateStatusRecursiveForOneItem } from '~/helpers/updateStatusItem'
 import { buildTreeForItems } from '~/helpers/createChildForAllParents'
-import { LogNodeInterface, TreeInterface, UpdatedBy } from '~/interfaces/admin/general.interface'
-import { string } from 'joi'
+import { LogNodeInterface, TreeInterface, UpdatedByInterface } from '~/interfaces/admin/general.interface'
 import { ProductCategoryInterface } from '~/interfaces/admin/productCategory.interface'
 
 export const getProductCategories = async (query: any) => {
@@ -42,7 +41,7 @@ export const getProductCategories = async (query: any) => {
 
   // Pagination
   const parentFind = { ...find, parent_id: '' }
-  const countParents = await ProductCategory.countDocuments(parentFind)
+  const countParents = await ProductCategoryModel.countDocuments(parentFind)
   const objectPagination = paginationHelpers(
     { 
       currentPage: 1, 
@@ -55,16 +54,16 @@ export const getProductCategories = async (query: any) => {
 
   //  Query song song bằng Promise.all (giảm round-trip)
   const [parentCategories, accounts, allCategories] = await Promise.all([
-    ProductCategory
+    ProductCategoryModel
       .find(parentFind)
       .sort(sort)
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip) // chỉ parent
       .lean(),
-    Account
+    AccountModel
       .find({ deleted: false }) // account info
       .lean(),
-    ProductCategory
+    ProductCategoryModel
       .find({ deleted: false })
       .sort(sort) 
       .lean()
@@ -93,16 +92,16 @@ export const getProductCategories = async (query: any) => {
 
 
 export const changeStatusWithChildren = async (accoutn_id: string, status: string, id: string) => {
-  const updatedBy: UpdatedBy = {
+  const updatedBy: UpdatedByInterface = {
     account_id: accoutn_id,
     updatedAt: new Date()
   }
 
-  await updateStatusRecursiveForOneItem(ProductCategory, status, id, updatedBy)
+  await updateStatusRecursiveForOneItem(ProductCategoryModel, status, id, updatedBy)
 }
 
 export const deleteProductCategory = async (id: string, account_id: string) => {
-  await ProductCategory.updateOne(
+  await ProductCategoryModel.updateOne(
     { _id: id },
     {
       $set: {
@@ -127,7 +126,7 @@ export const createProductCategory = async (data: ProductCategoryInterface, acco
       account_id
     }
   }
-  const productCategory = new ProductCategory(dataTemp)
+  const productCategory = new ProductCategoryModel(dataTemp)
   await productCategory.save()
   const productCategoryToObject = productCategory.toObject()
 
@@ -146,7 +145,7 @@ export const editProductCategory = async (data: ProductCategoryInterface, id: st
     status: data.status,
     thumbnail: data.thumbnail
   }
-  await ProductCategory.updateOne(
+  await ProductCategoryModel.updateOne(
     { _id: id },
     {
       $set: dataTemp,
@@ -156,7 +155,7 @@ export const editProductCategory = async (data: ProductCategoryInterface, id: st
 }
 
 export const detailProductCategory = async (id: string) => {
-  const productCategory = await ProductCategory.findOne({ _id: id, deleted: false })
+  const productCategory = await ProductCategoryModel.findOne({ _id: id, deleted: false })
   return productCategory
 }
 
@@ -189,7 +188,7 @@ export const productCategoryTrash = async (query: any) => {
   // Pagination
   // const parentFind = { ...find, parent_id: '' }
 
-  const countParents = await ProductCategory.countDocuments(find)
+  const countParents = await ProductCategoryModel.countDocuments(find)
   const objectPagination = paginationHelpers(
     { 
       currentPage: 1, 
@@ -202,13 +201,13 @@ export const productCategoryTrash = async (query: any) => {
 
   //  Query song song bằng Promise.all (giảm round-trip)
   const [parentCategories, accounts] = await Promise.all([
-    ProductCategory
+    ProductCategoryModel
       .find(find)
       .sort(sort)
       .limit(objectPagination.limitItems)
       .skip(objectPagination.skip) // chỉ parent
       .lean(),
-    Account
+    AccountModel
       .find({ deleted: false }) // account info
       .lean()
   ])
@@ -223,7 +222,7 @@ export const productCategoryTrash = async (query: any) => {
 
 export const permanentlyDeleteProductCategory = async (id: string) => {
   // Lấy danh mục gốc cần xóa
-  const rootCategory = await ProductCategory.findOne({ _id: id }).lean()
+  const rootCategory = await ProductCategoryModel.findOne({ _id: id }).lean()
   
   if (!rootCategory) {
     return { 
@@ -234,7 +233,7 @@ export const permanentlyDeleteProductCategory = async (id: string) => {
   }
   
   // Lấy tất cả danh mục để tìm con
-  const allCategories = await ProductCategory.find({}).lean()
+  const allCategories = await ProductCategoryModel.find({}).lean()
   
   // Tạo cây từ danh mục gốc
   const tree = buildTreeForPagedItems(
@@ -263,7 +262,7 @@ export const permanentlyDeleteProductCategory = async (id: string) => {
   const allIdsToDelete = getAllIdsFromTree(tree)
   
   // Xóa tất cả danh mục
-  await ProductCategory.deleteMany({
+  await ProductCategoryModel.deleteMany({
     _id: { $in: allIdsToDelete }
   })
 
@@ -271,7 +270,7 @@ export const permanentlyDeleteProductCategory = async (id: string) => {
 }
 
 export const recoverProductCategory = async (id: string) => {
-  await ProductCategory.updateOne(
+  await ProductCategoryModel.updateOne(
     { _id: id },
     { $set: { deleted: false, recoveredAt: new Date() }}
   )

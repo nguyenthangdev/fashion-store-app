@@ -1,4 +1,4 @@
-import Product from '~/models/product.model'
+import ProductModel from '~/models/product.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import { convertToSlug } from '~/helpers/convertToSlug'
@@ -18,7 +18,7 @@ export const getSearch = async (keyword: any) => {
     const stringSlug = convertToSlug(String(keyword))
     const stringSlugRegex = new RegExp(stringSlug, 'i')
     const regex = new RegExp(objectSearch.keyword, 'i')
-    const products = await Product.find({
+    const products = await ProductModel.find({
       $or: [
         { title: regex },
         { slug: stringSlugRegex }

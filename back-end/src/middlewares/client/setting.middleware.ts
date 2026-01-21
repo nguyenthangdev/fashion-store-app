@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import SettingsGeneral from '~/models/settingGeneral.model'
+import SettingsGeneralModel from '~/models/settingGeneral.model'
 export const settingsGeneral = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const settingsGeneral = await SettingsGeneral.findOne({})
+  const settingsGeneral = await SettingsGeneralModel.findOne({})
   req['settingsGeneral'] = settingsGeneral
   next()
 }

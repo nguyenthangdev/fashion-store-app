@@ -14,17 +14,21 @@ const accountSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      select: false // Quan trọng: Ẩn mật khẩu khỏi các truy vấn find()
+      select: false
     },
-    phone: String,
+    phone: {
+      type: String,
+      required: true
+    },
     avatar: String,
     role_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Role' // Tham chiếu đến model Role (Giả sử tên model là 'Role')
+      ref: 'Role',
+      require: true
     },
     status: {
       type: String,
-      enum: ['ACTIVE', 'INACTIVE'], // Chỉ cho phép 2 giá trị này
+      enum: ['ACTIVE', 'INACTIVE'],
       default: 'ACTIVE'
     },
     deleted: {
@@ -38,7 +42,7 @@ const accountSchema = new mongoose.Schema(
   }
 )
 
-const Account = mongoose.model('Account', accountSchema, 'accounts')
+const AccountModel = mongoose.model('Account', accountSchema, 'accounts')
 
-export default Account
+export default AccountModel
 

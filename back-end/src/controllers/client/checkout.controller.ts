@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import Cart from '~/models/cart.model'
-import Product from '~/models/product.model'
+import CartModel from '~/models/cart.model'
+import ProductModel from '~/models/product.model'
 import { vnpayCreateOrder } from '~/helpers/vnpayPayment'
 import { zalopayCreateOrder } from '~/helpers/zalopayPayment'
 import { momoCreateOrder } from '~/helpers/momoPayment'
@@ -52,7 +52,7 @@ export const order = async (req: Request, res: Response) => {
     const { newOrder, paymentMethod } = result
 
     if (paymentMethod === 'COD') {
-      await Cart.updateOne({ _id: cartId }, { products: [] })
+      await CartModel.updateOne({ _id: cartId }, { products: [] })
       res.status(StatusCodes.OK).json({ 
         code: 201,  
         message: 'Đặt hàng thành công!', 
@@ -81,7 +81,7 @@ export const order = async (req: Request, res: Response) => {
     }
     // Trừ kho hàng
     for (const item of newOrder.products) {
-      await Product.updateOne(
+      await ProductModel.updateOne(
         { _id: item.product_id },
         [
           { 

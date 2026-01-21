@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import ArticleCategory from '~/models/articleCategory.model'
+import ArticleCategoryModel from '~/models/articleCategory.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import { deleteManyStatusFast, updateManyStatusFast } from '~/helpers/updateStatusItem'
 import * as articleCategoryService from '~/services/admin/articleCategory.service'
@@ -19,9 +19,9 @@ export const index = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
-      articleCategories: articleCategories,
-      allArticleCategories: allArticleCategories,
-      accounts: accounts,
+      articleCategories,
+      allArticleCategories,
+      accounts,
       filterStatus: filterStatusHelpers(req.query),
       keyword: objectSearch.keyword,
       pagination: objectPagination
@@ -33,35 +33,6 @@ export const index = async (req: Request, res: Response) => {
     })
   }
 }
-
-// // [PATCH] /admin/articles-category/change-status/:status/:id
-// export const changeStatus = async (req: Request, res: Response) => {
-//   try {
-//     const status: string = req.params.status
-//     const id: string = req.params.id
-//     const updatedBy = {
-//       account_id: req['accountAdmin'].id,
-//       updatedAt: new Date()
-//     }
-//     await ArticleCategory.updateOne(
-//       { _id: id },
-//       { status: status, $push: { updatedBy: updatedBy } }
-//     )
-
-//     res.json({
-//       code: 200,
-//       message: 'Cập nhật thành công trạng thái danh mục bài viết!'
-//     })
-//   } catch (error) {
-//     res.json({
-//       code: 400,
-//       message: 'Lỗi!',
-//       error: error
-//     })
-//   }
-// }
-
-
 
 export const changeStatusWithChildren = async (req: Request, res: Response) => {
    try {
@@ -88,7 +59,7 @@ export const changeMulti = async (req: Request, res: Response) => {
   try {
     const body = req.body as { type: string; ids: string[] }
     const type = body.type
-    const ids = body.ids // Chứa tất cả id cả cha và con đã được front-end gửi lên
+    const ids = body.ids
     const updatedBy = {
       account_id: req['accountAdmin'].id,
       updatedAt: new Date()
@@ -100,21 +71,21 @@ export const changeMulti = async (req: Request, res: Response) => {
     }
     switch (type) {
       case Key.ACTIVE:
-        await updateManyStatusFast(ArticleCategory, Key.ACTIVE, ids, updatedBy)
+        await updateManyStatusFast(ArticleCategoryModel, Key.ACTIVE, ids, updatedBy)
         res.status(StatusCodes.OK).json({
           code: 200,
           message: `Cập nhật thành công trạng thái ${ids.length} danh mục bài viết!`
         })
         break
       case Key.INACTIVE:
-        await updateManyStatusFast(ArticleCategory, Key.INACTIVE, ids, updatedBy)
+        await updateManyStatusFast(ArticleCategoryModel, Key.INACTIVE, ids, updatedBy)
         res.status(StatusCodes.OK).json({
           code: 200,
           message: `Cập nhật thành công trạng thái ${ids.length} danh mục bài viết!`
         })
         break
       case Key.DELETEALL:
-        await deleteManyStatusFast(ArticleCategory, ids)
+        await deleteManyStatusFast(ArticleCategoryModel, ids)
         res.json({
           code: 204,
           message: `Xóa thành công ${ids.length} danh mục bài viết!`
@@ -195,7 +166,7 @@ export const detailArticleCategory = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Lấy Thành công chi tiết danh mục bài viết!',
-      articleCategory: articleCategory
+      articleCategory
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

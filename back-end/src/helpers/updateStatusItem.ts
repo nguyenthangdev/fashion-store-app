@@ -1,6 +1,6 @@
-import { UpdatedBy } from "~/interfaces/admin/general.interface"
+import { UpdatedByInterface } from "~/interfaces/admin/general.interface"
 
-export const updateStatusRecursiveForOneItem = async (model: any, status: string, item_id: string, currentUser: UpdatedBy): Promise<void> => {
+export const updateStatusRecursiveForOneItem = async (model: any, status: string, item_id: string, currentUser: UpdatedByInterface): Promise<void> => {
   const stack = [item_id]
   while (stack.length > 0) {
     const currentId = stack.pop()!
@@ -29,7 +29,7 @@ export const updateStatusRecursiveForOneItem = async (model: any, status: string
 }
 
 
-export const updateManyStatusFast = async (model: any, status: string, ids: string[], currentUser: UpdatedBy): Promise<void> => {
+export const updateManyStatusFast = async (model: any, status: string, ids: string[], currentUser: UpdatedByInterface): Promise<void> => {
   // Dùng Set để lọc trùng ID (đề phòng Frontend gửi trùng)
   const uniqueIds = [...new Set(ids)]
 

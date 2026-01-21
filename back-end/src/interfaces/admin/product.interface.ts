@@ -8,7 +8,7 @@ export interface ProductInterface {
     stock: number
     colors: {
         name: string
-        code: string,
+        code: string
         images: (File | string)[]
     }[]
     sizes: string[]

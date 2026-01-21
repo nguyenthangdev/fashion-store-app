@@ -90,6 +90,6 @@ orderSchema.index({ deleted: 1, status: 1, amount: -1 })
 orderSchema.index({ 'userInfo.phone': 1, deleted: 1 })
 
 
-const Order = mongoose.model('Order', orderSchema, 'orders')
+const OrderModel = mongoose.model('Order', orderSchema, 'orders')
 
-export default Order
+export default OrderModel

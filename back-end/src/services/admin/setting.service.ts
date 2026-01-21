@@ -1,8 +1,8 @@
 import { SettingInterface } from '~/interfaces/admin/setting.interface'
-import SettingsGeneral from '~/models/settingGeneral.model'
+import SettingsGeneralModel from '~/models/settingGeneral.model'
 
 export const getSettingGeneral = async () => {
-  const settingGeneral = await SettingsGeneral.find({})
+  const settingGeneral = await SettingsGeneralModel.find({})
   return settingGeneral
 }
 
@@ -15,15 +15,15 @@ export const editSettingGeneral = async (data: SettingInterface) => {
     copyright: data.copyright,
     logo: data.logo
   }
-  const settingsGeneral = await SettingsGeneral.findOne({}) // Lấy một document bất kỳ trong collection (thường là document đầu tiên)
+  const settingsGeneral = await SettingsGeneralModel.findOne({}) // Lấy một document bất kỳ trong collection (thường là document đầu tiên)
   if (settingsGeneral) {
-    await SettingsGeneral.findByIdAndUpdate(
+    await SettingsGeneralModel.findByIdAndUpdate(
       { _id: settingsGeneral._id }, 
       { $set: dataTemp }, 
       { new: true } // trả về document mới
     )
   } else {
-    const settingGeneral = new SettingsGeneral(dataTemp)
+    const settingGeneral = new SettingsGeneralModel(dataTemp)
     await settingGeneral.save()
   } 
   return settingsGeneral

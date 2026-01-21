@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import User from '~/models/user.model'
+import UserModel from '~/models/user.model'
 import { StatusCodes } from 'http-status-codes'
 import { JWTProvider } from '~/providers/jwt.provider'
 
@@ -22,7 +22,7 @@ export const requireAuth = async (
       res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ!!' })
       return
     }
-    const user = await User.findOne({
+    const user = await UserModel.findOne({
       _id: accessTokenUserDecoded.userId,
       deleted: false,
       status: 'ACTIVE'
