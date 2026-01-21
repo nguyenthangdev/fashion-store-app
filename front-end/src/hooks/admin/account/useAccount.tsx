@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchAccountsAPI, fetchChangeStatusAPI, fetchDeleteAccountAPI } from '~/apis/admin/account.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { AccountsDetailInterface, AccountInfoInterface } from '~/interfaces/account.interface'
+import type { AccountsAPIResponse, AccountInfoInterface } from '~/interfaces/account.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
 const useAccount = () => {
@@ -16,7 +16,7 @@ const useAccount = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res: AccountsDetailInterface = await fetchAccountsAPI()
+        const res: AccountsAPIResponse = await fetchAccountsAPI()
         setAccounts(res.accounts)
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -75,6 +75,12 @@ const useAccount = () => {
       })
     }
   }
+  const handlePreventEditStatus = () => {
+    dispatchAlert({
+      type: 'SHOW_ALERT',
+      payload: { message: 'Không thể chỉnh sửa trạng thái hoạt động của quản trị viên cấp cao nhất!', severity: 'error' }
+    })
+  }
   return {
     accounts,
     open,
@@ -83,7 +89,8 @@ const useAccount = () => {
     handleToggleStatus,
     handleOpen,
     handleClose,
-    handleDelete
+    handleDelete,
+    handlePreventEditStatus
   }
 }
 

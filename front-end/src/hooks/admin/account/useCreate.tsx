@@ -31,8 +31,8 @@ const useCreate = () => {
       email: '',
       password: '',
       phone: '',
-      status: 'ACTIVE',
-      role_id: ''
+      role_id: '',
+      status: 'ACTIVE'
     }
   })
 
@@ -76,9 +76,9 @@ const useCreate = () => {
       formData.append('fullName', data.fullName)
       formData.append('email', data.email)
       formData.append('password', data.password)
-      formData.append('status', data.status)
-      formData.append('role_id', data.role_id)
       formData.append('phone', data.phone)
+      formData.append('role_id', data.role_id)
+      formData.append('status', data.status)
 
       const file = uploadImageInputRef.current?.files?.[0]
       if (file) {

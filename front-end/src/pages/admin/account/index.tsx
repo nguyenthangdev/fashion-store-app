@@ -18,7 +18,8 @@ const Account = () => {
     handleToggleStatus,
     handleOpen,
     handleClose,
-    handleDelete
+    handleDelete,
+    handlePreventEditStatus
   } = useAccount()
 
   if (loading) {
@@ -164,13 +165,22 @@ const Account = () => {
                       <TableCell align='center'>{account.email}</TableCell>
                       <TableCell align='center'>{account.phone}</TableCell>
                       <TableCell align='center'>
-                        <button
-                          onClick={() => handleToggleStatus(account._id, account.status)}
-                          className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
+                        {account.role_id.titleId === 'Admin' ? (
+                          <button
+                            onClick={() => handlePreventEditStatus()}
+                            className={'cursor-pointer border rounded-[5px] p-[5px] text-white bg-[#18BA2A]'}
+                          >
+                            Hoạt động
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleToggleStatus(account._id, account.status)}
+                            className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
                           ${account.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
-                        >
-                          {account.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
-                        </button>
+                          >
+                            {account.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
+                          </button>
+                        )}
                       </TableCell>
                       <TableCell align='center'>
                         <Link
