@@ -3,10 +3,19 @@ import { StatusCodes } from 'http-status-codes'
 import CartModel from '~/models/cart.model'
 import * as cartService from '~/services/client/cart.service'
 
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       cartId?: string
+//     }
+//   }
+// }
+
 // [GET] /cart
 export const index = async (req: Request, res: Response) => {
   try {
-    const result = await cartService.getCart(req["cartId"])
+    const result = await cartService.getCart((req as any)['cartId'])
+    console.log('Cart result:', result)
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,

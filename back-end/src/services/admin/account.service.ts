@@ -1,22 +1,30 @@
-import AccountModel from "~/models/account.model"
+import AccountModel from '~/models/account.model'
 import bcrypt from 'bcrypt'
-import RoleModel from "~/models/role.model"
-import { AccountInterface } from "~/interfaces/admin/account.interface"
-import { AccountsWithRolesResponseDTO, CreateAccountDTO, CreateAccountResponseDTO } from "~/dtos/admin/account.dto"
-import * as accountRepository from '~/repositories/account.repository'
+import RoleModel from '~/models/role.model'
+import { AccountInterface } from '~/interfaces/admin/account.interface'
+// import { AccountsWithRolesResponseDTO, CreateAccountDTO, CreateAccountResponseDTO } from '~/dtos/admin/account.dto'
+// import * as accountRepository from '~/repositories/account.repository'
 
-export const getAccountsWithRoles = async ():Promise<AccountsWithRolesResponseDTO | null> => {
-  const accounts = await accountRepository.getAllAccounts()
-  if (!accounts) return null
+export const getAccountsWithRoles = async () => {
+  const accounts = await AccountModel
+    .find({ deleted: false })
+    .populate('role_id')
+    .lean()
 
-  const roles = await accountRepository.getAllRoles()
-  if (!roles) return null
-
-  return { accounts, roles }
+  const roles = await RoleModel
+    .find({ deleted: false })
+    .lean()
+  
+  return { 
+    accounts: accounts || [], 
+    roles: roles || []
+  }
 }
     
-export const createAccount = async (dto: CreateAccountDTO): Promise<CreateAccountResponseDTO> => {
-  const account = await accountRepository.isEmailExists(dto.email)
+export const createAccount = async (dto: any) => {
+  const account = await AccountModel
+    .findOne({ email: dto.email, deleted: false })
+    .lean()
 
   if (account) {
     return { 
@@ -33,6 +41,7 @@ export const createAccount = async (dto: CreateAccountDTO): Promise<CreateAccoun
     ...dto,
     password: hashedPassword
   })
+
   await newAccount.save()
   const accountToObject = newAccount.toObject()
   delete accountToObject.password

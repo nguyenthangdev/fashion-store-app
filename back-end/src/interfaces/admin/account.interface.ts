@@ -6,11 +6,11 @@ export interface AccountInterface {
   email: string
   password?: string
   phone: string
-  avatar?: string
-  role_id?: Types.ObjectId
+  avatar?: string | null
+  role_id?: Types.ObjectId | null
   status: 'ACTIVE' | 'INACTIVE'
   deleted: boolean
-  deletedAt?: Date
+  deletedAt?: Date | null
   createdAt: Date
   updatedAt: Date
 }

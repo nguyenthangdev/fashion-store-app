@@ -1,20 +1,20 @@
-import { Types } from "mongoose"
+import { Types } from 'mongoose'
 
 export interface RoleInterface {
   _id: Types.ObjectId
   title: string
   titleId: string
-  description?: string
+  description?: string | null
   permissions: string[]
   deleted: boolean
   deletedBy?: {
-    account_id?: string
-    deletedAt?: Date
-  }
+    account_id?: string | null
+    deletedAt?: Date | null
+  } | null
   updatedBy?: {
-    account_id?: String
-    updatedAt?: Date
-  }[]
+    account_id?: string | null
+    updatedAt?: Date | null
+  }[] 
   createdAt: Date
   updatedAt: Date
 }

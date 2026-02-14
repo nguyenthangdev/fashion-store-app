@@ -46,11 +46,11 @@ export const requireAuth = async (
       res.status(StatusCodes.FORBIDDEN).json({ message: 'Không thể xác định quyền tài khoản!' })
       return
     }
-    req['accountAdmin'] = accountAdmin
+    req['accountAdmin'] = accountAdmin
     req['accountAdmin.roleName'] = role.titleId
     next()
 
-  } catch (error) {
+  } catch (error: any) {
     if (error.message?.includes('jwt expired')) {
       res.status(StatusCodes.GONE).json({ message: 'Cần refresh token mới!' })
       return

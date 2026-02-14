@@ -1,7 +1,7 @@
 export interface ProductCategoryInterface {
-    title: string
-    parent_id: string
-    description: string
-    status: string
-    thumbnail: any
+  title: string
+  parent_id: string
+  description: string
+  status: string
+  thumbnail: any
 }

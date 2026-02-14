@@ -37,7 +37,7 @@ export const index = async (req: Request, res: Response) => {
 }
 
 // [POST] /admin/accounts/create
-export const createAccount = async (req: Request<{}, {}, CreateAccountDTO>, res: Response) => {
+export const createAccount = async (req: Request, res: Response) => {
   try {
     const dto: CreateAccountDTO = {
       fullName: req.body.fullName,
@@ -135,7 +135,7 @@ export const accountDetail = async (req: Request, res: Response) => {
 export const deleteAccount = async (req: Request, res: Response) => {
   try {
     await accountService.deleteAccount(req.params.id)
-    
+
     res.json({
       code: 204,
       message: 'Xóa tài khoản thành công!'

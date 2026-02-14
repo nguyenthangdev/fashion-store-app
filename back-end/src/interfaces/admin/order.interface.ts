@@ -1,9 +1,9 @@
 export interface EstimatedDeliveryDayInterface {
-    estimatedDeliveryDay: any
-    id: string
+  estimatedDeliveryDay: any
+  id: string
 }
 
 export interface EstimatedConfirmedDayInterface {
-    estimatedConfirmedDay: any
-    id: string
+  estimatedConfirmedDay: any
+  id: string
 }

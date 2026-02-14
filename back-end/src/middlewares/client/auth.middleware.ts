@@ -33,7 +33,7 @@ export const requireAuth = async (
     }
     req['accountUser'] = user 
     next() 
-  } catch (error) {
+  } catch (error: any) {
     if (error.message?.includes('jwt expired')) {
       res.status(StatusCodes.GONE).json({ message: 'Cần refresh token mới!' })
       return

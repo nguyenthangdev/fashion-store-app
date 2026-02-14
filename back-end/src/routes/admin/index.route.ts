@@ -23,21 +23,21 @@ const routeAdmin = (app: Express): void => {
   app.use(PATH_ADMIN, noCache)
   app.use(PATH_ADMIN + '/auth', authRoutes)
   app.use(PATH_ADMIN + '/my-account', authMiddleware.requireAuth, myAccountRoutes)
-  app.use(PATH_ADMIN + '/statistics', authMiddleware.requireAuth,requirePermission(['Admin']), statisticRoutes)
-  app.use(PATH_ADMIN + '/settings', authMiddleware.requireAuth,requirePermission(['Admin']), settingRoutes)
-  app.use(PATH_ADMIN + '/roles', authMiddleware.requireAuth,requirePermission(['Admin']), roleRoutes)
-  app.use(PATH_ADMIN + '/accounts', authMiddleware.requireAuth,requirePermission(['Admin']), accountRoutes)
-  app.use(PATH_ADMIN + '/users', authMiddleware.requireAuth,requirePermission(['Admin']), userRoutes)
+  app.use(PATH_ADMIN + '/statistics', authMiddleware.requireAuth, requirePermission(['Admin']), statisticRoutes)
+  app.use(PATH_ADMIN + '/settings', authMiddleware.requireAuth, requirePermission(['Admin']), settingRoutes)
+  app.use(PATH_ADMIN + '/roles', authMiddleware.requireAuth, requirePermission(['Admin']), roleRoutes)
+  app.use(PATH_ADMIN + '/accounts', authMiddleware.requireAuth, requirePermission(['Admin']), accountRoutes)
+  app.use(PATH_ADMIN + '/users', authMiddleware.requireAuth, requirePermission(['Admin']), userRoutes)
 
-  app.use(PATH_ADMIN + '/chats', authMiddleware.requireAuth,requirePermission(['Admin', 'Product']), chatRoutes)
-  app.use(PATH_ADMIN + '/products-category', authMiddleware.requireAuth,requirePermission(['Admin', 'Product']), productCategoryRoutes)
+  app.use(PATH_ADMIN + '/chats', authMiddleware.requireAuth, requirePermission(['Admin', 'Product']), chatRoutes)
+  app.use(PATH_ADMIN + '/products-category', authMiddleware.requireAuth, requirePermission(['Admin', 'Product']), productCategoryRoutes)
   app.use(PATH_ADMIN + '/products', authMiddleware.requireAuth, requirePermission(['Admin', 'Product']), productRoutes)
 
-  app.use(PATH_ADMIN + '/brands', authMiddleware.requireAuth,requirePermission(['Admin', 'Content']), brandRoutes)
-  app.use(PATH_ADMIN + '/articles', authMiddleware.requireAuth,requirePermission(['Admin', 'Content']), articleRoutes)
-  app.use(PATH_ADMIN + '/articles-category', authMiddleware.requireAuth,requirePermission(['Admin', 'Content']), articleCategoryRoutes)
+  app.use(PATH_ADMIN + '/brands', authMiddleware.requireAuth, requirePermission(['Admin', 'Content']), brandRoutes)
+  app.use(PATH_ADMIN + '/articles', authMiddleware.requireAuth, requirePermission(['Admin', 'Content']), articleRoutes)
+  app.use(PATH_ADMIN + '/articles-category', authMiddleware.requireAuth, requirePermission(['Admin', 'Content']), articleCategoryRoutes)
 
-  app.use(PATH_ADMIN + '/orders', authMiddleware.requireAuth,requirePermission(['Admin', 'Order']), orderRoutes)
+  app.use(PATH_ADMIN + '/orders', authMiddleware.requireAuth, requirePermission(['Admin', 'Order']), orderRoutes)
 }
 
 export default routeAdmin

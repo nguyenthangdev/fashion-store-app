@@ -9,6 +9,6 @@ export const infoUser = async (
   res: Response,
   next: NextFunction
 ) => {
-   return
+  return
   
 }

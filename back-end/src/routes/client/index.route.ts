@@ -3,9 +3,7 @@ import { homeRoutes } from './home.route'
 import { productRoutes } from './product.route'
 import * as categoryMiddleware from '~/middlewares/client/category.middleware'
 import * as settingMiddleware from '~/middlewares/client/setting.middleware'
-// import * as authMiddleware from '~/middlewares/client/auth.middleware'
 import * as cartMiddleware from '~/middlewares/client/cart.middleware'
-
 import { articleRoutes } from './article.route'
 import { searchRoutes } from './search.route'
 import { cartRoutes } from './cart.route'
@@ -25,27 +23,13 @@ const routeClient = (app: Express): void => {
   app.use(settingMiddleware.settingsGeneral)
   app.use(passport.initialize())
 
-  // --- NHÓM 1: CHO PHÉP CACHE (Public) ---
-  // Không thêm noCache vào đây để tăng tốc độ tải trang
   app.use('/', homeRoutes)
   app.use('/products', productRoutes)
   app.use('/articles', articleRoutes)
   app.use('/brands', brandClientRoutes)
   app.use('/search', searchRoutes)
 
-  // --- NHÓM 2: KHÔNG CACHE (Private/Dynamic) ---
   app.use('/cart', noCache, cartMiddleware.cartId, cartRoutes)
-//   // Thêm middleware log TẤT CẢ request vào /checkout
-// app.use('/checkout', (req, res, next) => {
-//   console.log('=== INCOMING REQUEST TO /checkout ===')
-//   console.log('Method:', req.method)
-//   console.log('Path:', req.path)
-//   console.log('Full URL:', req.originalUrl)
-//   console.log('Body:', req.body)
-//   console.log('Headers:', req.headers)
-//   console.log('Cookies:', req.cookies)
-//   next()
-// })
   app.use('/checkout', noCache, cartMiddleware.cartId, checkoutRoutes)
   app.use('/user', noCache, userRoutes)
   app.use('/settings', noCache, settingRoutes)

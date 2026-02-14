@@ -3,8 +3,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import UserModel from '~/models/user.model'
 
 passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  clientID: process.env.GOOGLE_CLIENT_ID!,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
   callbackURL: `${process.env.API_ROOT}/user/auth/google/callback`,
   passReqToCallback: false
 },

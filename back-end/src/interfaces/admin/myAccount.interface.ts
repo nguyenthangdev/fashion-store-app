@@ -1,7 +1,7 @@
 export interface MyAccountInterface {
-    fullName: string
-    email: string
-    password: string
-    phone: string
-    avatar: string
+  fullName: string
+  email: string
+  password: string
+  phone: string
+  avatar: string
 }

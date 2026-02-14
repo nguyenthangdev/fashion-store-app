@@ -288,7 +288,7 @@ export const changePasswordUser = async (account_id: string, data: UserChangePas
       message: 'Không tìm thấy người dùng!'
     }
   }
-  const isMatch = await bcrypt.compare(dataTemp.currentPassword, user.password)
+  const isMatch = bcrypt.compare(dataTemp.currentPassword, user.password)
   if (!isMatch) {
     return {
       success: false,

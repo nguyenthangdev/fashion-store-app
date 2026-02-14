@@ -12,7 +12,7 @@ export const getCart = async (cartId: any) => {
       select: 'title thumbnail slug price discountPercentage colors sizes stock' // Chỉ lấy các trường cần thiết
     })
     .lean()
-  
+  console.log('cart: ',cart)
   // Nếu không có giỏ hàng, trả về an toàn
   if (!cart) {
     return { 

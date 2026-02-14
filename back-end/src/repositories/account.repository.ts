@@ -1,18 +1,18 @@
-import { AccountInterface } from "~/interfaces/admin/account.interface"
-import { RoleInterface } from "~/interfaces/admin/role.interface"
-import AccountModel from "~/models/account.model"
-import RoleModel from "~/models/role.model"
+// import { AccountInterface } from '~/interfaces/admin/account.interface'
+// import { RoleInterface } from '~/interfaces/admin/role.interface'
+import AccountModel from '~/models/account.model'
+import RoleModel from '~/models/role.model'
 
-export const getAllAccounts = async ():Promise<AccountInterface[]> => {
+export const getAllAccounts = async () => {
   const accounts = await AccountModel
     .find({ deleted: false })
     .populate('role_id')
     .lean()
-
+  
   return accounts 
 }
 
-export const getAllRoles = async ():Promise<RoleInterface[]> => {
+export const getAllRoles = async () => {
   const roles = await RoleModel
     .find({ deleted: false })
     .lean()
@@ -20,7 +20,7 @@ export const getAllRoles = async ():Promise<RoleInterface[]> => {
   return roles 
 }
 
-export const isEmailExists = async (email: string): Promise<boolean> => {
+export const isEmailExists = async (email: string) => {
   const account = await AccountModel
     .findOne({ email: email, deleted: false })
     .lean()
