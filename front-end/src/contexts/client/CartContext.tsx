@@ -24,6 +24,7 @@ export const CartClientProvider = ({ children }: { children: ReactNode }) => {
   const refreshCart = async () => {
     try {
       const res = await fetchCartAPI()
+      console.log('res from CartContext: ', res)
       setCartDetail(res.cartDetail)
     } catch (error) {
       console.error('Failed to refresh cart:', error)

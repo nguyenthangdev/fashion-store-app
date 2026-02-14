@@ -21,6 +21,7 @@ const useCart = () => {
   const refreshCart = useCallback(async () => {
     try {
       const cartRes = await fetchCartAPI()
+      console.log('cartRes: ', cartRes)
       setCartDetail(cartRes.cartDetail)
     } catch (error) {
       dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Lỗi khi fetch giỏ hàng', severity: 'error' } })

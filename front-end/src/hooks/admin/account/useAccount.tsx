@@ -75,12 +75,14 @@ const useAccount = () => {
       })
     }
   }
+
   const handlePreventEditStatus = () => {
     dispatchAlert({
       type: 'SHOW_ALERT',
       payload: { message: 'Không thể chỉnh sửa trạng thái hoạt động của quản trị viên cấp cao nhất!', severity: 'error' }
     })
   }
+
   return {
     accounts,
     open,

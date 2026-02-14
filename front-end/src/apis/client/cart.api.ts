@@ -7,6 +7,7 @@ export const fetchCartAPI = async (): Promise<CartDetailInterface> => {
     `${API_ROOT}/cart`,
     { withCredentials: true }
   )
+  console.log('response: ', response)
   return response.data
 }
 

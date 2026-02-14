@@ -34,7 +34,7 @@ const useHeader = () => {
   const { dataHome, setDataHome } = useHome()
   const { settingGeneral } = useSettingGeneral()
   const { cartDetail } = useCart()
-
+  console.log('cartDetail: ',cartDetail)
   const [closeTopHeader, setCloseTopHeader] = useState<boolean>(() => {
     const saved = sessionStorage.getItem('closeTopHeader')
     return saved === 'true'
