@@ -5,8 +5,24 @@ import useDetail from '~/hooks/admin/account/useDetail'
 const DetailAccount = () => {
   const {
     accountInfo,
-    role
+    role,
+    isLoading
   } = useDetail()
+
+  if (isLoading) {
+    return (
+      <div className='text-[17px] mt-[15px] flex flex-col gap-[15px] w-full bg-[#FFFFFF] py-[15px] pl-[50px] shadow-md'>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="circular" width={200} height={200} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="rectangular" width={90} height={33} sx={{ bgcolor: 'grey.400' }}/>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -23,7 +39,10 @@ const DetailAccount = () => {
                 <b>Họ và tên: </b>
                 {accountInfo.fullName}
               </div>
-              <b>Vai trò: {accountInfo.role_id.title}</b>
+              <div>
+                <b>Vai trò: </b>
+                {accountInfo.role_id.title}
+              </div>
               <div>
                 <b>Email: </b>
                 {accountInfo.email}
@@ -54,15 +73,14 @@ const DetailAccount = () => {
             </div>
           </>
         ) : (
-          <div className='text-[17px] mt-[15px] flex flex-col gap-[15px] w-full bg-[#FFFFFF] py-[15px] pl-[50px] shadow-md'>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="circular" width={200} height={200} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={140} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="rectangular" width={90} height={33} sx={{ bgcolor: 'grey.400' }}/>
+          <div className='w-full mt-[15px] flex flex-col gap-[15px] bg-[#FFFFFF] py-[15px] pl-[50px] shadow-md'>
+            <div className='text-[24px] font-[700] mt-[10px]'>Không tìm thấy tài khoản!</div>
+            <Link
+              to={'/admin/accounts'}
+              className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white w-[6%] text-center text-[14px]'
+            >
+              Quay lại
+            </Link>
           </div>
         )
       )}

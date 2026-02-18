@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { STATUSES } from '~/utils/constants'
 import type { GeneralInfoInterface, HelperInterface, PaginationInterface, ParamsInterface } from './helper.interface'
 
 export interface BrandCategory extends GeneralInfoInterface {
@@ -23,7 +24,7 @@ export interface BrandGroup {
   title: string
   slug?: string
   thumbnail: string
-  status: 'ACTIVE' | 'INACTIVE'
+  status: typeof STATUSES[keyof typeof STATUSES]
   pagination: PaginationInterface
 }
 

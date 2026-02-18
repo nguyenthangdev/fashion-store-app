@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { fetchDetailAccountAPI, fetchEditAccountAPI } from '~/apis/admin/account.api'
+import { fetchDetailAccountAPI, fetchEditAccountAPI, fetchRolesAPI } from '~/apis/admin/account.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { AccountAPIResponse } from '~/interfaces/account.interface'
 import type { RoleInfoInterface } from '~/interfaces/role.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { editAccountSchema, type EditAccountFormData } from '~/validations/admin/account.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 const useEdit = () => {
   const [roles, setRoles] = useState<RoleInfoInterface[]>([])
@@ -27,9 +27,14 @@ const useEdit = () => {
     reset,
     setValue,
     watch
-  } = useForm<EditAccountFormData>({
-    resolver: zodResolver(editAccountSchema),
-    defaultValues: {
+  } = useForm<EditAccountFormData>({ // Initialize the form with Zod validation
+    resolver: zodResolver(editAccountSchema), // Apply Zod validation schema
+    defaultValues: { // Set default values for the form fields
+      fullName: '',
+      email: '',
+      phone: '',
+      role_id: '',
+      avatar: null,
       status: 'ACTIVE'
     }
   })
@@ -43,20 +48,25 @@ const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const response: AccountAPIResponse = await fetchDetailAccountAPI(id)
-        const acc = response.account
-        setRoles(response.roles)
+        const [resAccount, resRoles] = await Promise.all([
+          fetchDetailAccountAPI(id),
+          fetchRolesAPI()
+        ])
+        setRoles(resRoles.roles)
+
+        const account = resAccount.account
 
         reset({
-          fullName: acc.fullName,
-          email: acc.email,
-          phone: acc.phone || '',
-          role_id: acc.role_id._id,
-          status: acc.status,
+          fullName: account.fullName,
+          email: account.email,
+          phone: account.phone,
+          role_id: account.role_id._id,
+          status: account.status,
+          avatar: account.avatar,
           password: ''
         })
 
-        setPreview(acc.avatar)
+        setPreview(account.avatar)
       } catch (error) {
         dispatchAlert({
           type: 'SHOW_ALERT',
@@ -76,41 +86,34 @@ const useEdit = () => {
   // Cleanup blob URL to prevent memory leak
   useEffect(() => {
     return () => {
-      if (preview && preview.startsWith('blob:')) {
+      if (preview?.startsWith('blob:')) {
         URL.revokeObjectURL(preview)
       }
     }
   }, [preview])
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
     if (!file) return
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
       dispatchAlert({
         type: 'SHOW_ALERT',
-        payload: { message: 'Vui lòng chọn file ảnh hợp lệ', severity: 'error' }
+        payload: { message: error, severity: 'error' }
       })
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-      })
-      return
-    }
-
-    // Revoke old preview URL if exists
-    if (preview && preview.startsWith('blob:')) {
-      URL.revokeObjectURL(preview)
-    }
-
+    const imageUrl = URL.createObjectURL(file)
+    setPreview(imageUrl)
     setValue('avatar', file)
-    setPreview(URL.createObjectURL(file))
   }
 
   const onSubmit = async (data: EditAccountFormData) => {
@@ -118,7 +121,6 @@ const useEdit = () => {
 
     try {
       const formData = new FormData()
-
       formData.append('fullName', data.fullName)
       formData.append('email', data.email)
       formData.append('role_id', data.role_id)
@@ -157,6 +159,7 @@ const useEdit = () => {
       })
     }
   }
+
   return {
     roles,
     isLoading,

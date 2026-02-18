@@ -1,3 +1,4 @@
+import type { STATUSES } from '~/utils/constants'
 import type { AccountInfoInterface } from './account.interface'
 
 export interface UpdatedBy {
@@ -59,7 +60,7 @@ export interface GeneralInfoInterface {
   _id?: string,
   title: string,
   thumbnail: string,
-  status: 'ACTIVE' | 'INACTIVE',
+  status: typeof STATUSES[keyof typeof STATUSES]
   slug?: string,
   createdBy: CreatedBy
   createdAt: Date | null

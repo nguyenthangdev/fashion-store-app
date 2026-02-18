@@ -1,14 +1,14 @@
 import type { RoleInfoInterface } from './role.interface'
-
+import { STATUSES } from '~/utils/constants'
 export interface AccountInfoInterface {
-  _id: string,
-  avatar: string,
-  fullName: string,
-  email: string,
-  password: string,
-  phone: string,
-  status: 'ACTIVE' | 'INACTIVE',
+  _id: string
+  fullName: string
+  email: string
+  // password: string
+  phone: string
+  avatar: string
   role_id: RoleInfoInterface
+  status: typeof STATUSES[keyof typeof STATUSES]
 }
 
 export interface MyAccountAPIResponse {

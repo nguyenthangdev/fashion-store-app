@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
 import { fetchAccountsAPI, fetchChangeStatusAPI, fetchDeleteAccountAPI } from '~/apis/admin/account.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { AccountsAPIResponse, AccountInfoInterface } from '~/interfaces/account.interface'
+import type { AccountInfoInterface } from '~/interfaces/account.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 
 const useAccount = () => {
@@ -9,33 +11,43 @@ const useAccount = () => {
   const { dispatchAlert } = useAlertContext()
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { role } = useAuth()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
-        const res: AccountsAPIResponse = await fetchAccountsAPI()
-        setAccounts(res.accounts)
+        setIsLoading(true)
+        const res = await fetchAccountsAPI()
+        if (res.code === 200) {
+          setAccounts(res?.accounts || [])
+        } else {
+          dispatchAlert({
+            type: 'SHOW_ALERT',
+            payload: { message: res.message, severity: 'error' }
+          })
+          setAccounts([])
+        }
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Fetch roles error:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đã xảy ra lỗi khi tải dữ liệu tài khoản!', severity: 'error' }
+        })
+        setAccounts([])
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
     fetchData()
-  }, [])
+  }, [dispatchAlert])
 
-  const handleToggleStatus = async (id: string, currentStatus: string): Promise<void> => {
+  const handleToggleStatus = async (account_id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusAPI(newStatus, id)
+    const response = await fetchChangeStatusAPI(account_id, newStatus.toLowerCase())
     if (response.code === 200) {
-      setAccounts((prev) => prev.map((account) => account._id === id ? {
-        ...account,
-        status: newStatus
-      }: account))
+      setAccounts(prevAccounts => prevAccounts.map(account =>
+        account._id === account_id ? { ...account, status: newStatus } : account)
+      )
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }
@@ -48,8 +60,8 @@ const useAccount = () => {
     }
   }
 
-  const handleOpen = (id: string) => {
-    setSelectedId(id)
+  const handleOpen = (account_id: string) => {
+    setSelectedId(account_id)
     setOpen(true)
   }
 
@@ -60,9 +72,10 @@ const useAccount = () => {
 
   const handleDelete = async () => {
     if (!selectedId) return
+
     const response = await fetchDeleteAccountAPI(selectedId)
     if (response.code === 204) {
-      setAccounts((prev) => prev.filter((item) => item._id != selectedId))
+      setAccounts(prevAccounts => prevAccounts.filter(account => account._id != selectedId))
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }
@@ -86,7 +99,7 @@ const useAccount = () => {
   return {
     accounts,
     open,
-    loading,
+    isLoading,
     role,
     handleToggleStatus,
     handleOpen,

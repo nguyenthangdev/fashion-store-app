@@ -1,5 +1,7 @@
 import Skeleton from '@mui/material/Skeleton'
 import useEdit from '~/hooks/admin/account/useEdit'
+import { useEffect } from 'react'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 
 const EditAccount = () => {
   const {
@@ -18,16 +20,26 @@ const EditAccount = () => {
     id
   } = useEdit()
 
-  // Check permission
+  useEffect(() => {
+    if (!role || !role.permissions.includes('accounts_edit')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
   if (!role || !role.permissions.includes('accounts_edit')) {
     return (
       <div className="bg-white p-6 rounded shadow-md mt-4">
-        <p className="text-red-500 text-center">Bạn không có quyền truy cập trang này</p>
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
       </div>
     )
   }
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="bg-white p-[15px] shadow-md mt-[15px]">
@@ -46,10 +58,10 @@ const EditAccount = () => {
     >
       <h1 className="text-[24px] font-[600] text-[#192335]">Chỉnh sửa tài khoản admin</h1>
 
-      {/* Avatar */}
       <div className="flex flex-col gap-[10px]">
         <label className="text-[#192335]">Avatar</label>
         <input
+          {...register('avatar')}
           type="file"
           accept="image/*"
           className="hidden"
@@ -62,18 +74,15 @@ const EditAccount = () => {
         >
           Chọn ảnh
         </label>
-        {preview ? (
+        {preview && (
           <img
             src={preview}
             alt="Avatar preview"
             className="w-[150px] h-[150px] rounded-full object-cover border-2 border-gray-200"
           />
-        ) : (
-          <Skeleton variant="circular" width={150} height={150} />
         )}
       </div>
 
-      {/* Full name */}
       <div className="form-group flex flex-col gap-2">
         <label className="text-[#192335]">
           Họ và tên <span className="text-red-500">*</span>
@@ -82,12 +91,9 @@ const EditAccount = () => {
           {...register('fullName')}
           className="py-[8px] px-[12px] border border-gray-300 rounded-[5px] focus:outline-none focus:border-[#525FE1] transition-colors"
         />
-        {errors.fullName && (
-          <p className="text-red-500 text-[14px]">{errors.fullName.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName="fullName" />
       </div>
 
-      {/* Email */}
       <div className="form-group flex flex-col gap-2">
         <label className="text-[#192335]">
           Email <span className="text-red-500">*</span>
@@ -97,12 +103,9 @@ const EditAccount = () => {
           type="email"
           className="py-[8px] px-[12px] border border-gray-300 rounded-[5px] focus:outline-none focus:border-[#525FE1] transition-colors"
         />
-        {errors.email && (
-          <p className="text-red-500 text-[14px]">{errors.email.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName="email" />
       </div>
 
-      {/* Phone */}
       <div className="form-group flex flex-col gap-2">
         <label className="text-[#192335]">Số điện thoại <span className="text-red-500">*</span></label>
         <input
@@ -111,26 +114,20 @@ const EditAccount = () => {
           placeholder="VD: 0912345678"
           className="py-[8px] px-[12px] border border-gray-300 rounded-[5px] focus:outline-none focus:border-[#525FE1] transition-colors"
         />
-        {errors.phone && (
-          <p className="text-red-500 text-[14px]">{errors.phone.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName="phone" />
       </div>
 
-      {/* Password */}
       <div className="form-group flex flex-col gap-2">
         <label className="text-[#192335]">Mật khẩu mới</label>
         <input
           {...register('password')}
           type="password"
-          placeholder="Để trống nếu không muốn đổi mật khẩu"
+          placeholder="Để trống nếu không muốn đổi mật khẩu."
           className="py-[8px] px-[12px] border border-gray-300 rounded-[5px] focus:outline-none focus:border-[#525FE1] transition-colors"
         />
-        {errors.password && (
-          <p className="text-red-500 text-[14px]">{errors.password.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName="password" />
       </div>
 
-      {/* Role */}
       <div className="form-group flex flex-col gap-2">
         <label className="text-[#192335]">
           Phân quyền <span className="text-red-500">*</span>
@@ -140,19 +137,15 @@ const EditAccount = () => {
           className="py-[8px] px-[12px] border border-gray-300 rounded-[5px] focus:outline-none focus:border-[#525FE1] transition-colors"
         >
           <option value="">-- Chọn phân quyền --</option>
-          {roles && roles.length > 0 && (
-            roles.map(r => (
-              <option key={r._id} value={r._id}>{r.title}</option>
-            ))
-          )}
+          {roles?.map(role => (
+            <option key={role._id} value={role._id}>{role.title}</option>
+          ))
+          }
 
         </select>
-        {errors.role_id && (
-          <p className="text-red-500 text-[14px]">{errors.role_id.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName="role_id" />
       </div>
 
-      {/* Status */}
       <div className="flex flex-col gap-2">
         <label className="text-[#192335]">
           Trạng thái <span className="text-red-500">*</span>
@@ -179,9 +172,9 @@ const EditAccount = () => {
             <span>Dừng hoạt động</span>
           </label>
         </div>
+        <FieldErrorAlert errors={errors} fieldName="status" />
       </div>
 
-      {/* Submit buttons */}
       <div className="flex gap-3 mt-4">
         <button
           type="submit"
