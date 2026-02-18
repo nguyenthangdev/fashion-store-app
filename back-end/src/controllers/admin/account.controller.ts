@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { CreateAccountDTO } from '~/dtos/admin/account.dto'
-import * as accountService from '~/services/admin/account.service'
+import { accountServices } from '~/services/admin/account.service'
 
 // [GET] /admin/accounts
-export const index = async (req: Request, res: Response) => {
+export const getAllAccounts = async (req: Request, res: Response) => {
   try {
-    const { accounts, roles } = await accountService.getAccountsWithRoles()
+    const accounts = await accountServices.getAllAccounts()
   
     if (!accounts) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -15,6 +15,24 @@ export const index = async (req: Request, res: Response) => {
       })
     }
 
+    res.status(StatusCodes.OK).json({
+      code: 200,
+      message: 'Lấy thành công trang danh sách tài khoản!',
+      accounts
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      code: 500,
+      message: 'Đã xảy ra lỗi hệ thống!'
+    })
+  }
+}
+
+// [GET] /admin/accounts/get-roles
+export const getAllRoles = async (req: Request, res: Response) => {
+  try {
+    const roles = await accountServices.getAllRoles()
+  
     if (!roles) {
       return res.status(StatusCodes.NOT_FOUND).json({
         code: 404,
@@ -24,8 +42,7 @@ export const index = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Lấy thành công trang index tài khoản!',
-      accounts,
+      message: 'Lấy thành công nhóm quyền!',
       roles
     })
   } catch (error) {
@@ -39,16 +56,7 @@ export const index = async (req: Request, res: Response) => {
 // [POST] /admin/accounts/create
 export const createAccount = async (req: Request, res: Response) => {
   try {
-    const dto: CreateAccountDTO = {
-      fullName: req.body.fullName,
-      email: req.body.email,
-      password: req.body.password,
-      phone: req.body.phone,
-      avatar: req.body.avatar,
-      role_id: req.body.role_id,
-      status: req.body.status
-    }
-    const result = await accountService.createAccount(dto)
+    const result = await accountServices.createAccount(req.body)
 
     if (!result.success) {
       return res.status(StatusCodes.CONFLICT).json({
@@ -61,7 +69,7 @@ export const createAccount = async (req: Request, res: Response) => {
     res.status(StatusCodes.CREATED).json({
       code: 201,
       message: 'Tạo tài khoản thành công!',
-      data: accountToObject
+      createdAccount: accountToObject
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -72,9 +80,9 @@ export const createAccount = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/accounts/change-status/:status/:id
-export const changeAccountStatus = async (req: Request, res: Response) => {
+export const changeAccountStatusById = async (req: Request, res: Response) => {
   try {
-    await accountService.changeAccountStatus(req.params.status, req.params.id)
+    await accountServices.changeAccountStatusById(req.params.id, req.params.status.toUpperCase())
     
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -89,9 +97,9 @@ export const changeAccountStatus = async (req: Request, res: Response) => {
 }
 
 // [PATCH] /admin/accounts/edit/:id
-export const editAccount = async (req: Request, res: Response) => {
+export const editAccountById = async (req: Request, res: Response) => {
   try {
-    const result = await accountService.editAccount(req.body, req.params.id)
+    const result = await accountServices.editAccountById(req.body, req.params.id)
 
     if (!result.success) {
       return res.status(StatusCodes.CONFLICT).json({
@@ -115,13 +123,19 @@ export const editAccount = async (req: Request, res: Response) => {
 // [GET] /admin/accounts/detail/:id
 export const accountDetail = async (req: Request, res: Response) => {
   try {
-    const { account, roles } = await accountService.accountDetail(req.params.id)
+    const account = await accountServices.accountDetail(req.params.id)
+
+    if (!account) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        code: 404,
+        message: 'Không tìm thấy tài khoản!'
+      })
+    }
 
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Lấy trang chi tiết tài khoản thành công!',
-      account,
-      roles
+      account
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -132,9 +146,9 @@ export const accountDetail = async (req: Request, res: Response) => {
 }
 
 // [DELETE] /admin/accounts/delete/:id
-export const deleteAccount = async (req: Request, res: Response) => {
+export const deleteAccountById = async (req: Request, res: Response) => {
   try {
-    await accountService.deleteAccount(req.params.id)
+    await accountServices.deleteAccountById(req.params.id)
 
     res.json({
       code: 204,

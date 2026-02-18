@@ -1,9 +1,11 @@
+import type { STATUSES } from '~/utils/constants'
+
 export interface UserInfoInterface {
   _id: string,
   fullName: string,
   email: string,
   address: string,
-  status: 'ACTIVE' | 'INACTIVE',
+  status: typeof STATUSES[keyof typeof STATUSES]
   avatar: string,
   phone: string,
   password: string

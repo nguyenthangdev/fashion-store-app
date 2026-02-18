@@ -37,7 +37,9 @@ export const accountSchema = z.object({
     message: 'Trạng thái không hợp lệ!'
   }),
 
-  avatar: z.any().optional()
+  avatar: z.instanceof(File)
+    .optional()
+    .nullable()
 })
 
 export type AccountFormData = z.infer<typeof accountSchema>
@@ -108,7 +110,13 @@ export const editAccountSchema = z.object({
     message: 'Trạng thái không hợp lệ!'
   }),
 
-  avatar: z.any().optional()
+  avatar: z
+    .union([
+      z.instanceof(File),
+      z.string(),
+      z.null()
+    ])
+    .optional()
 })
 
 export type EditAccountFormData = z.infer<typeof editAccountSchema>

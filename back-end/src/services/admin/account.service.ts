@@ -1,116 +1,99 @@
 import AccountModel from '~/models/account.model'
 import bcrypt from 'bcrypt'
-import RoleModel from '~/models/role.model'
 import { AccountInterface } from '~/interfaces/admin/account.interface'
 // import { AccountsWithRolesResponseDTO, CreateAccountDTO, CreateAccountResponseDTO } from '~/dtos/admin/account.dto'
-// import * as accountRepository from '~/repositories/account.repository'
+import { accountRepositories } from '~/repositories/account.repository'
+import { CreateAccountDTO } from '~/dtos/admin/account.dto'
+import { pickAccount } from '~/utils/formatters'
 
-export const getAccountsWithRoles = async () => {
-  const accounts = await AccountModel
-    .find({ deleted: false })
-    .populate('role_id')
-    .lean()
-
-  const roles = await RoleModel
-    .find({ deleted: false })
-    .lean()
+const getAllAccounts = async () => {
+  const accounts = accountRepositories.getAllAccounts()
   
-  return { 
-    accounts: accounts || [], 
-    roles: roles || []
-  }
+  return accounts || []
 }
-    
-export const createAccount = async (dto: any) => {
-  const account = await AccountModel
-    .findOne({ email: dto.email, deleted: false })
-    .lean()
+
+const getAllRoles = async () => {
+  const roles = accountRepositories.getAllRoles()
+  
+  return roles || []
+}
+
+const createAccount = async (reqBody: CreateAccountDTO) => {
+  const data = {
+    ...reqBody
+  }
+  
+  const account = await accountRepositories.findAccountByEmail(data.email)
 
   if (account) {
     return { 
       success: false, 
       code: 409, 
-      message: `Email ${dto.email} đã tồn tại`
+      message: `Email ${data.email} đã tồn tại`
     }
   }
 
   const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(dto.password, salt)
+  const hashedPassword = await bcrypt.hash(data.password, salt)
 
   const newAccount = new AccountModel({
-    ...dto,
+    ...data,
     password: hashedPassword
   })
 
   await newAccount.save()
-  const accountToObject = newAccount.toObject()
-  delete accountToObject.password
+  const accountToObject = newAccount.toObject() as AccountInterface
 
-  return { success: true, accountToObject }
+  return { success: true, accountToObject: pickAccount(accountToObject) }
 }
 
-export const changeAccountStatus = async (status: string, account_id: string) => {
-  await AccountModel.updateOne(
-    { _id: account_id }, 
-    { $set: { status } }
-  )
+const changeAccountStatusById = async (account_id: string, status: string) => {
+  await accountRepositories.changeAccountStatusById(account_id, status)
 }
 
-export const editAccount = async (data: AccountInterface, account_id: string) => {
-  const dataTemp = {
-    fullName: data.fullName,
-    email: data.email,
-    password: data.password,
-    phone: data.phone,
-    avatar: data.avatar,
-    role_id: data.role_id,
-    status: data.status
+const editAccountById = async (reqBody: AccountInterface, account_id: string) => {
+  const data = {
+    ...reqBody
   }
 
-  const isEmailExist = await AccountModel.findOne({
-    _id: { $ne: account_id },
-    email: dataTemp.email,
-    deleted: false
-  })
-  if (isEmailExist) {
-      return { 
-          success: false, 
-          code: 409, 
-          message: `Email ${dataTemp.email} đã tồn tại`
-      }
+  const account = await accountRepositories.findAccountByUniqueEmail(data.email, account_id)
+  if (account) {
+    return { 
+      success: false, 
+      code: 409, 
+      message: `Email ${data.email} đã tồn tại`
+    }
   }
 
-  if (dataTemp.password) {
+  if (data.password) {
     const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(dataTemp.password, salt)
-    dataTemp.password = hashedPassword
-  } else {
-    delete dataTemp.password
+    const hashedPassword = await bcrypt.hash(data.password, salt)
+    data.password = hashedPassword
   }
   await AccountModel.updateOne(
     { _id: account_id }, 
-    { $set: dataTemp }
+    { $set: data }
   )
 
   return { success: true }
 }
 
-export const accountDetail = async (account_id: string) => {
-  const account = await AccountModel
-    .findOne({ _id: account_id, deleted: false })
-    .populate('role_id')
-    .lean()
+const accountDetail = async (account_id: string) => {
+  const account = await accountRepositories.findAccountById(account_id)
 
-  const roles = await RoleModel
-    .find({ deleted: false })
-    .lean()
-
-  return { account, roles }
+  return account
 }
 
-export const deleteAccount = async (account_id: string) => {
-  await AccountModel.updateOne(
-    { _id: account_id },
-    { $set: { deleted: true, deletedAt: new Date() } }
-  )
+const deleteAccountById = async (account_id: string) => {
+  await accountRepositories.deleteAccountById(account_id)
+}
+
+export const accountServices = {
+  getAllAccounts,
+  getAllRoles,
+  createAccount,
+  changeAccountStatusById,
+  editAccountById,
+  accountDetail,
+  deleteAccountById
 }

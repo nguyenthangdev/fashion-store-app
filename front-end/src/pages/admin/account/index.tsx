@@ -13,7 +13,7 @@ const Account = () => {
   const {
     accounts,
     open,
-    loading,
+    isLoading,
     role,
     handleToggleStatus,
     handleOpen,
@@ -22,7 +22,7 @@ const Account = () => {
     handlePreventEditStatus
   } = useAccount()
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className='flex flex-col gap-[10px] bg-[#FFFFFF] p-[15px] shadow-md mt-[15px]'>
         <Skeleton variant="text" width={270} height={32} sx={{ bgcolor: 'grey.400' }}/>
@@ -149,9 +149,9 @@ const Account = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {accounts && (
+                {accounts?.length > 0 ? (
                   accounts.map((account, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={account._id}>
                       <TableCell align='center'>{index + 1}</TableCell>
                       <TableCell align='center'>
                         <div className='flex items-center justify-center'>
@@ -187,24 +187,31 @@ const Account = () => {
                           to={`/admin/accounts/detail/${account._id}`}
                           className='nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white'
                         >
-                          Chi tiết
+                        Chi tiết
                         </Link>
                         <Link
                           to={`/admin/accounts/edit/${account._id}`}
                           className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white'
                         >
-                          Sửa
+                        Sửa
                         </Link>
                         <button
                           onClick={() => handleOpen(account._id)}
                           className='nav-link border rounded-[5px] bg-[#BC3433] p-[5px] text-white'
                         >
-                          Xóa
+                        Xóa
                         </button>
                       </TableCell>
                     </TableRow>
                   ))
+                ) : (
+                  <TableRow>
+                    <TableCell align='center' colSpan={9}>
+                      Không tồn tại tài khoản nào!
+                    </TableCell>
+                  </TableRow>
                 )}
+
                 <Dialog
                   open={open}
                   onClose={handleClose}
@@ -213,13 +220,13 @@ const Account = () => {
                   <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
-                    Bạn có chắc chắn muốn xóa tài khoản này không?
+                      Bạn có chắc chắn muốn xóa tài khoản này không?
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleDelete} color="error" variant="contained">
-                    Xóa
+                      Xóa
                     </Button>
                   </DialogActions>
                 </Dialog>

@@ -16,20 +16,27 @@ export const uploadWithOneImageToCloud = (
   if (req.file) {
     const streamUpload = (req: Request) => {
       return new Promise((resolve, reject) => {
+        // Tạo 1 cái luồng stream upload lên cloudinary vào thư mục folder ở tham số thứ nhất (Tùy chọn, ở đây không dùng folder)
         const stream = cloudinary.uploader.upload_stream((error, result) => {
-          if (result) {
-            resolve(result)
-          } else {
-            reject(error)
-          }
+          if (result) resolve(result)
+          else reject(error)
         })
-        streamifier.createReadStream(req.file.buffer).pipe(stream)
+        // Thực hiện upload cái luồng trên bằng lib streamifier
+        if (req.file && req.file.buffer) {
+          streamifier.createReadStream(req.file.buffer).pipe(stream)
+        }
       })
     }
     async function upload(req: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result: any = await streamUpload(req)
-      req.body[req.file.fieldname] = result.secure_url
+      console.log('result: ', result)
+      console.log('req: ', req)
+      console.log('req.file: ', req.file)
+
+      if (req.file && result && result.secure_url) {
+        req.body[req.file.fieldname] = result.secure_url
+      }
       next()
     }
     upload(req)
@@ -42,11 +49,8 @@ export const uploadWithOneImageToCloud = (
 const streamUpload = (fileBuffer: Buffer): Promise<any> => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream((error, result) => {
-      if (result) {
-        resolve(result)
-      } else {
-        reject(error)
-      }
+      if (result) resolve(result)
+      else reject(error)
     })
     streamifier.createReadStream(fileBuffer).pipe(stream)
   })

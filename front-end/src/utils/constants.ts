@@ -17,6 +17,10 @@ export const MYORDER_STATUSES = [
   { value: 'CANCELED', label: 'Đã hủy' }
 ]
 
+export const STATUSES = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
 
 export const ORDERTRASH_STATUSES_CHANGEMULTI = [
   { value: 'RECOVER', label: 'Khôi phục' },

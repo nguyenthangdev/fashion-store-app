@@ -1,4 +1,3 @@
-import { Types } from "mongoose"
 import { AccountInterface } from "~/interfaces/admin/account.interface"
 import { RoleInterface } from "~/interfaces/admin/role.interface"
 
@@ -20,6 +19,6 @@ export interface CreateAccountDTO {
   password: string
   phone: String
   avatar: string
-  role_id: Types.ObjectId | string
+  role_id: string
   status: 'ACTIVE' | 'INACTIVE'
 }

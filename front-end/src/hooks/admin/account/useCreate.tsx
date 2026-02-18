@@ -1,21 +1,21 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { fetchAccountsAPI, fetchCreateAccountAPI } from '~/apis/admin/account.api'
+import { fetchRolesAPI, fetchCreateAccountAPI } from '~/apis/admin/account.api'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { AccountsAPIResponse } from '~/interfaces/account.interface'
 import type { RoleInfoInterface } from '~/interfaces/role.interface'
 import { accountSchema, type AccountFormData } from '~/validations/admin/account.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 const useCreate = () => {
   const [roles, setRoles] = useState<RoleInfoInterface[]>([])
   const { dispatchAlert } = useAlertContext()
   const navigate = useNavigate()
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const { role } = useAuth()
 
@@ -32,59 +32,76 @@ const useCreate = () => {
       password: '',
       phone: '',
       role_id: '',
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      avatar: null
     }
   })
 
   useEffect(() => {
-    fetchAccountsAPI().then((response: AccountsAPIResponse) => {
-      setRoles(response.roles)
-    })
-  }, [])
-
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate image size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
+    const fetchData = async () => {
+      try {
+        const res = await fetchRolesAPI()
+        setRoles(res.roles)
+      } catch (error) {
         dispatchAlert({
           type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
+          payload: { message: 'Đã có lỗi xảy ra', severity: 'error' }
         })
-        return
       }
-
-      // Validate image type
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      const imageUrl = URL.createObjectURL(file)
-      setPreview(imageUrl)
-      setValue('avatar', file)
     }
+    fetchData()
+  }, [dispatchAlert])
+
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith('blob:')) {
+        URL.revokeObjectURL(preview)
+      }
+    }
+  }, [preview])
+
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+
+    if (!file) return
+
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(file)
+    setPreview(imageUrl)
+    setValue('avatar', file)
   }
 
-  const onSubmit = async (data: AccountFormData): Promise<void> => {
+  const onSubmit = async (data: AccountFormData) => {
     try {
       const formData = new FormData()
-
       formData.append('fullName', data.fullName)
       formData.append('email', data.email)
       formData.append('password', data.password)
       formData.append('phone', data.phone)
       formData.append('role_id', data.role_id)
       formData.append('status', data.status)
-
-      const file = uploadImageInputRef.current?.files?.[0]
-      if (file) {
-        formData.append('avatar', file)
+      if (data.avatar) {
+        formData.append('avatar', data.avatar)
       }
-
+      // const file = uploadImageInputRef.current?.files?.[0]
+      // console.log('file of uploadImageInputRef: ', file)
+      // if (file) {
+      //   formData.append('avatar', file)
+      // }
       const response = await fetchCreateAccountAPI(formData)
 
       if (response.code === 201) {
@@ -92,9 +109,7 @@ const useCreate = () => {
           type: 'SHOW_ALERT',
           payload: { message: response.message, severity: 'success' }
         })
-        setTimeout(() => {
-          navigate('/admin/accounts')
-        }, 2000)
+        setTimeout(() => navigate('/admin/accounts'), 2000)
       } else {
         dispatchAlert({
           type: 'SHOW_ALERT',
@@ -109,10 +124,10 @@ const useCreate = () => {
     }
   }
 
-  const handleClickUpload = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClickUpload = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     roles,
@@ -124,8 +139,6 @@ const useCreate = () => {
     isSubmitting,
     handleImageChange,
     onSubmit,
-    handleClickUpload,
-    uploadImageInputRef,
     navigate
   }
 }
