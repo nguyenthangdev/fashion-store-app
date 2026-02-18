@@ -2,30 +2,33 @@ import { Router } from 'express'
 const router: Router = Router()
 
 import * as controller from '~/controllers/admin/account.controller'
-// Upload ảnh
 import multer from 'multer'
 import { uploadWithOneImageToCloud } from '~/middlewares/admin/uploadCloud.middleware'
-// Upload ảnh
 import * as validate from '~/validations/admin/account.validation'
 
-router.get('/', controller.index)
+router.get('/', controller.getAllAccounts)
+
+router.get('/get-roles', controller.getAllRoles)
+
 router.post(
   '/create',
   multer().single('avatar'),
   uploadWithOneImageToCloud,
-  validate.createAccount, // middleware
+  validate.createAccount,
   controller.createAccount
 )
-router.patch('/change-status/:status/:id', controller.changeAccountStatus)
-// Bắt đầu chỉnh sửa sản phẩm và gửi form đi.
+router.patch('/change-status/:status/:id', controller.changeAccountStatusById)
+
 router.patch(
   '/edit/:id',
   multer().single('avatar'),
   uploadWithOneImageToCloud,
-  validate.editAccount, // middleware
-  controller.editAccount
+  validate.editAccountById,
+  controller.editAccountById
 )
+
 router.get('/detail/:id', controller.accountDetail)
-router.delete('/delete/:id', controller.deleteAccount)
+
+router.delete('/delete/:id', controller.deleteAccountById)
 
 export const accountRoutes: Router = router

@@ -20,7 +20,10 @@ const accountSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    avatar: String,
+    avatar: {
+      type: String,
+      default: null
+    },
     role_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Role',

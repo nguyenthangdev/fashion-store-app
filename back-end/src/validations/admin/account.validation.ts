@@ -17,6 +17,7 @@ export const createAccount = (
       .messages({
         "any.required": 'Họ và tên là bắt buộc!',
         "string.empty": "Vui lòng nhập họ tên!",
+        "string.min": "Họ và tên phải có ít nhất 3 ký tự!",
         "string.max": "Họ và tên không được vượt quá 50 ký tự!"
       }),
 
@@ -36,7 +37,10 @@ export const createAccount = (
       .trim()
       .required()
       .min(8)
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+      .pattern(/[A-Z]/)
+      .pattern(/[a-z]/)
+      .pattern(/[0-9]/)
+      .pattern(/[@$!%*?&]/)
       .messages({
         "any.required": "Mật khẩu là bắt buộc!",
         "string.empty": "Vui lòng nhập mật khẩu!",
@@ -79,7 +83,7 @@ export const createAccount = (
       
     avatar: Joi.string()
       .optional()
-      .allow('')
+      .allow(null)
       .uri()
       .messages({
         "string.uri": "URL avatar không hợp lệ!"
@@ -104,11 +108,12 @@ export const createAccount = (
   next()
 }
 
-export const editAccount = (
+export const editAccountById = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  console.log('reqBody: ', req.body)
   const schema = Joi.object({
     fullName: Joi.string()
       .trim()
