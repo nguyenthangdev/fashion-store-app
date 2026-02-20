@@ -16,7 +16,12 @@ export const getBrands = async (query: any) => {
     // Pagination
     const countBrands = await BrandModel.countDocuments(find)
     const objectPagination = paginationHelpers(
-      { currentPage: 1, limitItems: 10 },
+      {
+        currentPage: 1, limitItems: 10,
+        skip: 0,
+        totalPage: 0,
+        totalItems: 0
+      },
       query,
       countBrands
     )

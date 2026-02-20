@@ -16,9 +16,9 @@ export const chatSocket = (io: Server) => {
 
       if (tokenAdmin) {
         // Xác thực Admin (Account)
-        const decoded = await JWTProvider.verifyToken(
+        const decoded = JWTProvider.verifyToken(
           tokenAdmin, 
-          process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN
+          process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN as string
         ) as {
           accountId: string, 
           role_id: string
@@ -32,9 +32,9 @@ export const chatSocket = (io: Server) => {
         return next()
       } else if (tokenUser) {
         // Xác thực Client (UserModel)
-        const decoded = await JWTProvider.verifyToken(
+        const decoded = JWTProvider.verifyToken(
           tokenUser,
-          process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT
+          process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT as string
         ) as {
           userId: string
         }

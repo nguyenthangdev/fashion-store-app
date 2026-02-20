@@ -3,11 +3,11 @@ import { buildTreeForItems } from '~/helpers/createChildForAllParents'
 import { addLogInfoToTree } from '~/helpers/addLogInfoToChildren'
 import paginationHelpers from '~/helpers/pagination'
 import { buildTreeForPagedItems } from '~/helpers/createChildForPagedParents'
-import AccountModel from '~/models/account.model'
 import ArticleCategoryModel from '~/models/articleCategory.model'
 import { updateStatusRecursiveForOneItem } from '~/helpers/updateStatusItem'
 import { LogNodeInterface, TreeInterface } from '~/interfaces/admin/general.interface'
 import { ArticleCategoryInterface } from '~/interfaces/admin/articleCategory.interface'
+import { articleCategoryRepositories } from '~/repositories/articleCategory.repository'
 
 export const getArticleCategories = async (query: any) => {
   const find: any = { deleted: false }
@@ -44,7 +44,10 @@ export const getArticleCategories = async (query: any) => {
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
-      limitItems: 3
+      limitItems: 3,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countParents
@@ -54,20 +57,7 @@ export const getArticleCategories = async (query: any) => {
   //  Query song song bằng Promise.all (giảm round-trip)
   // parentCategories: Các danh mục bài viết cấp cao nhất (Cấp 1) (đã được phân trang)
   // allCategories: Tất cả các danh mục bài viết cấp cao nhất (Cấp 1)
-  const [parentCategories, accounts, allCategories] = await Promise.all([
-    ArticleCategoryModel.find(parentFind)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .lean(),
-    AccountModel
-      .find({ deleted: false })
-      .lean(),
-    ArticleCategoryModel
-      .find({ deleted: false })
-      .sort(sort)
-      .lean()
-  ])
+  const { parentCategories, accounts, allCategories } = await articleCategoryRepositories.getArticleCategories(parentFind, sort, objectPagination)
 
   // Tạo cây phân cấp (Mỗi cha sẽ được gán thêm trường children)
   const articleCategories = buildTreeForPagedItems(parentCategories as unknown as TreeInterface[], allCategories as unknown as TreeInterface[])
@@ -99,18 +89,7 @@ export const changeStatusWithChildren = async (status: string, category_id: stri
 }
 
 export const deleteArticleCategory = async (id: string, account_id: string) => {
-  await ArticleCategoryModel.updateOne(
-    { _id: id },
-    {
-      $set: {
-        deleted: true,
-        deletedBy: {
-          account_id: account_id,
-          deletedAt: new Date()
-        }
-      }
-    }
-  )
+  await articleCategoryRepositories.deleteArticleCategory(id, account_id)
 }
 
 export const createArticleCategory = async (data: ArticleCategoryInterface, account_id: string) => {
@@ -145,21 +124,11 @@ export const editArticleCategory = async (data: any, id: string, account_id: str
     status: data.status,
     thumbnail: data.thumbnail
   }
-  await ArticleCategoryModel.updateOne(
-    { _id: id },
-    {
-      $set: dataTemp,
-      $push: {
-        updatedBy
-      }
-    }
-  )
+  await articleCategoryRepositories.editArticleCategory(id, dataTemp, updatedBy)
 }
 
 export const detailArticleCategory = async (id: string) => {
-  const articleCategory = await ArticleCategoryModel
-    .findOne({ _id: id, deleted: false })
-    .lean()
-    
+  const articleCategory = await articleCategoryRepositories.detailArticleCategory(id)
+
   return articleCategory
 }

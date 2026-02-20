@@ -1,29 +1,9 @@
-// {
-//     "compilerOptions": {
-//         "outDir": "dist",
-//         "target": "es6",
-//         "module": "nodenext",
-//         "removeComments": true,
-//         "esModuleInterop": true,
-//         "moduleResolution": "nodenext",
-//         "paths": {
-//             "~/*": [
-//                 "./src/*"
-//             ]
-//         }
-//     },
-//     "include": [
-//         "src/**/*.ts",
-//         "src/types/**/*.d.ts"
-//     ],
-//     "exclude": [
-//         "node_modules"
-//     ]
-// }
 {
     "compilerOptions": {
       // "strict": true,
         // "rootDir": "src",
+        "strict": false, 
+        "strictNullChecks": false,
         "outDir": "dist",
         "target": "es6",
         "module": "nodenext",

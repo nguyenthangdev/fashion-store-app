@@ -13,7 +13,12 @@ export const getArticles = async (query: any) => {
   // Pagination
   const countProducts = await ArticleModel.countDocuments(find)
   const objectPagination = paginationHelpers(
-  { currentPage: 1, limitItems: 20 },
+  {
+    currentPage: 1, limitItems: 20,
+    skip: 0,
+    totalPage: 0,
+    totalItems: 0
+  },
   query,
   countProducts
   )

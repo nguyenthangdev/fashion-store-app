@@ -30,9 +30,6 @@ export const uploadWithOneImageToCloud = (
     async function upload(req: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result: any = await streamUpload(req)
-      console.log('result: ', result)
-      console.log('req: ', req)
-      console.log('req.file: ', req.file)
 
       if (req.file && result && result.secure_url) {
         req.body[req.file.fieldname] = result.secure_url

@@ -1,20 +1,33 @@
-import JWT from 'jsonwebtoken'
+import * as JWT from 'jsonwebtoken'
+import { SignOptions } from 'jsonwebtoken'
 
-const generateToken = async (payload, secretSignature, tokenLife) => {
+const generateToken = (
+  payload: object,
+  secretSignature: string,
+  tokenLife: string | number
+): string => {
   try {
-    return JWT.sign(payload, secretSignature, { algorithm: 'HS256', expiresIn: tokenLife })
-  } catch (error) {
-    throw new Error(error)
+    const options: SignOptions = {
+      algorithm: 'HS256',
+      expiresIn: tokenLife as SignOptions['expiresIn'] 
+    }
+
+    return JWT.sign(payload, secretSignature, options)
+  } catch (error: any) {
+    throw new Error(error.message)
   }
 }
 
-const verifyToken = async (token, secretSignature) => {
+const verifyToken = (
+  token: string,
+  secretSignature: string
+) => {
   try {
     return JWT.verify(token, secretSignature)
-  } catch (error) {
-    throw new Error(error)
+  } catch (error: any) {
+    throw new Error(error.message)
   }
-}   
+}
 
 export const JWTProvider = {
   generateToken,

@@ -43,15 +43,15 @@ export const loginAdmin = async (data: any) => {
     role_id: accountAdmin.role_id 
   }
 
-  const accessToken = await JWTProvider.generateToken(
+  const accessToken = JWTProvider.generateToken(
     payload,
-    process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN, 
+    process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN as string, 
     '1h'
   )
 
-  const refreshToken = await JWTProvider.generateToken(
+  const refreshToken = JWTProvider.generateToken(
     payload,
-    process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
+    process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN as string,
     '14d'
   )
   const role = await RoleModel.findOne({ 
@@ -80,9 +80,9 @@ export const refreshTokenAdmin = async (refreshToken: string) => {
     }
   }
 
-  const refreshTokenDecoded = await JWTProvider.verifyToken(
+  const refreshTokenDecoded = JWTProvider.verifyToken(
     refreshToken, 
-    process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN
+    process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN as string
   ) as {
     accountId: string,
     email: string,
@@ -109,9 +109,9 @@ export const refreshTokenAdmin = async (refreshToken: string) => {
     role_id: refreshTokenDecoded.role_id, 
   }
 
-  const newAccessToken = await JWTProvider.generateToken(
+  const newAccessToken = JWTProvider.generateToken(
     payload,
-    process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN,
+    process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN as string,
     '1h'
   )
   return {

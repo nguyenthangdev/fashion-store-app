@@ -1,9 +1,10 @@
 // import { AccountInterface } from '~/interfaces/admin/account.interface'
 // import { RoleInterface } from '~/interfaces/admin/role.interface'
+import { AccountInterface } from '~/interfaces/admin/account.interface'
 import AccountModel from '~/models/account.model'
 import RoleModel from '~/models/role.model'
 
-export const getAllAccounts = async () => {
+const getAllAccounts = async () => {
   const accounts = await AccountModel
     .find({ deleted: false })
     .populate('role_id')
@@ -12,7 +13,7 @@ export const getAllAccounts = async () => {
   return accounts 
 }
 
-export const getAllRoles = async () => {
+const getAllRoles = async () => {
   const roles = await RoleModel
     .find({ deleted: false })
     .lean()
@@ -20,7 +21,7 @@ export const getAllRoles = async () => {
   return roles 
 }
 
-export const isEmailExist = async (email: string) => {
+const isEmailExist = async (email: string) => {
   const account = await AccountModel
     .findOne({ email: email, deleted: false })
     .lean()
@@ -28,21 +29,21 @@ export const isEmailExist = async (email: string) => {
   return !!account
 }
 
-export const changeAccountStatusById = async (account_id: string, status: string) => {
+const changeAccountStatusById = async (account_id: string, status: string) => {
   await AccountModel.updateOne(
     { _id: account_id }, 
     { $set: { status } }
   )
 }
 
-export const deleteAccountById = async (account_id: string) => {
+const deleteAccountById = async (account_id: string) => {
   await AccountModel.updateOne(
     { _id: account_id },
     { $set: { deleted: true, deletedAt: new Date() } }
   )
 }
 
-export const findAccountById = async (account_id: string) => {
+const findAccountById = async (account_id: string) => {
   const account = await AccountModel
     .findOne({ _id: account_id, deleted: false })
     .populate('role_id')
@@ -51,7 +52,7 @@ export const findAccountById = async (account_id: string) => {
   return account
 }
 
-export const findAccountByEmail = async (email: string) => {
+const findAccountByEmail = async (email: string) => {
   const account = await AccountModel
     .findOne({ email: email, deleted: false })
     .lean()
@@ -59,7 +60,7 @@ export const findAccountByEmail = async (email: string) => {
   return account
 }
 
-export const findAccountByUniqueEmail = async (email: string, account_id: string) => {
+const findAccountByUniqueEmail = async (email: string, account_id: string) => {
   const account = await AccountModel.findOne({
     _id: { $ne: account_id },
     email,
@@ -67,6 +68,13 @@ export const findAccountByUniqueEmail = async (email: string, account_id: string
   })
 
   return account
+}
+
+const editAccountById = async (account_id: string, data: AccountInterface) => {
+  await AccountModel.updateOne(
+    { _id: account_id }, 
+    { $set: data }
+  )
 }
 
 export const accountRepositories = {
@@ -77,5 +85,6 @@ export const accountRepositories = {
   deleteAccountById,
   findAccountById,
   findAccountByEmail,
-  findAccountByUniqueEmail
+  findAccountByUniqueEmail,
+  editAccountById
 }

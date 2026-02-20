@@ -33,7 +33,7 @@ export const createArticle = (
       .required()
       .messages({
         'any.only': 'Giá trị nổi bật không hợp lệ!',
-        'any.required': 'Nổi bật là bắt buộc!'
+        'any.required': 'Giá trị nổi bật là bắt buộc!'
       }),
 
     descriptionShort: Joi.string()
@@ -120,7 +120,7 @@ export const editArticle = (
       .max(200)
       .messages({
         'any.required': 'Tiêu đề là bắt buộc!',
-        'string.empty': 'Tiêu đề là bắt buộc!',
+        'string.empty': 'Tiêu đề không được để trống!',
         'string.max': 'Tiêu đề không được quá 200 ký tự!'
       }),
 
@@ -129,8 +129,8 @@ export const editArticle = (
       .required()
       .min(1)
       .messages({
-        'any.required': 'Vui lòng chọn danh mục!',
-        'string.empty': 'Vui lòng chọn danh mục!'
+        'any.required': 'Danh mục bài viết là bắt buộc!',
+        'string.empty': 'Danh mục bài viết không được để trống!'
       }),
 
     featured: Joi.string()
@@ -156,16 +156,16 @@ export const editArticle = (
       .valid('ACTIVE', 'INACTIVE')
       .required()
       .messages({
-        'any.only': 'Trạng thái không hợp lệ!',
-        'any.required': 'Trạng thái là bắt buộc!'
+        'any.only': 'Trạng thái bài viết không hợp lệ!',
+        'any.required': 'Trạng thái bài viết là bắt buộc!'
       }),
 
     thumbnail: Joi.any()
       .required()
       .invalid(null, '')
       .messages({
-        'any.invalid': 'Vui lòng chọn ảnh đại diện!',
-        'any.required': 'Vui lòng chọn ảnh đại diện!'
+        'any.invalid': 'Ảnh đại diện không hợp lệ!',
+        'any.required': 'Ảnh đại diện là bắt buộc!'
       })
   })
 

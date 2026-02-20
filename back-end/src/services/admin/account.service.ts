@@ -70,10 +70,7 @@ const editAccountById = async (reqBody: AccountInterface, account_id: string) =>
     const hashedPassword = await bcrypt.hash(data.password, salt)
     data.password = hashedPassword
   }
-  await AccountModel.updateOne(
-    { _id: account_id }, 
-    { $set: data }
-  )
+  await accountRepositories.editAccountById(account_id, data)
 
   return { success: true }
 }

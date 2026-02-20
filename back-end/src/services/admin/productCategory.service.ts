@@ -43,9 +43,12 @@ export const getProductCategories = async (query: any) => {
   const parentFind = { ...find, parent_id: '' }
   const countParents = await ProductCategoryModel.countDocuments(parentFind)
   const objectPagination = paginationHelpers(
-    { 
-      currentPage: 1, 
-      limitItems: 2 
+    {
+      currentPage: 1,
+      limitItems: 2,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countParents
@@ -190,9 +193,12 @@ export const productCategoryTrash = async (query: any) => {
 
   const countParents = await ProductCategoryModel.countDocuments(find)
   const objectPagination = paginationHelpers(
-    { 
-      currentPage: 1, 
-      limitItems: 2 
+    {
+      currentPage: 1,
+      limitItems: 2,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countParents

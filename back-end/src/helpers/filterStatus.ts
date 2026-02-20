@@ -1,6 +1,5 @@
 import { QueryInterface, StatusInterface } from "~/interfaces/admin/general.interface"
 
-
 const filterStatusHelpers = (query: QueryInterface): StatusInterface[] => {
   const statuses: StatusInterface[] = [
     { name: 'Tất cả', status: '', class: '' },

@@ -14,9 +14,9 @@ export const requireAuth = async (
       res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Vui lòng gửi kèm token!' })
       return
     }
-    const accessTokenUserDecoded = await JWTProvider.verifyToken(
+    const accessTokenUserDecoded = JWTProvider.verifyToken(
       accessTokenUser, 
-      process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT
+      process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT as string
     ) as { userId: string }
     if (!accessTokenUserDecoded) {
       res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ!!' })

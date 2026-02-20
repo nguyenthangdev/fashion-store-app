@@ -121,9 +121,9 @@ export const logoutALL = async (req: Request, res: Response) => {
         message: 'Không tồn tại accessToken!' 
       })
     }
-    const accessTokenDecoded = await JWTProvider.verifyToken(
+    const accessTokenDecoded = JWTProvider.verifyToken(
       accessToken,
-      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN
+      process.env.JWT_ACCESS_TOKEN_SECRET_ADMIN as string
     ) as {
       accountId: string,
       email: string,

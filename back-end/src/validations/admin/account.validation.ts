@@ -16,7 +16,7 @@ export const createAccount = (
       .max(50)
       .messages({
         "any.required": 'Họ và tên là bắt buộc!',
-        "string.empty": "Vui lòng nhập họ tên!",
+        "string.empty": "Họ và tên không được để trống!",
         "string.min": "Họ và tên phải có ít nhất 3 ký tự!",
         "string.max": "Họ và tên không được vượt quá 50 ký tự!"
       }),
@@ -29,7 +29,7 @@ export const createAccount = (
       .lowercase()
       .messages({
         "any.required": "Email là bắt buộc!",
-        "string.empty": "Vui lòng nhập email!",
+        "string.empty": "Email không được để trống!",
         "string.email": "Email không đúng định dạng!"
       }),
 
@@ -43,7 +43,7 @@ export const createAccount = (
       .pattern(/[@$!%*?&]/)
       .messages({
         "any.required": "Mật khẩu là bắt buộc!",
-        "string.empty": "Vui lòng nhập mật khẩu!",
+        "string.empty": "Mật khẩu không được để trống!",
         "string.min": "Mật khẩu phải chứa ít nhất 8 ký tự!",
         "string.pattern.base": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt (@$!%*?&)!"
       }),
@@ -55,7 +55,7 @@ export const createAccount = (
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc!",
-        "string.empty": "Vui lòng nhập số điện thoại của bạn!",
+        "string.empty": "Số điện thoại không được để trống!",
         "string.pattern.base": "Số điện thoại phải có 10 số và bắt đầu bằng 03/05/07/08/09 hoặc +84!"
       }),
 
@@ -69,7 +69,7 @@ export const createAccount = (
       })
       .messages({
         'any.required': 'Phân quyền là bắt buộc!',
-        'string.empty': 'Vui lòng chọn phân quyền!',
+        'string.empty': 'Phân quyền không được để trống!',
         'any.invalid': 'Phân quyền không hợp lệ!'
       }),
 
@@ -113,7 +113,6 @@ export const editAccountById = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('reqBody: ', req.body)
   const schema = Joi.object({
     fullName: Joi.string()
       .trim()
@@ -123,7 +122,7 @@ export const editAccountById = (
       .trim()
       .messages({
         "any.required": "Họ tên là bắt buộc!",
-        "string.empty": "Vui lòng nhập họ tên!",
+        "string.empty": "Họ và tên không được để trống!",
         "string.max": "Họ tên không được vượt quá 50 ký tự!"
       }),
     
@@ -135,7 +134,7 @@ export const editAccountById = (
       .lowercase()
       .messages({
         "any.required": "Email là bắt buộc!",
-        "string.empty": "Vui lòng nhập email!",
+        "string.empty": "Email không được để trống!",
         "string.email": "Email không đúng định dạng!"
       }),
     
@@ -160,7 +159,7 @@ export const editAccountById = (
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc!",
-        "string.empty": "Vui lòng nhập số điện thoại của bạn!",
+        "string.empty": "Số điện thoại không được để trống!",
         "string.pattern.base": "Số điện thoại phải có 10 số và bắt đầu bằng 03/05/07/08/09 hoặc +84!"
       }),
     
@@ -174,7 +173,7 @@ export const editAccountById = (
       })
       .messages({
         'any.required': 'Phân quyền là bắt buộc!',
-        'string.empty': 'Vui lòng chọn phân quyền!',
+        'string.empty': 'Phân quyền không được để trống!',
         'any.invalid': 'Phân quyền không hợp lệ!'
       }),
     

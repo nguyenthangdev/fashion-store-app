@@ -8,7 +8,7 @@ import { uploadWithOneImageToCloud } from '~/middlewares/admin/uploadCloud.middl
 // Upload ảnh
 import * as validate from '~/validations/admin/articleCategory.validation'
 
-router.get('/', controller.index)
+router.get('/', controller.getArticleCategories)
 // router.patch('/change-status/:status/:id', controller.changeStatus)
 router.patch('/change-multi', controller.changeMulti)
 router.post(

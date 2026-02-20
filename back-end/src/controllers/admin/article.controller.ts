@@ -1,23 +1,22 @@
 import { Request, Response } from 'express'
 import ArticleModel from '~/models/article.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
-import * as articleService from '~/services/admin/article.service'
 import { StatusCodes } from 'http-status-codes'
-import { QueryInterface } from '~/interfaces/admin/general.interface'
+import { articleServices } from '~/services/admin/article.service'
 
 // [GET] /admin/articles
-export const index = async (req: Request<{}, {}, {}, QueryInterface>, res: Response) => {
+export const getAllArticles = async (req: Request, res: Response) => {
   try {
     const {
       articles,
       objectSearch,
       objectPagination,
       allArticles
-    } = await articleService.getArticles(req.query)
+    } = await articleServices.getAllArticles(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Lấy trang index của bài viết thành công!',
+      message: 'Lấy trang danh sách bài viết thành công!',
       articles,
       filterStatus: filterStatusHelpers(req.query),
       keyword: objectSearch.keyword,
@@ -35,12 +34,12 @@ export const index = async (req: Request<{}, {}, {}, QueryInterface>, res: Respo
 // [POST] /admin/articles/create
 export const createArticle = async (req: Request, res: Response) => {
   try {
-    const articleToObject = await articleService.createArticle(req.body, req['accountAdmin'].id)
+    const articleToObject = await articleServices.createArticle(req.body, req['accountAdmin']._id)
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
       message: 'Thêm bài viết thành công!',
-      data: articleToObject,
+      createdArticle: articleToObject,
     })
   } catch (error) {
    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -53,7 +52,7 @@ export const createArticle = async (req: Request, res: Response) => {
 // [GET] /admin/articles/detail/:id
 export const articleDetail = async (req: Request, res: Response) => {
   try {
-    const article = await articleService.articleDetail(req.params.id)
+    const article = await articleServices.articleDetail(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -71,7 +70,7 @@ export const articleDetail = async (req: Request, res: Response) => {
 // [PATCH] /admin/articles/edit/:id
 export const editArticle = async (req: Request, res: Response) => {
   try {
-    await articleService.editArticle(req.body, req.params.id, req['accountAdmin'].id)
+    await articleServices.editArticle(req.body, req.params.id, req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -88,10 +87,10 @@ export const editArticle = async (req: Request, res: Response) => {
 // [PATCH] /admin/articles/change-status/:status/:id
 export const changeArticleStatus = async (req: Request, res: Response) => {
   try {
-    const updater = await articleService.changeArticleStatus(
-      req.params.status, 
+    const updater = await articleServices.changeArticleStatus(
+      req.params.status.toUpperCase(), 
       req.params.id, 
-      req['accountAdmin'].id
+      req['accountAdmin']._id
     )
 
     res.status(StatusCodes.OK).json({
@@ -114,7 +113,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     const type = body.type
     const ids = body.ids
     const updatedBy = {
-      account_id: req['accountAdmin'].id,
+      account_id: req['accountAdmin']._id,
       updatedAt: new Date()
     }
     enum Key {
@@ -171,7 +170,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [DELETE] /admin/articles/delete/:id
 export const deleteArticle = async (req: Request, res: Response) => {
   try {
-    await articleService.deleteArticle(req.params.id, req['accountAdmin'].id)
+    await articleServices.deleteArticle(req.params.id, req['accountAdmin']._id)
     
     res.json({
       code: 204,

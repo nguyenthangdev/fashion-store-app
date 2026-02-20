@@ -45,9 +45,9 @@ export interface QueryInterface {
 export interface PaginationInterface {
   currentPage: number
   limitItems: number
-  skip?: number
-  totalPage?: number
-  totalItems?: number
+  skip: number
+  totalPage: number
+  totalItems: number
 }
 
 interface OrConditionInterface {

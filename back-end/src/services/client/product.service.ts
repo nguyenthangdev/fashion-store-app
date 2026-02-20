@@ -123,7 +123,12 @@ export const getProducts = async (query: any) => {
     const countProducts = aggregationResult[0].count[0]?.total || 0
 
     const objectPagination = paginationHelpers(
-        { currentPage, limitItems },
+        {
+          currentPage, limitItems,
+          skip: 0,
+          totalPage: 0,
+          totalItems: 0
+        },
         query,
         countProducts
     )

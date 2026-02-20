@@ -12,4 +12,5 @@ export interface AccountInterface {
   deleted: boolean
   createdAt: Date
   updatedAt?: Date | null
+  roleName?: string
 }

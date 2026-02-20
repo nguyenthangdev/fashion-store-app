@@ -3,8 +3,9 @@ import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
 import { ArticleInterface } from '~/interfaces/admin/article.interface'
 import { FindInterface, QueryInterface } from '~/interfaces/admin/general.interface'
+import { articleRepositories } from '~/repositories/article.repository'
 
-export const getArticles = async (query: QueryInterface) => {
+export const getAllArticles = async (query: QueryInterface) => {
   const find: FindInterface = { deleted: false }
 
   if (query.status) {
@@ -33,25 +34,16 @@ export const getArticles = async (query: QueryInterface) => {
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
-      limitItems: 5
+      limitItems: 5,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countArticles
   )
 
-  const [articles, allArticles] = await Promise.all([
-    ArticleModel
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .populate('createdBy.account_id', 'fullName email')
-      .populate('updatedBy.account_id', 'fullName email')
-      .lean(),
-    ArticleModel
-      .find({ deleted: false })
-      .lean()
-  ])
+  const { articles, allArticles } = await articleRepositories.getAllArticles(find, sort, objectPagination)
 
   return {
     articles,
@@ -74,18 +66,14 @@ export const createArticle = async (data: ArticleInterface, account_id: string) 
       account_id
     }
   }
-
   const article = new ArticleModel(dataTemp)
   await article.save()
   const articleToObject = article.toObject()
-
   return articleToObject
 }
 
 export const articleDetail = async (article_id: string) => {
-  const article = await ArticleModel
-    .findOne({ _id: article_id, deleted: false })
-    .lean()
+  const article = await articleRepositories.findArticleById(article_id)
     
   return article
 }
@@ -104,13 +92,7 @@ export const editArticle = async (data: ArticleInterface, article_id: string, ac
     status: data.status,
     thumbnail: data.thumbnail,
   }
-  await ArticleModel.updateOne(
-    { _id: article_id },
-    { 
-      $set: dataTemp,
-      $push: { updatedBy }
-    }
-  )
+  await articleRepositories.editArticle(article_id, dataTemp, updatedBy)
 }
 
 export const changeArticleStatus = async (status: string, article_id: string, account_id: string) => {
@@ -118,33 +100,20 @@ export const changeArticleStatus = async (status: string, article_id: string, ac
     account_id,
     updatedAt: new Date()
   }
-  const updater = await ArticleModel
-    .findByIdAndUpdate(
-      { _id: article_id },
-      {
-        $set: { status },
-        $push: { updatedBy }
-      },
-      { new: true } // Trả về document sau update
-    )
-    .populate('createdBy.account_id', 'fullName email')
-    .populate('updatedBy.account_id', 'fullName email')
-    .lean() 
+  const updater = await articleRepositories.changeArticleStatus(status, article_id, updatedBy)
 
   return updater
 }
 
 export const deleteArticle = async (article_id: string, account_id: string) => {
-  await ArticleModel.updateOne(
-    { _id: article_id },
-    {
-      $set: {
-        deleted: true,
-        deletedBy: {
-          account_id,
-          deletedAt: new Date()
-        }
-      }
-    }
-  )
+  await articleRepositories.deleteArticle(article_id, account_id)
+}
+
+export const articleServices = {
+  getAllArticles,
+  createArticle,
+  articleDetail,
+  editArticle,
+  changeArticleStatus,
+  deleteArticle
 }

@@ -141,9 +141,9 @@ export const refreshToken = async (refreshTokenUser: string) => {
       message: 'Không tồn tại refreshTokenUser!'
     }
   }
-  const refreshTokenUserDecoded = await JWTProvider.verifyToken(
+  const refreshTokenUserDecoded = JWTProvider.verifyToken(
     refreshTokenUser, 
-    process.env.JWT_REFRESH_TOKEN_SECRET_CLIENT
+    process.env.JWT_REFRESH_TOKEN_SECRET_CLIENT as string
   ) as {
     userId: string
   }
@@ -219,9 +219,9 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
     }
   }
   let resetTokenDecoded: any
-  resetTokenDecoded = await JWTProvider.verifyToken(
+  resetTokenDecoded = JWTProvider.verifyToken(
     dataTemp.resetToken,
-    process.env.JWT_SECRET_RESET_PASSWORD
+    process.env.JWT_SECRET_RESET_PASSWORD as string
   ) as {
     userId: string
   }
@@ -341,7 +341,10 @@ export const getOrders = async (account_id: string, query: any) => {
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
-      limitItems: 5
+      limitItems: 5,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countOrders

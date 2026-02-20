@@ -6,7 +6,7 @@ import * as articleCategoryService from '~/services/admin/articleCategory.servic
 import { StatusCodes } from 'http-status-codes'
 
 // [GET] /admin/articles-category
-export const index = async (req: Request, res: Response) => {
+export const getArticleCategories = async (req: Request, res: Response) => {
   try {
     const { 
       articleCategories,

@@ -38,7 +38,10 @@ export const getProducts = async (query: any) => {
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
-      limitItems: 5
+      limitItems: 5,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countProducts
@@ -257,7 +260,10 @@ export const productTrash = async (query: any) => {
   const objectPagination = paginationHelpers(
     {
       currentPage: 1,
-      limitItems: 10
+      limitItems: 10,
+      skip: 0,
+      totalPage: 0,
+      totalItems: 0
     },
     query,
     countOrders

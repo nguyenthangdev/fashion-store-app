@@ -38,7 +38,7 @@ const articleSchema = new mongoose.Schema(
       }
     },
     deletedBy: {
-       account_id: {
+      account_id: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Account'
       },
