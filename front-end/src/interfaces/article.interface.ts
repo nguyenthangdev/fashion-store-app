@@ -22,7 +22,7 @@ export interface ArticleStates extends HelperInterface {
   keyword: string,
   sortKey: string,
   sortValue: string,
-  loading: boolean,
+  isLoading: boolean,
 }
 
 export type ArticleActions =

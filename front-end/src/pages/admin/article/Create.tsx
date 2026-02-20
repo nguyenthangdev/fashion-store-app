@@ -1,24 +1,45 @@
 import { Editor } from '@tinymce/tinymce-react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import SelectTreeArticle from '~/components/admin/tableTree/SelectTreeArticle'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 import { useCreate } from '~/hooks/admin/article/useCreate'
 import { API_KEY } from '~/utils/constants'
 
 const CreateArticle = () => {
   const {
     allArticleCategories,
-    uploadImageInputRef,
     preview,
     handleThumbnailChange,
-    handleClick,
     handleSubmit,
     role,
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate
   } = useCreate()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('articles_create')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('articles_create')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -37,9 +58,7 @@ const CreateArticle = () => {
               id="title"
               className='py-[3px] text-[16px]'
             />
-            {errors.title && (
-              <span className="text-red-500 text-sm">{errors.title.message}</span>
-            )}
+            <FieldErrorAlert errors={errors} fieldName='title'/>
           </div>
 
           <div className="form-group">
@@ -50,7 +69,7 @@ const CreateArticle = () => {
               className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
             >
               <option value="">-- Chọn danh mục --</option>
-              {allArticleCategories && allArticleCategories.length > 0 && (
+              {allArticleCategories?.length > 0 && (
                 allArticleCategories.map(articleCategory => (
                   <SelectTreeArticle
                     key={articleCategory._id}
@@ -62,9 +81,7 @@ const CreateArticle = () => {
                 ))
               )}
             </select>
-            {errors.article_category_id && (
-              <span className="text-red-500 text-sm">{errors.article_category_id.message}</span>
-            )}
+            <FieldErrorAlert errors={errors} fieldName='article_category_id'/>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -91,9 +108,7 @@ const CreateArticle = () => {
                 <label htmlFor="featured0">Không nổi bật</label>
               </div>
             </div>
-            {errors.featured && (
-              <span className="text-red-500 text-sm">{errors.featured.message}</span>
-            )}
+            <FieldErrorAlert errors={errors} fieldName='featured'/>
           </div>
 
           <div className="form-group">
@@ -105,7 +120,7 @@ const CreateArticle = () => {
                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
               }}
               value={watch('descriptionShort')}
-              onEditorChange={(newValue) => setValue('descriptionShort', newValue)}
+              onEditorChange={newValue => setValue('descriptionShort', newValue)}
               id="descriptionShort"
             />
           </div>
@@ -119,7 +134,7 @@ const CreateArticle = () => {
                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
               }}
               value={watch('descriptionDetail')}
-              onEditorChange={(newValue) => setValue('descriptionDetail', newValue)}
+              onEditorChange={newValue => setValue('descriptionDetail', newValue)}
               id="descriptionDetail"
             />
           </div>
@@ -127,20 +142,20 @@ const CreateArticle = () => {
           <div className="flex flex-col gap-2">
             <label>Ảnh đại diện <span className="text-red-500">*</span></label>
             <input
-              onChange={handleThumbnailChange}
-              ref={uploadImageInputRef}
+              {...register('thumbnail')}
+              // ref={uploadImageInputRef}
               type="file"
-              name="thumbnail"
+              id="thumbnail"
               className='hidden'
               accept="image/*"
+              onChange={handleThumbnailChange}
             />
-            <button
-              type="button"
-              onClick={handleClick}
+            <label
+              htmlFor="thumbnail"
               className="bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white"
             >
               Chọn ảnh
-            </button>
+            </label>
             {preview && (
               <img
                 src={preview}
@@ -148,9 +163,7 @@ const CreateArticle = () => {
                 className="border rounded-md w-40 h-40 object-cover"
               />
             )}
-            {errors.thumbnail && (
-              <span className="text-red-500 text-sm">{errors.thumbnail.message as string}</span>
-            )}
+            <FieldErrorAlert errors={errors} fieldName='thumbnail'/>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -178,9 +191,7 @@ const CreateArticle = () => {
                 <label htmlFor="statusInActive">Dừng hoạt động</label>
               </div>
             </div>
-            {errors.status && (
-              <span className="text-red-500 text-sm">{errors.status.message}</span>
-            )}
+            <FieldErrorAlert errors={errors} fieldName='status'/>
           </div>
 
           <div className='flex items-center justify-start text-center gap-[5px]'>

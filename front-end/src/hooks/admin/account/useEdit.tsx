@@ -41,7 +41,6 @@ const useEdit = () => {
 
   const watchedStatus = watch('status')
 
-  // Fetch account details
   useEffect(() => {
     if (!id) return
 

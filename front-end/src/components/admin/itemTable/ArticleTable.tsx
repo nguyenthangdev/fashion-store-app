@@ -22,7 +22,7 @@ import type { AccountInfoInterface } from '~/interfaces/account.interface'
 
 const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
   const {
-    loading,
+    isLoading,
     articles,
     handleToggleStatus,
     handleCheckbox,
@@ -34,7 +34,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
     handleDelete
   } = useTable({ selectedIds, setSelectedIds })
 
-  if (loading) {
+  if (isLoading) {
     return (
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table size='small' sx={{
@@ -110,7 +110,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
 
   return (
     <>
-      {articles && articles.length > 0 ? (
+      {articles?.length > 0 ? (
         <TableContainer sx={{ maxHeight: 600 }}>
           <Table size='small' sx={{
             borderCollapse: 'collapse',
@@ -139,8 +139,8 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
             </TableHead>
             <TableBody>
               {articles
-                .map((article, index) => (
-                  <TableRow key={index}>
+                .map((article) => (
+                  <TableRow key={article._id}>
                     <TableCell align='center' sx={{ padding: '0px 2px' }}>
                       <Checkbox
                         checked={selectedIds.includes(article._id ?? '')}
@@ -169,7 +169,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                       </button>
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '6px 0px' }} className='font-[700] '>{(() => {
-                      const creator = article.createdBy.account_id as AccountInfoInterface
+                      const creator = article.createdBy?.account_id as AccountInfoInterface
                       return creator ? (
                         <>
                           <span className="text-sm font-medium text-gray-800">
@@ -187,9 +187,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                         const updatedBy = article.updatedBy?.[(article.updatedBy as UpdatedBy[]).length - 1]
                         if (!updatedBy) {
                           return (
-                            <>
-                              <p className="text-xs italic text-gray-400">Chưa có ai cập nhật</p>
-                            </>
+                            <p className="text-xs italic text-gray-400">Chưa có ai cập nhật</p>
                           )
                         }
                         if (Array.isArray(article.updatedBy) && article.updatedBy.length > 0) {
@@ -203,7 +201,7 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                             </>
                           ) : (
                             <span className="text-sm italic text-gray-400">
-                            Không xác định
+                              Không xác định
                             </span>
                           )
                         }
@@ -213,17 +211,17 @@ const ArticleTable = ({ selectedIds, setSelectedIds }: Props) => {
                       <Link
                         to={`/admin/articles/detail/${article._id}`}
                         className='border rounded-[5px] bg-[#0542AB] p-[5px] text-white'>
-                      Chi tiết
+                        Chi tiết
                       </Link>
                       <Link
                         to={`/admin/articles/edit/${article._id}`}
                         className='border rounded-[5px] bg-[#FFAB19] p-[5px] text-white'>
-                      Sửa
+                        Sửa
                       </Link>
                       <button
                         onClick={() => handleOpen(article._id ?? '')}
                         className='cursor-pointer border rounded-[5px] bg-[#BC3433] p-[5px] text-white'>
-                      Xóa
+                        Xóa
                       </button>
                     </TableCell>
                   </TableRow>

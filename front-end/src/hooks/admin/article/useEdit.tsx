@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fetchDetailArticleAPI, fetchEditArticleAPI } from '~/apis/admin/article.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
-import type { ArticleDetailInterface } from '~/interfaces/article.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { editArticleSchema, type EditArticleFormData } from '~/validations/admin/article.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useEdit = () => {
   const params = useParams()
@@ -20,19 +20,18 @@ export const useEdit = () => {
   const { dispatchAlert } = useAlertContext()
   const navigate = useNavigate()
   const { role } = useAuth()
-
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     setValue,
-    watch,
-    trigger
+    watch
+    // trigger
   } = useForm<EditArticleFormData>({
     resolver: zodResolver(editArticleSchema),
     defaultValues: {
@@ -52,17 +51,17 @@ export const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const data: ArticleDetailInterface = await fetchDetailArticleAPI(id)
-        const article = data.article
+        const res = await fetchDetailArticleAPI(id)
+        const article = res.article
 
         reset({
-          title: article.title || '',
-          article_category_id: String(article.article_category_id || ''),
-          featured: article.featured || '1',
-          descriptionShort: article.descriptionShort || '',
-          descriptionDetail: article.descriptionDetail || '',
-          status: article.status || 'ACTIVE',
-          thumbnail: article.thumbnail || null
+          title: article.title,
+          article_category_id: String(article.article_category_id),
+          featured: article.featured,
+          descriptionShort: article.descriptionShort,
+          descriptionDetail: article.descriptionDetail,
+          status: article.status,
+          thumbnail: article.thumbnail
         })
 
         setThumbnailPreview(article.thumbnail || null)
@@ -82,91 +81,97 @@ export const useEdit = () => {
     fetchData()
   }, [id, reset, dispatchAlert])
 
-  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      // Cleanup old preview if it's a blob URL
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
+  // Cleanup blob URL to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview?.startsWith('blob:')) {
         URL.revokeObjectURL(thumbnailPreview)
       }
-
-      setThumbnailFile(file)
-      setThumbnailPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
-      trigger('thumbnail')
     }
+  }, [thumbnailPreview])
+
+  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+    if (!file) return
+
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(file)
+    setThumbnailFile(file)
+    setThumbnailPreview(imageUrl)
+    setValue('thumbnail', file)
+    // trigger('thumbnail')
   }
 
   const onSubmit = async (data: EditArticleFormData): Promise<void> => {
-    const formData = new FormData()
+    if (!id) return
+    try {
+      const formData = new FormData()
 
-    formData.append('title', data.title)
-    formData.append('article_category_id', data.article_category_id)
-    formData.append('featured', data.featured)
-    formData.append('descriptionShort', data.descriptionShort || '')
-    formData.append('descriptionDetail', data.descriptionDetail || '')
-    formData.append('status', data.status)
+      formData.append('title', data.title)
+      formData.append('article_category_id', data.article_category_id)
+      formData.append('featured', data.featured)
+      formData.append('descriptionShort', data.descriptionShort || '')
+      formData.append('descriptionDetail', data.descriptionDetail || '')
+      formData.append('status', data.status)
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile)
+      } else if (data.thumbnail) {
+        formData.append('thumbnail', data.thumbnail)
+      }
 
-    // Chỉ append file nếu có upload mới
-    if (thumbnailFile) {
-      formData.append('thumbnail', thumbnailFile)
-    } else if (typeof data.thumbnail === 'string') {
-      // Giữ URL ảnh cũ
-      formData.append('thumbnail', data.thumbnail)
-    }
-
-    const response = await fetchEditArticleAPI(id, formData)
-    if (response.code === 200) {
+      const response = await fetchEditArticleAPI(id, formData)
+      if (response.code === 200) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: response.message, severity: 'success' }
+        })
+        setTimeout(() => navigate(`/admin/articles/detail/${id}`), 2000)
+      } else {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: response.message || 'Cập nhật thất bại', severity: 'error' }
+        })
+      }
+    } catch (error) {
       dispatchAlert({
         type: 'SHOW_ALERT',
-        payload: { message: response.message, severity: 'success' }
-      })
-      setTimeout(() => {
-        navigate(`/admin/articles/detail/${id}`)
-      }, 2000)
-    } else {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: response.message, severity: 'error' }
+        payload: { message: 'Đã có lỗi xảy ra. Vui lòng thử lại!', severity: 'error' }
       })
     }
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     isLoading,
     allArticleCategories,
-    uploadImageInputRef,
     thumbnailPreview,
     handleThumbnailChange,
-    handleClick,
-    handleSubmit: handleSubmitForm(onSubmit),
+    handleSubmit,
     role,
-    // React Hook Form
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate,
+    onSubmit
   }
 }

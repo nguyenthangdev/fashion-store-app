@@ -5,6 +5,7 @@ import { fetchAccountsAPI, fetchChangeStatusAPI, fetchDeleteAccountAPI } from '~
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import type { AccountInfoInterface } from '~/interfaces/account.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const useAccount = () => {
   const [accounts, setAccounts] = useState<AccountInfoInterface[]>([])
@@ -13,6 +14,7 @@ const useAccount = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const { role } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,7 +107,8 @@ const useAccount = () => {
     handleOpen,
     handleClose,
     handleDelete,
-    handlePreventEditStatus
+    handlePreventEditStatus,
+    navigate
   }
 }
 

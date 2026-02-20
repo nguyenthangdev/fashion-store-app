@@ -15,7 +15,7 @@ export const initialState: ArticleStates = {
   keyword: '',
   sortKey: '',
   sortValue: '',
-  loading: false,
+  isLoading: false,
   allArticles: []
 }
 
@@ -25,7 +25,7 @@ export function articleReducer(
 ): ArticleStates {
   switch (actionArticle.type) {
     case 'SET_LOADING':
-      return { ...stateArticle, loading: actionArticle.payload }
+      return { ...stateArticle, isLoading: actionArticle.payload }
     case 'SET_DATA':
       return { ...stateArticle, ...actionArticle.payload }
     default:

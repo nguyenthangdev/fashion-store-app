@@ -11,7 +11,7 @@ export interface Props {
 
 export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { stateArticle, dispatchArticle } = useArticleContext()
-  const { articles, loading } = stateArticle
+  const { articles, isLoading } = stateArticle
   const { dispatchAlert } = useAlertContext()
   const [searchParams] = useSearchParams()
   const currentStatus = searchParams.get('status') || ''
@@ -34,7 +34,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     //   updatedAt: new Date()
     // }
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusAPI(newStatus, id)
+    const response = await fetchChangeStatusAPI(newStatus.toLowerCase(), id)
     if (response.code === 200) {
       const updateArticle = response
       const updatedAllArticles = stateArticle.allArticles.map(article =>
@@ -112,7 +112,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
   const isCheckAll = (articles.length > 0) && (selectedIds.length === articles.length)
 
   return {
-    loading,
+    isLoading,
     currentStatus,
     articles,
     dispatchArticle,

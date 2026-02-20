@@ -1,4 +1,4 @@
-import type { ArticleCategoryAPIResponse, ArticleCategoryDetailInterface } from '~/interfaces/articleCategory.interface'
+import type { ArticleCategoryAPIResponse } from '~/interfaces/articleCategory.interface'
 import type { AllParams } from '~/interfaces/helper.interface'
 import authorizedAxiosInstance from '~/utils/authorizedAxiosAdmin'
 import { API_ROOT } from '~/utils/constants'
@@ -26,7 +26,7 @@ export const fetchDeleteArticleCategoryAPI = async (id: string) => {
   return response.data
 }
 
-export const fetchDetailArticleCategoryAPI = async (id: string): Promise<ArticleCategoryDetailInterface> => {
+export const fetchDetailArticleCategoryAPI = async (id: string) => {
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/articles-category/detail/${id}`
   )

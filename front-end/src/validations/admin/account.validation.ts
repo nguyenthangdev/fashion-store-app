@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const accountSchema = z.object({
+export const createAccountSchema = z.object({
   fullName: z.string()
     .trim()
     .min(1, 'Vui lòng nhập họ và tên!')
@@ -12,7 +12,7 @@ export const accountSchema = z.object({
     .trim()
     .lowercase()
     .min(1, 'Vui lòng nhập email!')
-    .pipe(z.email('Email không hợp lệ')),
+    .pipe(z.email('Email không hợp lệ!')),
 
   password: z.string()
     .trim()
@@ -42,7 +42,7 @@ export const accountSchema = z.object({
     .nullable()
 })
 
-export type AccountFormData = z.infer<typeof accountSchema>
+export type CreateAccountFormData = z.infer<typeof createAccountSchema>
 
 export const editAccountSchema = z.object({
   fullName: z.string()
@@ -104,7 +104,7 @@ export const editAccountSchema = z.object({
       }
     }),
 
-  role_id: z.string().min(1, 'Vui lòng chọn phân quyền'),
+  role_id: z.string().min(1, 'Vui lòng chọn phân quyền!'),
 
   status: z.enum(['ACTIVE', 'INACTIVE'], {
     message: 'Trạng thái không hợp lệ!'

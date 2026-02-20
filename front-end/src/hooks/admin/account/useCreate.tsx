@@ -8,7 +8,7 @@ import { fetchRolesAPI, fetchCreateAccountAPI } from '~/apis/admin/account.api'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import type { RoleInfoInterface } from '~/interfaces/role.interface'
-import { accountSchema, type AccountFormData } from '~/validations/admin/account.validation'
+import { createAccountSchema, type CreateAccountFormData } from '~/validations/admin/account.validation'
 import { singleFileValidator } from '~/validations/validators/validators'
 
 const useCreate = () => {
@@ -24,8 +24,8 @@ const useCreate = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue
-  } = useForm<AccountFormData>({
-    resolver: zodResolver(accountSchema),
+  } = useForm<CreateAccountFormData>({
+    resolver: zodResolver(createAccountSchema),
     defaultValues: {
       fullName: '',
       email: '',
@@ -85,7 +85,7 @@ const useCreate = () => {
     setValue('avatar', file)
   }
 
-  const onSubmit = async (data: AccountFormData) => {
+  const onSubmit = async (data: CreateAccountFormData) => {
     try {
       const formData = new FormData()
       formData.append('fullName', data.fullName)

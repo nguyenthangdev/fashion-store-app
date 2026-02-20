@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailAccountAPI } from '~/apis/admin/account.api'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import type { AccountInfoInterface } from '~/interfaces/account.interface'
@@ -14,12 +14,13 @@ const useDetail = () => {
   const params = useParams()
   const id = params.id as string
   const { dispatchAlert } = useAlertContext()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    if (!id) return
+
     const fetchData = async () => {
       try {
-        if (!id) return
-
         setIsLoading(true)
         const response = await fetchDetailAccountAPI(id)
         setAccountInfo(response.account)
@@ -39,7 +40,8 @@ const useDetail = () => {
   return {
     accountInfo,
     role,
-    isLoading
+    isLoading,
+    navigate
   }
 }
 

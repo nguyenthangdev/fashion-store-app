@@ -111,8 +111,8 @@ export const useArticle = () => {
   }
 
   const handleConfirmDeleteAll = async () => {
-    if (pendingAction === 'delete-all') {
-      await executeAction('delete-all')
+    if (pendingAction === 'DELETEALL') {
+      await executeAction('DELETEALL')
     }
     setOpen(false)
   }

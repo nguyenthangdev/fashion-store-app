@@ -1,5 +1,4 @@
 import type { ArticleAPIResponse } from '~/interfaces/article.interface'
-import type { ArticleDetailInterface } from '~/interfaces/article.interface'
 import type { AllParams } from '~/interfaces/helper.interface'
 import authorizedAxiosInstance from '~/utils/authorizedAxiosAdmin'
 import { API_ROOT } from '~/utils/constants'
@@ -28,7 +27,7 @@ export const fetchChangeStatusAPI = async (status: string, id: string) => {
   return response.data
 }
 
-export const fetchDetailArticleAPI = async (id: string): Promise<ArticleDetailInterface> => {
+export const fetchDetailArticleAPI = async (id: string) => {
   const response = await authorizedAxiosInstance.get(
     `${API_ROOT}/admin/articles/detail/${id}`
   )

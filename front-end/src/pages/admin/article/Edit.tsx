@@ -4,23 +4,45 @@ import { useEdit } from '~/hooks/admin/article/useEdit'
 import SelectTree from '~/components/admin/tableTree/SelectTreeArticle'
 import Skeleton from '@mui/material/Skeleton'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 
 const EditArticle = () => {
   const {
     isLoading,
     allArticleCategories,
-    uploadImageInputRef,
     thumbnailPreview,
     handleThumbnailChange,
-    handleClick,
     handleSubmit,
     role,
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate,
+    onSubmit
   } = useEdit()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('articles_edit')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('articles_edit')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -58,185 +80,175 @@ const EditArticle = () => {
 
   return (
     <>
-      {role && role.permissions.includes('articles_edit') && (
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-[15px] text-[17px] font-[500] bg-[#FFFFFF] p-[15px] shadow-md"
-        >
-          <h1 className="text-[24px] font-[600] text-[#192335]">Chỉnh sửa bài viết</h1>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-[15px] text-[17px] font-[500] bg-[#FFFFFF] p-[15px] shadow-md"
+      >
+        <h1 className="text-[24px] font-[600] text-[#192335]">Chỉnh sửa bài viết</h1>
 
-          <div className="form-group">
-            <label htmlFor="title">Tiêu đề <span className="text-red-500">*</span></label>
-            <input
-              {...register('title')}
-              type="text"
-              id="title"
-              className='py-[3px] text-[16px]'
-            />
-            {errors.title && (
-              <span className="text-red-500 text-sm">{errors.title.message}</span>
-            )}
-          </div>
+        <div className="form-group">
+          <label htmlFor="title">Tiêu đề <span className="text-red-500">*</span></label>
+          <input
+            {...register('title')}
+            type="text"
+            id="title"
+            className='py-[3px] text-[16px]'
+          />
+          <FieldErrorAlert errors={errors} fieldName='title'/>
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="article_category_id">Danh mục <span className="text-red-500">*</span></label>
-            <select
-              {...register('article_category_id')}
-              id="article_category_id"
-              className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
-              defaultValue={watch('article_category_id')}
-            >
-              <option value="">-- Chọn danh mục --</option>
-              {allArticleCategories && allArticleCategories.length > 0 && (
-                allArticleCategories.map(articleCategory => (
-                  <SelectTree
-                    key={articleCategory._id}
-                    articleCategory={articleCategory}
-                    level={1}
-                    allArticleCategories={allArticleCategories}
-                    parent_id={watch('article_category_id')}
-                  />
-                ))
-              )}
-            </select>
-            {errors.article_category_id && (
-              <span className="text-red-500 text-sm">{errors.article_category_id.message}</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label>Nổi bật <span className="text-red-500">*</span></label>
-            <div className="flex items-center justify-start gap-[10px] text-[16px]">
-              <div className="flex gap-[5px]">
-                <input
-                  {...register('featured')}
-                  type="radio"
-                  className="border rounded-[5px] border-[#192335]"
-                  id="featured1"
-                  value="1"
+        <div className="form-group">
+          <label htmlFor="article_category_id">Danh mục <span className="text-red-500">*</span></label>
+          <select
+            {...register('article_category_id')}
+            id="article_category_id"
+            className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
+            defaultValue={watch('article_category_id')}
+          >
+            <option value="">-- Chọn danh mục --</option>
+            {allArticleCategories?.length > 0 && (
+              allArticleCategories.map(articleCategory => (
+                <SelectTree
+                  key={articleCategory._id}
+                  articleCategory={articleCategory}
+                  level={1}
+                  allArticleCategories={allArticleCategories}
+                  parent_id={watch('article_category_id')}
                 />
-                <label htmlFor="featured1">Nổi bật</label>
-              </div>
-              <div className="flex gap-[5px]">
-                <input
-                  {...register('featured')}
-                  type="radio"
-                  className="border rounded-[5px] border-[#192335]"
-                  id="featured0"
-                  value="0"
-                />
-                <label htmlFor="featured0">Không nổi bật</label>
-              </div>
-            </div>
-            {errors.featured && (
-              <span className="text-red-500 text-sm">{errors.featured.message}</span>
+              ))
             )}
-          </div>
+          </select>
+          <FieldErrorAlert errors={errors} fieldName='article_category_id'/>
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="descriptionShort">Mô tả ngắn</label>
-            <Editor
-              apiKey={API_KEY}
-              init={{
-                plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
-              }}
-              value={watch('descriptionShort')}
-              onEditorChange={(newValue) => setValue('descriptionShort', newValue)}
-              id="descriptionShort"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="descriptionDetail">Mô tả chi tiết</label>
-            <Editor
-              apiKey={API_KEY}
-              init={{
-                plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
-              }}
-              value={watch('descriptionDetail')}
-              onEditorChange={(newValue) => setValue('descriptionDetail', newValue)}
-              id="descriptionDetail"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label>Ảnh đại diện <span className="text-red-500">*</span></label>
-            <input
-              onChange={handleThumbnailChange}
-              ref={uploadImageInputRef}
-              type="file"
-              name="thumbnail"
-              className='hidden'
-              accept="image/*"
-            />
-            <button
-              type="button"
-              onClick={handleClick}
-              className="bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white"
-            >
-              Chọn ảnh
-            </button>
-            {thumbnailPreview && (
-              <img
-                src={thumbnailPreview}
-                alt="Thumbnail preview"
-                className="border rounded-md w-40 h-40 object-cover"
+        <div className="flex flex-col gap-2">
+          <label>Nổi bật <span className="text-red-500">*</span></label>
+          <div className="flex items-center justify-start gap-[10px] text-[16px]">
+            <div className="flex gap-[5px]">
+              <input
+                {...register('featured')}
+                type="radio"
+                className="border rounded-[5px] border-[#192335]"
+                id="featured1"
+                value="1"
               />
-            )}
-            {errors.thumbnail && (
-              <span className="text-red-500 text-sm">{errors.thumbnail.message as string}</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label>Trạng thái <span className="text-red-500">*</span></label>
-            <div className="flex items-center justify-start gap-[5px]">
-              <div className="flex gap-[5px]">
-                <input
-                  {...register('status')}
-                  type="radio"
-                  className="border rounded-[5px] border-[#192335]"
-                  id="statusActive"
-                  value="ACTIVE"
-                />
-                <label htmlFor="statusActive">Hoạt động</label>
-              </div>
-
-              <div className="flex gap-[5px]">
-                <input
-                  {...register('status')}
-                  type="radio"
-                  className="border rounded-[5px] border-[#192335]"
-                  id="statusInActive"
-                  value="INACTIVE"
-                />
-                <label htmlFor="statusInActive">Dừng hoạt động</label>
-              </div>
+              <label htmlFor="featured1">Nổi bật</label>
             </div>
-            {errors.status && (
-              <span className="text-red-500 text-sm">{errors.status.message}</span>
-            )}
+            <div className="flex gap-[5px]">
+              <input
+                {...register('featured')}
+                type="radio"
+                className="border rounded-[5px] border-[#192335]"
+                id="featured0"
+                value="0"
+              />
+              <label htmlFor="featured0">Không nổi bật</label>
+            </div>
           </div>
+          <FieldErrorAlert errors={errors} fieldName='featured'/>
+        </div>
 
-          <div className='flex items-center justify-start text-center gap-[5px]'>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-[8%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px] disabled:opacity-50"
-            >
-              {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật'}
-            </button>
-            <Link
-              to="/admin/articles"
-              className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
-            >
-              Hủy
-            </Link>
+        <div className="form-group">
+          <label htmlFor="descriptionShort">Mô tả ngắn</label>
+          <Editor
+            apiKey={API_KEY}
+            init={{
+              plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
+            }}
+            value={watch('descriptionShort')}
+            onEditorChange={(newValue) => setValue('descriptionShort', newValue)}
+            id="descriptionShort"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="descriptionDetail">Mô tả chi tiết</label>
+          <Editor
+            apiKey={API_KEY}
+            init={{
+              plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
+            }}
+            value={watch('descriptionDetail')}
+            onEditorChange={(newValue) => setValue('descriptionDetail', newValue)}
+            id="descriptionDetail"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label>Ảnh đại diện <span className="text-red-500">*</span></label>
+          <input
+            {...register('thumbnail')}
+            // ref={uploadImageInputRef}
+            type="file"
+            id="thumbnail-upload"
+            className='hidden'
+            accept="image/*"
+            onChange={handleThumbnailChange}
+          />
+          <label
+            htmlFor="thumbnail-upload"
+            // type="button"
+            // onClick={handleClick}
+            className="bg-[#9D9995] hover:bg-[#87857F] transition-colors border rounded-[5px] w-[100px] inline-block px-4 py-2 text-[14px] cursor-pointer text-center text-white"
+          >
+            Chọn ảnh
+          </label>
+          {thumbnailPreview && (
+            <img
+              src={thumbnailPreview}
+              alt="Thumbnail preview"
+              className="border rounded-md w-40 h-40 object-cover"
+            />
+          )}
+          <FieldErrorAlert errors={errors} fieldName='thumbnail'/>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label>Trạng thái <span className="text-red-500">*</span></label>
+          <div className="flex items-center justify-start gap-[5px]">
+            <div className="flex gap-[5px]">
+              <input
+                {...register('status')}
+                type="radio"
+                className="border rounded-[5px] border-[#192335]"
+                id="statusActive"
+                value="ACTIVE"
+              />
+              <label htmlFor="statusActive">Hoạt động</label>
+            </div>
+
+            <div className="flex gap-[5px]">
+              <input
+                {...register('status')}
+                type="radio"
+                className="border rounded-[5px] border-[#192335]"
+                id="statusInActive"
+                value="INACTIVE"
+              />
+              <label htmlFor="statusInActive">Dừng hoạt động</label>
+            </div>
           </div>
-        </form>
-      )}
+          <FieldErrorAlert errors={errors} fieldName='status'/>
+        </div>
+
+        <div className='flex items-center justify-start text-center gap-[5px]'>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-[8%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px] disabled:opacity-50"
+          >
+            {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật'}
+          </button>
+          <Link
+            to="/admin/articles"
+            className="w-[6%] border rounded-[5px] bg-[#525FE1] text-white p-[7px] text-[14px]"
+          >
+            Hủy
+          </Link>
+        </div>
+      </form>
     </>
   )
 }
