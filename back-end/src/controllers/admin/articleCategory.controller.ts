@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import ArticleCategoryModel from '~/models/articleCategory.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import { deleteManyStatusFast, updateManyStatusFast } from '~/helpers/updateStatusItem'
-import * as articleCategoryService from '~/services/admin/articleCategory.service'
+import { articleCategoryServices }  from '~/services/admin/articleCategory.service'
 import { StatusCodes } from 'http-status-codes'
 
 // [GET] /admin/articles-category
@@ -14,7 +14,7 @@ export const getArticleCategories = async (req: Request, res: Response) => {
       accounts,
       objectSearch,
       objectPagination 
-    } = await articleCategoryService.getArticleCategories(req.query)
+    } = await articleCategoryServices.getArticleCategories(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -36,10 +36,10 @@ export const getArticleCategories = async (req: Request, res: Response) => {
 
 export const changeStatusWithChildren = async (req: Request, res: Response) => {
    try {
-    await articleCategoryService.changeStatusWithChildren(
-      req.params.status, 
+    await articleCategoryServices.changeStatusWithChildren(
+      req.params.status.toUpperCase(), 
       req.params.id, 
-      req['accountAdmin'].id
+      req['accountAdmin']._id
     )
 
     return res.status(StatusCodes.OK).json({ 
@@ -61,7 +61,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     const type = body.type
     const ids = body.ids
     const updatedBy = {
-      account_id: req['accountAdmin'].id,
+      account_id: req['accountAdmin']._id,
       updatedAt: new Date()
     }
     enum Key {
@@ -109,7 +109,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [DELETE] /admin/articles-category/delete/:id
 export const deleteArticleCategory = async (req: Request, res: Response) => {
   try {
-    await articleCategoryService.deleteArticleCategory(req.params.id, req['accountAdmin'].id)
+    await articleCategoryServices.deleteArticleCategory(req.params.id, req['accountAdmin']._id)
 
     res.json({
       code: 204,
@@ -126,12 +126,12 @@ export const deleteArticleCategory = async (req: Request, res: Response) => {
 // [POST] /admin/articles-category/create
 export const createArticleCategory = async (req: Request, res: Response) => {
   try {
-    const articleCategoryToObject = await articleCategoryService.createArticleCategory(req.body, req['accountAdmin'].id)
+    const articleCategoryToObject = await articleCategoryServices.createArticleCategory(req.body, req['accountAdmin']._id)
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
       message: 'Thêm thành công danh mục bài viết!',
-      data: articleCategoryToObject
+      createdArticleCategory: articleCategoryToObject
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -144,7 +144,7 @@ export const createArticleCategory = async (req: Request, res: Response) => {
 // [PATCH] /admin/articles-category/edit/:id
 export const editArticleCategory = async (req: Request, res: Response) => {
   try {
-    await articleCategoryService.editArticleCategory(req.body, req.params.id, req['accountAdmin'].id)
+    await articleCategoryServices.editArticleCategory(req.body, req.params.id, req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -161,7 +161,7 @@ export const editArticleCategory = async (req: Request, res: Response) => {
 // [GET] /admin/articles-category/detail/:id
 export const detailArticleCategory = async (req: Request, res: Response) => {
   try {
-    const articleCategory = await articleCategoryService.detailArticleCategory(req.params.id)
+    const articleCategory = await articleCategoryServices.detailArticleCategory(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,

@@ -57,10 +57,15 @@ export const getArticleCategories = async (query: any) => {
   //  Query song song bằng Promise.all (giảm round-trip)
   // parentCategories: Các danh mục bài viết cấp cao nhất (Cấp 1) (đã được phân trang)
   // allCategories: Tất cả các danh mục bài viết cấp cao nhất (Cấp 1)
-  const { parentCategories, accounts, allCategories } = await articleCategoryRepositories.getArticleCategories(parentFind, sort, objectPagination)
+  const { parentCategories, accounts, allCategories } = await articleCategoryRepositories.getArticleCategories(
+    parentFind, sort, objectPagination
+  )
 
   // Tạo cây phân cấp (Mỗi cha sẽ được gán thêm trường children)
-  const articleCategories = buildTreeForPagedItems(parentCategories as unknown as TreeInterface[], allCategories as unknown as TreeInterface[])
+  const articleCategories = buildTreeForPagedItems(
+    parentCategories as unknown as TreeInterface[], 
+    allCategories as unknown as TreeInterface[]
+  )
 
   // Tạo cây phân cấp (Mỗi cha sẽ được gán thêm trường children)
   const allArticleCategories = buildTreeForItems(allCategories as unknown as TreeInterface[])
@@ -131,4 +136,13 @@ export const detailArticleCategory = async (id: string) => {
   const articleCategory = await articleCategoryRepositories.detailArticleCategory(id)
 
   return articleCategory
+}
+
+export const articleCategoryServices = {
+  getArticleCategories,
+  changeStatusWithChildren,
+  deleteArticleCategory,
+  createArticleCategory,
+  editArticleCategory,
+  detailArticleCategory
 }

@@ -41,9 +41,7 @@ const editArticleCategory = async (id: string, dataTemp: any, updatedBy: any) =>
     { _id: id },
     {
       $set: dataTemp,
-      $push: {
-        updatedBy
-      }
+      $push: { updatedBy }
     }
   )
 }
