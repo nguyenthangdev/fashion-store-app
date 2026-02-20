@@ -127,6 +127,7 @@ export const useEdit = () => {
       formData.append('descriptionShort', data.descriptionShort || '')
       formData.append('descriptionDetail', data.descriptionDetail || '')
       formData.append('status', data.status)
+
       if (thumbnailFile) {
         formData.append('thumbnail', thumbnailFile)
       } else if (data.thumbnail) {

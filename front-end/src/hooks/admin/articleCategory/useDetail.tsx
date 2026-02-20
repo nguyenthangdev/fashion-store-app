@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailArticleCategoryAPI } from '~/apis/admin/articleCategory.api'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -14,10 +14,13 @@ export const useDetail = () => {
   const { role } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const { dispatchAlert } = useAlertContext()
+  const navigate = useNavigate()
+
   useEffect(() => {
+    if (!id) return
+
     const fetchData = async () => {
       try {
-        if (!id) return
         setIsLoading(true)
         const res = await fetchDetailArticleCategoryAPI(id)
         setArticleCategoryDetail(res.articleCategory)
@@ -30,12 +33,15 @@ export const useDetail = () => {
         setIsLoading(false)
       }
     }
+
     fetchData()
   }, [dispatchAlert, id])
+
   return {
     articleCategoryDetail,
     id,
     role,
-    isLoading
+    isLoading,
+    navigate
   }
 }

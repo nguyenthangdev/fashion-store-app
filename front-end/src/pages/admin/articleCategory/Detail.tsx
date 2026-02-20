@@ -1,4 +1,5 @@
 import Skeleton from '@mui/material/Skeleton'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useDetail } from '~/hooks/admin/articleCategory/useDetail'
 
@@ -7,8 +8,29 @@ const DetailArticleCategory = () => {
     articleCategoryDetail,
     id,
     role,
-    isLoading
+    isLoading,
+    navigate
   } = useDetail()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('articles-category_view')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('articles-category_view')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -55,7 +77,7 @@ const DetailArticleCategory = () => {
                   />
                 </div>
                 <div>
-                  <b>Trạng thái:</b>
+                  <b>Trạng thái: </b>
                   {
                     articleCategoryDetail.status === 'ACTIVE' ?
                       <span className="text-green-500 font-[600]">Hoạt động</span> :

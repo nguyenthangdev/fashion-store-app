@@ -10,6 +10,7 @@ import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryConte
 import type { ArticleCategoryDetailInterface } from '~/interfaces/articleCategory.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { editArticleCategorySchema, type EditArticleCategoryFormData } from '~/validations/admin/articleCategory.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useEdit = () => {
   const params = useParams()
@@ -27,7 +28,7 @@ export const useEdit = () => {
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     setValue,
@@ -51,16 +52,16 @@ export const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const data: ArticleCategoryDetailInterface = await fetchDetailArticleCategoryAPI(id)
-        const articleCategory = data.articleCategory
+        const res = await fetchDetailArticleCategoryAPI(id)
+        const articleCategory = res.articleCategory
 
         reset({
-          title: articleCategory.title || '',
-          parent_id: String(articleCategory.parent_id || ''),
-          descriptionShort: articleCategory.descriptionShort || '',
-          descriptionDetail: articleCategory.descriptionDetail || '',
-          status: articleCategory.status || 'ACTIVE',
-          thumbnail: articleCategory.thumbnail || null
+          title: articleCategory.title,
+          parent_id: String(articleCategory.parent_id),
+          descriptionShort: articleCategory.descriptionShort,
+          descriptionDetail: articleCategory.descriptionDetail,
+          status: articleCategory.status,
+          thumbnail: articleCategory.thumbnail
         })
 
         setThumbnailPreview(articleCategory.thumbnail || null)
@@ -81,34 +82,29 @@ export const useEdit = () => {
   }, [id, reset, dispatchAlert])
 
   const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
+    const file = event.target.files?.[0] as File
+    if (!file) return
 
-      // Cleanup old preview if it's a blob URL
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(thumbnailPreview)
-      }
-
-      setThumbnailFile(file)
-      setThumbnailPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
-      trigger('thumbnail')
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
     }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(file)
+    setThumbnailFile(file)
+    setThumbnailPreview(imageUrl)
+    setValue('thumbnail', file)
+    // trigger('thumbnail')
   }
 
   const onSubmit = async (data: EditArticleCategoryFormData): Promise<void> => {
@@ -123,12 +119,13 @@ export const useEdit = () => {
     // Chỉ append file nếu có upload mới
     if (thumbnailFile) {
       formData.append('thumbnail', thumbnailFile)
-    } else if (typeof data.thumbnail === 'string') {
+    } else if (data.thumbnail) {
       // Giữ URL ảnh cũ
       formData.append('thumbnail', data.thumbnail)
     }
 
     const response = await fetchEditArticleCategoryAPI(id, formData)
+
     if (response.code === 200) {
       dispatchAlert({
         type: 'SHOW_ALERT',
@@ -157,13 +154,15 @@ export const useEdit = () => {
     thumbnailPreview,
     handleThumbnailChange,
     handleClick,
-    handleSubmit: handleSubmitForm(onSubmit),
+    handleSubmit,
+    onSubmit,
     role,
     // React Hook Form
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate
   }
 }

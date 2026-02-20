@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,11 +7,12 @@ import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { createArticleCategorySchema, type CreateArticleCategoryFormData } from '~/validations/admin/articleCategory.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useCreate = () => {
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
     watch
@@ -33,33 +34,38 @@ export const useCreate = () => {
   const { role } = useAuth()
   const navigate = useNavigate()
   const [preview, setPreview] = useState<string | null>(null)
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith('blob:')) {
+        URL.revokeObjectURL(preview)
+      }
+    }
+  }, [preview])
 
   const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
+    const file = event.target.files?.[0] as File
+    if (!file) return
 
-      // Cleanup old preview
-      if (preview) URL.revokeObjectURL(preview)
-
-      setPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
     }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(file)
+    setPreview(imageUrl)
+    setValue('thumbnail', file)
   }
 
   const onSubmit = async (data: CreateArticleCategoryFormData): Promise<void> => {
@@ -76,6 +82,7 @@ export const useCreate = () => {
     }
 
     const response = await fetchCreateArticleCategoryAPI(formData)
+
     if (response.code === 201) {
       dispatchAlert({
         type: 'SHOW_ALERT',
@@ -92,24 +99,25 @@ export const useCreate = () => {
     }
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     allArticleCategories,
-    uploadImageInputRef,
+    // uploadImageInputRef,
     preview,
     handleThumbnailChange,
-    handleClick,
-    handleSubmit: handleSubmitForm(onSubmit),
+    // handleClick,
+    handleSubmit,
+    onSubmit,
     role,
-    // React Hook Form
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate
   }
 }
