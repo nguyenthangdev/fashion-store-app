@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as chatService from '~/services/admin/chat.service'
+import { chatServices } from '~/services/admin/chat.service'
 
 // [GET] /admin/chats
 export const getChatRooms = async (req: Request, res: Response) => {
   try {
-    const chatRooms = await chatService.getAdminChatRooms()
+    const chatRooms = await chatServices.getAdminChatRooms()
 
     res.status(StatusCodes.OK).json({ 
       code: 200, 
@@ -22,7 +22,7 @@ export const getChatRooms = async (req: Request, res: Response) => {
 // [GET] /admin/chats/:userId
 export const getChatHistory = async (req: Request, res: Response) => {
   try {
-    const chat = await chatService.getAdminChatHistory(req.params.userId)
+    const chat = await chatServices.getAdminChatHistory(req.params.userId)
 
     if (!chat) {
       return res.status(StatusCodes.NOT_FOUND).json({ 

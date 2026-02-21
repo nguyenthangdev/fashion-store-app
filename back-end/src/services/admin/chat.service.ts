@@ -1,18 +1,18 @@
-import ChatModel from "~/models/chat.model"
+import { chatRepositories } from '~/repositories/admin/chat.repository'
 
-export const getAdminChatRooms = async () => {
-  const chatRooms = await ChatModel
-    .find()
-    .populate('user_id', 'fullName avatar') // Lấy thông tin user
-    .sort({ lastMessageAt: -1 }) // Sắp xếp theo tin nhắn mới nhất
-    .lean() // Dùng .lean() để tăng tốc độ
+const getAdminChatRooms = async () => {
+  const chatRooms = await chatRepositories.getAdminChatRooms()
+
   return chatRooms
 }
 
-export const getAdminChatHistory = async (userId: string) => {
-  const chat = await ChatModel
-    .findOne({ user_id: userId })
-    .populate('user_id', 'fullName avatar')
-    .lean()
+const getAdminChatHistory = async (userId: string) => {
+  const chat = await chatRepositories.getAdminChatHistory(userId)
+
   return chat
+}
+
+export const chatServices = {
+  getAdminChatRooms,
+  getAdminChatHistory
 }

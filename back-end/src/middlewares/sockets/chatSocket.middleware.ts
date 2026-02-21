@@ -49,8 +49,8 @@ export const chatSocket = (io: Server) => {
         return next(new Error('Authentication error: No token provided.'))
       }
     } catch (error) {
-        console.error('Socket Auth Error:', error.message)
-        return next(new Error('Authentication error: ' + error.message))
+      console.error('Socket Auth Error:', error.message)
+      return next(new Error('Authentication error: ' + error.message))
     }
   })
 }
