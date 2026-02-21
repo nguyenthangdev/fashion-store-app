@@ -41,10 +41,14 @@ const BrandAdmin = () => {
                 <TableCell colSpan={4} align="center">Đang tải...</TableCell>
               </TableRow>
             ) : (
-              brands.map((brand) => (
+              brands.map(brand => (
                 <TableRow key={brand._id}>
                   <TableCell>
-                    <img src={brand.thumbnail} alt={brand.title} className="w-16 h-16 object-contain" />
+                    <img
+                      src={brand.thumbnail}
+                      alt={brand.title}
+                      className="w-16 h-16 object-contain"
+                    />
                   </TableCell>
                   <TableCell>{brand.title}</TableCell>
                   <TableCell>
@@ -53,8 +57,12 @@ const BrandAdmin = () => {
                     </span>
                   </TableCell>
                   <TableCell align="right">
-                    <Button component={Link} to={`/admin/brands/edit/${brand._id}`} size="small" sx={{ mr: 1 }}>Sửa</Button>
-                    <Button onClick={() => handleOpenDelete(brand._id!)} size="small" color="error">Xóa</Button>
+                    <Button component={Link} to={`/admin/brands/edit/${brand._id}`} size="small" sx={{ mr: 1 }}>
+                      Sửa
+                    </Button>
+                    <Button onClick={() => handleOpenDelete(brand._id!)} size="small" color="error">
+                      Xóa
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -64,10 +72,11 @@ const BrandAdmin = () => {
       </TableContainer>
       {/* <Pagination pagination={pagination} /> */}
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={openDeleteDialog} onClose={handleCloseDelete}>
         <DialogTitle>Xác nhận xóa</DialogTitle>
-        <DialogContent><DialogContentText>Bạn có chắc chắn muốn xóa thương hiệu này không?</DialogContentText></DialogContent>
+        <DialogContent>
+          <DialogContentText>Bạn có chắc chắn muốn xóa thương hiệu này không?</DialogContentText>
+        </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDelete}>Hủy</Button>
           <Button onClick={handleDelete} color="error">Xóa</Button>

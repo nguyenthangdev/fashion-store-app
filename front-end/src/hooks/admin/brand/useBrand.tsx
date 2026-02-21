@@ -38,14 +38,21 @@ const useBrand = () => {
 
   const handleDelete = async () => {
     if (!selectedId) return
+
     try {
       const res = await deleteBrandAPI(selectedId)
       if (res.code === 204) {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: res.message, severity: 'success' } })
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: res.message, severity: 'success' }
+        })
         loadBrands(page)
       }
     } catch (error) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Xóa thất bại', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Đã xảy ra lỗi khi xóa thương hiệu', severity: 'error' }
+      })
     } finally {
       setOpenDeleteDialog(false)
       setSelectedId(null)
@@ -61,6 +68,7 @@ const useBrand = () => {
     setOpenDeleteDialog(false)
     setSelectedId(null)
   }
+
   return {
     brands,
     loading,

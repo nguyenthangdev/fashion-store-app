@@ -6,34 +6,71 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { fetchBrandDetailAPI, updateBrandAPI } from '~/apis/admin/brand.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import type { Brand } from '~/interfaces/brand.interface'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 const useEdit = () => {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams()
   const navigate = useNavigate()
   const { dispatchAlert } = useAlertContext()
   const [brand, setBrand] = useState<Brand | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
-    setLoading(true)
-    fetchBrandDetailAPI(id)
-      .then(res => {
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        const res = await fetchBrandDetailAPI(id)
         setBrand(res.brand)
         setPreview(res.brand.thumbnail) // Set preview ban đầu là ảnh cũ
-      })
-      .catch(() => dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Không tìm thấy thương hiệu', severity: 'error' } }))
-      .finally(() => setLoading(false))
+      } catch (error) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Lỗi khi tải thông tin thương hiệu', severity: 'error' }
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
   }, [id, dispatchAlert])
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (selectedFile) {
-      setFile(selectedFile)
-      setPreview(URL.createObjectURL(selectedFile)) // Cập nhật preview thành ảnh mới
+  // Cleanup blob URL to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith('blob:')) {
+        URL.revokeObjectURL(preview)
+      }
     }
+  }, [preview])
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] as File
+    if (!selectedFile) return
+
+    const newFile = {
+      name: selectedFile?.name || '',
+      size: selectedFile?.size || 0,
+      type: selectedFile?.type || ''
+    }
+
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(selectedFile)
+    setFile(selectedFile)
+    setPreview(imageUrl)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
@@ -48,26 +85,33 @@ const useEdit = () => {
     const formData = new FormData()
     formData.append('title', brand.title)
     formData.append('status', brand.status)
-    if (brand.brand_category_id) formData.append('brand_category_id', brand.brand_category_id)
+    if (brand.brand_category_id) {
+      formData.append('brand_category_id', brand.brand_category_id)
+    }
     if (file) {
       formData.append('thumbnail', file) // Gửi file mới
     }
-    // Nếu không có file mới, backend sẽ giữ nguyên thumbnail cũ (theo logic controller)
 
     try {
       const res = await updateBrandAPI(id, formData)
       if (res.code === 200) {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: res.message, severity: 'success' } })
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: res.message, severity: 'success' }
+        })
         navigate('/admin/brands')
       }
     } catch (error) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Cập nhật thất bại', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Cập nhật thất bại', severity: 'error' }
+      })
     }
   }
   return {
-    loading,
+    isLoading,
     preview,
-    handleFileChange,
+    handleImageChange,
     handleChange,
     handleSubmit,
     brand,

@@ -4,16 +4,17 @@ import useEdit from '~/hooks/admin/brand/useEdit'
 
 const EditBrand = () => {
   const {
-    loading,
+    isLoading,
     preview,
-    handleFileChange,
+    handleImageChange,
     handleChange,
     handleSubmit,
     brand,
     navigate
   } = useEdit()
 
-  if (loading) return <div className="p-6 flex justify-center"><CircularProgress /></div>
+  if (isLoading) return <div className="p-6 flex justify-center"><CircularProgress /></div>
+
   if (!brand) return <div className="p-6">Không tìm thấy thương hiệu.</div>
 
   return (
@@ -44,7 +45,7 @@ const EditBrand = () => {
         <div>
           <Button variant="contained" component="label">
             Đổi Logo
-            <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            <input type="file" hidden accept="image/*" onChange={handleImageChange} />
           </Button>
           {preview && <img src={preview} alt="Logo preview" className="w-32 h-32 object-contain mt-4 border" />}
         </div>

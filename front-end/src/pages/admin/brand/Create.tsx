@@ -4,13 +4,14 @@ import useCreate from '~/hooks/admin/brand/useCreate'
 
 const CreateBrand = () => {
   const {
-    setTitle,
-    setStatus,
+    handleChangeTitle,
     preview,
     handleFileChange,
     handleSubmit,
     title,
-    navigate
+    navigate,
+    handleChangeStatus,
+    status
   } = useCreate()
 
   return (
@@ -20,17 +21,19 @@ const CreateBrand = () => {
         <TextField
           label="Tiêu đề"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleChangeTitle}
           variant="outlined"
           fullWidth
           required
         />
         <FormControl fullWidth>
-          <InputLabel>Trạng thái</InputLabel>
+          <InputLabel id="status-label">Trạng thái</InputLabel>
           <Select
+            labelId="status-label"
+            id="status"
             value={status}
             label="Trạng thái"
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={handleChangeStatus}
           >
             <MenuItem value={'ACTIVE'}>Hoạt động</MenuItem>
             <MenuItem value={'INACTIVE'}>Không hoạt động</MenuItem>
@@ -39,13 +42,26 @@ const CreateBrand = () => {
         <div>
           <Button variant="contained" component="label">
             Chọn Logo
-            <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleFileChange}
+            />
           </Button>
-          {preview && <img src={preview} alt="Logo preview" className="w-32 h-32 object-contain mt-4 border" />}
+          {preview &&
+            <img
+              src={preview}
+              alt="Logo preview"
+              className="w-32 h-32 object-contain mt-4 border"
+            />
+          }
         </div>
         <div className="flex gap-4">
           <Button type="submit" variant="contained" color="primary">Tạo mới</Button>
-          <Button variant="outlined" onClick={() => navigate('/admin/brands')}>Hủy</Button>
+          <Button variant="outlined" onClick={() => navigate('/admin/brands')}>
+            Hủy
+          </Button>
         </div>
       </form>
     </div>
