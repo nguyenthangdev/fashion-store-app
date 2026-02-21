@@ -2,17 +2,17 @@ import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import filterOrderHelpers from '~/helpers/filterOrder'
 import OrderModel from '~/models/order.model'
-import * as orderService from '~/services/admin/order.service'
+import { orderServices } from '~/services/admin/order.service'
 
 // [GET] /admin/orders
 export const index = async (req: Request, res: Response) => {
   try {
     const {
-        orders,
-        allOrders,
-        objectSearch,
-        objectPagination
-    } = await orderService.getOrders(req.query)
+      orders,
+      allOrders,
+      objectSearch,
+      objectPagination
+    } = await orderServices.getOrders(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -34,10 +34,10 @@ export const index = async (req: Request, res: Response) => {
 // [PATCH] /admin/orders/change-status/:status/:id
 export const changeStatusOrder = async (req: Request, res: Response) => {
   try {
-    const updater = await orderService.changeStatusOrder(
-      req.params.status, 
+    const updater = await orderServices.changeStatusOrder(
+      req.params.status.toUpperCase(), 
       req.params.id, 
-      req['accountAdmin'].id
+      req['accountAdmin']._id
     )
 
     res.status(StatusCodes.OK).json({
@@ -60,7 +60,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     const type = body.type
     const ids = body.ids
     const updatedBy = {
-      account_id: req['accountAdmin'].id,
+      account_id: req['accountAdmin']._id,
       updatedAt: new Date()
     }
     enum Key {
@@ -139,7 +139,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [DELETE] /admin/orders/delete/:id
 export const deleteOrder = async (req: Request, res: Response) => {
   try {
-    await orderService.deleteOrder(req.params.id, req['accountAdmin'].id)
+    await orderServices.deleteOrder(req.params.id, req['accountAdmin']._id)
 
     res.json({
       code: 204,
@@ -158,7 +158,7 @@ export const deleteOrder = async (req: Request, res: Response) => {
 // [GET] /admin/orders/detail/:id
 export const detailOrder = async (req: Request, res: Response) => {
   try {
-    const order = await orderService.detailOrder(req.params.id)
+    const order = await orderServices.detailOrder(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -177,7 +177,7 @@ export const detailOrder = async (req: Request, res: Response) => {
 // [PATCH] /admin/orders/edit-estimatedDeliveryDay
 export const estimatedDeliveryDay = async (req: Request, res: Response) => {
   try {
-    await orderService.estimatedDeliveryDay(req.body, req['accountAdmin'].id)
+    await orderServices.estimatedDeliveryDay(req.body, req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -194,7 +194,7 @@ export const estimatedDeliveryDay = async (req: Request, res: Response) => {
 // [PATCH] /admin/orders/edit-estimatedConfirmedDay
 export const estimatedConfirmedDay = async (req: Request, res: Response) => {
   try {
-    await orderService.estimatedConfirmedDay(req.body, req['accountAdmin'].id)
+    await orderServices.estimatedConfirmedDay(req.body, req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -211,7 +211,7 @@ export const estimatedConfirmedDay = async (req: Request, res: Response) => {
 // [GET] /admin/orders/export
 export const exportOrder = async (req: Request, res: Response) => {
   try {
-    const { workbook, status } = await orderService.exportOrder(req.query)
+    const { workbook, status } = await orderServices.exportOrder(req.query)
 
     // Gửi file về cho client
     res.setHeader(
@@ -242,7 +242,7 @@ export const orderTrash = async (req: Request, res: Response) => {
       orders,
       objectSearch,
       objectPagination
-    } = await orderService.orderTrash(req.query)
+    } = await orderServices.orderTrash(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -305,7 +305,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
 // [DELETE] /admin/orders/trash/permanentlyDelete/:id
 export const permanentlyDeleteOrder = async (req: Request, res: Response) => {
   try {
-    await orderService.permanentlyDeleteOrder(req.params.id)
+    await orderServices.permanentlyDeleteOrder(req.params.id)
 
     res.json({
       code: 204,
@@ -322,7 +322,7 @@ export const permanentlyDeleteOrder = async (req: Request, res: Response) => {
 // [PATCH] /admin/orders/trash/recover/:id
 export const recoverOrder = async (req: Request, res: Response) => {
   try {
-    await orderService.recoverOrder(req.params.id)
+    await orderServices.recoverOrder(req.params.id)
     
     res.status(StatusCodes.OK).json({
       code: 200,

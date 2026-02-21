@@ -3,6 +3,7 @@ import paginationHelpers from '~/helpers/pagination'
 import OrderModel from '~/models/order.model'
 import ExcelJS from 'exceljs'
 import { EstimatedConfirmedDayInterface, EstimatedDeliveryDayInterface } from '~/interfaces/admin/order.interface'
+import { orderRepositories } from '~/repositories/admin/order.repository'
 
 export const getOrders = async (query: any) => {
   const find: any = { deleted: false }
@@ -46,20 +47,8 @@ export const getOrders = async (query: any) => {
   }
   // End Sort
 
-  const [orders, allOrders] = await Promise.all([
-    OrderModel
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .lean()  
-      .populate('createdBy.account_id', 'fullName email') // Lấy thông tin người tạo
-      .populate('updatedBy.account_id', 'fullName email')
-      .lean(),
-    OrderModel
-      .find({deleted: false})
-      .lean()
-  ])
+  const { orders, allOrders } = await orderRepositories.getOrders(find, sort, objectPagination)
+
   return {
     orders,
     allOrders,
@@ -73,38 +62,19 @@ export const changeStatusOrder = async (status: string, order_id: string, accoun
     account_id: account_id,
     updatedAt: new Date()
   }
-  const updater = await OrderModel
-    .findByIdAndUpdate(
-      { _id: order_id },
-      {
-        $set: { status },
-        $push: { updatedBy }
-      },
-      { new: true } // Trả về document sau update
-    )
-    .populate('updatedBy.account_id', 'fullName email')
-    .lean() 
+
+  const updater = await orderRepositories.changeStatusOrder(order_id, status, updatedBy)
 
   return updater
 }
 
 export const deleteOrder = async (order_id: string, account_id: string) => {
-  await OrderModel.updateOne(
-    { _id: order_id },
-    {
-      $set: {
-        deleted: true,
-        deletedBy: {
-          account_id: account_id,
-          deletedAt: new Date()
-        }
-      }
-    }
-  )
+  await orderRepositories.deleteOrder(order_id, account_id)
 }
 
 export const detailOrder = async (order_id: string) => {
-  const order = await OrderModel.findOne({ _id: order_id, deleted: false })
+  const order = await orderRepositories.findOrderById(order_id)
+
   return order
 }
 
@@ -117,13 +87,7 @@ export const estimatedDeliveryDay = async (data: EstimatedDeliveryDayInterface, 
     account_id: account_id,
     updatedAt: new Date()
   }
-  await OrderModel.updateOne(
-    { _id: dataTemp.orderId },
-    { 
-      $set: { estimatedDeliveryDay: dataTemp.estimatedDeliveryDay }, 
-      $push: { updatedBy }
-    }
-  )
+  await orderRepositories.estimatedDeliveryDay(dataTemp, updatedBy)
 }
 
 export const estimatedConfirmedDay = async (data: EstimatedConfirmedDayInterface, account_id: string) => {
@@ -135,13 +99,7 @@ export const estimatedConfirmedDay = async (data: EstimatedConfirmedDayInterface
     account_id: account_id,
     updatedAt: new Date()
   }
-  await OrderModel.updateOne(
-    { _id: dataTemp.orderId },
-    { 
-      $set: { estimatedConfirmedDay: dataTemp.estimatedConfirmedDay }, 
-      $push: { updatedBy }
-    }
-  )
+  await orderRepositories.estimatedConfirmedDay(dataTemp, updatedBy)
 }
 
 export const exportOrder = async (query: any) => {
@@ -153,7 +111,7 @@ export const exportOrder = async (query: any) => {
     }
 
   // Lấy TẤT CẢ đơn hàng (không phân trang) khớp với bộ lọc
-    const orders = await OrderModel.find(find).sort({ createdAt: -1 })
+    const orders = await orderRepositories.findAllOrders(find)
 
   // Tạo file Excel
     const workbook = new ExcelJS.Workbook()
@@ -249,13 +207,7 @@ export const orderTrash = async (query: any) => {
   }
   // End Sort
 
-  const orders = await OrderModel
-    .find(find)
-    .sort(sort)
-    .limit(objectPagination.limitItems)
-    .skip(objectPagination.skip)
-    .populate('deletedBy.account_id', 'fullName email') // Lấy thông tin người tạo
-    .lean()
+  const orders = await orderRepositories.orderTrash(find, sort, objectPagination)
 
   return {
     orders,
@@ -265,12 +217,22 @@ export const orderTrash = async (query: any) => {
 }
 
 export const permanentlyDeleteOrder = async (id: string) => {
-  await OrderModel.deleteOne({ _id: id })
+  await orderRepositories.permanentlyDeleteOrder(id)
 }
 
 export const recoverOrder = async (id: string) => {
-  await OrderModel.updateOne(
-    { _id: id },
-    { $set: { deleted: false, recoveredAt: new Date() } }
-  )
+  await orderRepositories.recoverOrder(id)
+}
+
+export const orderServices = {
+  getOrders,
+  changeStatusOrder,
+  deleteOrder,
+  detailOrder,
+  estimatedDeliveryDay,
+  estimatedConfirmedDay,
+  exportOrder,
+  orderTrash,
+  permanentlyDeleteOrder,
+  recoverOrder
 }
