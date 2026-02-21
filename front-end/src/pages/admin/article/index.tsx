@@ -12,6 +12,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import { ARTICLE_STATUSES_CHANGEMULTI } from '~/utils/constants'
+import { useEffect } from 'react'
 
 const ArticleAdmin = () => {
   const {
@@ -36,8 +37,29 @@ const ArticleAdmin = () => {
     allArticles,
     open,
     handleClose,
-    handleConfirmDeleteAll
+    handleConfirmDeleteAll,
+    navigate
   } = useArticle()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('articles_view')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('articles_view')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <>

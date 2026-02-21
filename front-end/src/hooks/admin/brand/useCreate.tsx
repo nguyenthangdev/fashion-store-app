@@ -6,6 +6,7 @@ import { createBrandAPI } from '~/apis/admin/brand.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { singleFileValidator } from '~/validations/validators/validators'
 import type { SelectChangeEvent } from '@mui/material/Select'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 const useCreate = () => {
   const navigate = useNavigate()
@@ -14,6 +15,7 @@ const useCreate = () => {
   const [status, setStatus] = useState('ACTIVE')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const { role } = useAuth()
 
   useEffect(() => {
     return () => {
@@ -96,7 +98,8 @@ const useCreate = () => {
     title,
     navigate,
     handleChangeStatus,
-    status
+    status,
+    role
   }
 }
 

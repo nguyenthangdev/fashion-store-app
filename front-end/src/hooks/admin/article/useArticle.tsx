@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchChangeMultiAPI } from '~/apis/admin/article.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleContext } from '~/contexts/admin/ArticleContext'
@@ -16,6 +16,7 @@ export const useArticle = () => {
   const [actionType, setActionType] = useState('')
   const [open, setOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   // Parse URL params một lần
   const urlParams = useMemo(() => ({
@@ -156,6 +157,7 @@ export const useArticle = () => {
     allArticles,
     handleConfirmDeleteAll,
     open,
-    handleClose
+    handleClose,
+    navigate
   }
 }

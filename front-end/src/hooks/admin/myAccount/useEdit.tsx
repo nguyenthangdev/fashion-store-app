@@ -3,11 +3,11 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
 import { fetchMyAccountAPI, fetchUpdateMyAccountAPI } from '~/apis/admin/myAccount.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { MyAccountAPIResponse } from '~/interfaces/account.interface'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { editMyAccountSchema, type EditMyAccountFormData } from '~/validations/admin/myAccount.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useEditMyAccount = () => {
   const { dispatchAlert } = useAlertContext()
@@ -22,19 +22,27 @@ export const useEditMyAccount = () => {
     reset,
     setValue
   } = useForm<EditMyAccountFormData>({
-    resolver: zodResolver(editMyAccountSchema)
+    resolver: zodResolver(editMyAccountSchema),
+    defaultValues: { // Set default values for the form fields
+      fullName: '',
+      email: '',
+      phone: '',
+      avatar: null
+    }
   })
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const data: MyAccountAPIResponse = await fetchMyAccountAPI()
+        const data = await fetchMyAccountAPI()
         const account = data.myAccount
+
         reset({
           fullName: account.fullName,
           email: account.email,
           phone: account.phone,
+          avatar: account.avatar,
           password: ''
         })
         setPreview(account.avatar)
@@ -62,34 +70,28 @@ export const useEditMyAccount = () => {
     }
   }, [preview])
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
       dispatchAlert({
         type: 'SHOW_ALERT',
-        payload: { message: 'Vui lòng chọn file ảnh hợp lệ', severity: 'error' }
+        payload: { message: error, severity: 'error' }
       })
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-      })
-      return
-    }
-
-    // Revoke old preview URL if exists
-    if (preview && preview.startsWith('blob:')) {
-      URL.revokeObjectURL(preview)
-    }
-
+    const imageUrl = URL.createObjectURL(file)
+    setPreview(imageUrl)
     setValue('avatar', file)
-    setPreview(URL.createObjectURL(file))
   }
 
   const onSubmit = async (data: EditMyAccountFormData) => {

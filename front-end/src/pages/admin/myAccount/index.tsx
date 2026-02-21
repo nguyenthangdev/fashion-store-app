@@ -5,8 +5,25 @@ import { useMyAccount } from '~/hooks/admin/myAccount/useMyAccount'
 const MyAccountAdmin = () => {
   const {
     accountInfo,
-    role
+    role,
+    isLoading
   } = useMyAccount()
+
+
+  if (isLoading) {
+    return (
+      <div className="text-[16px] mt-[15px] flex flex-col gap-[15px] w-[50%] bg-[#FFFFFF] py-[15px] pl-[50px] shadow-md">
+        <Skeleton variant="text" width={250} height={32} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="circular" width={150} height={150} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={175} height={30} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={200} height={30} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={180} height={30} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={175} height={30} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="text" width={170} height={30} sx={{ bgcolor: 'grey.400' }}/>
+        <Skeleton variant="rectangular" width={94} height={31} sx={{ bgcolor: 'grey.400' }}/>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -49,23 +66,16 @@ const MyAccountAdmin = () => {
               to={'/admin/my-account/edit'}
               className='nav-link text-[14px] border rounded-[5px] bg-[#2F57EF] p-[4px] text-white w-[13%] text-center'
             >
-                Chỉnh sửa
+              Chỉnh sửa
             </Link>
           </div>
         </>
       ) : (
-        <>
-          <div className="text-[16px] mt-[15px] flex flex-col gap-[15px] w-[50%] bg-[#FFFFFF] py-[15px] pl-[50px] shadow-md">
-            <Skeleton variant="text" width={250} height={32} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="circular" width={150} height={150} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={175} height={30} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={200} height={30} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={180} height={30} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={175} height={30} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="text" width={170} height={30} sx={{ bgcolor: 'grey.400' }}/>
-            <Skeleton variant="rectangular" width={94} height={31} sx={{ bgcolor: 'grey.400' }}/>
-          </div>
-        </>
+        <div className="bg-white p-6 rounded shadow-md mt-4">
+          <p className="text-red-500 text-center text-lg font-medium">
+            Không tìm thấy thông tin tài khoản của bạn!
+          </p>
+        </div>
       )}
     </>
   )

@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { deleteBrandAPI, fetchBrandAPI } from '~/apis/admin/brand.api'
 import type { Brand } from '~/interfaces/brand.interface'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 const useBrand = () => {
   const [brands, setBrands] = useState<Brand[]>([])
@@ -16,6 +17,8 @@ const useBrand = () => {
   const { dispatchAlert } = useAlertContext()
   const [searchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page') || '1', 10)
+  const navigate = useNavigate()
+  const { role } = useAuth()
 
   const loadBrands = async (currentPage = 1) => {
     setLoading(true)
@@ -76,7 +79,9 @@ const useBrand = () => {
     Link,
     handleDelete,
     handleOpenDelete,
-    handleCloseDelete
+    handleCloseDelete,
+    navigate,
+    role
   }
 }
 

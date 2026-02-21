@@ -1,5 +1,6 @@
 
 import { Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
+import { useEffect } from 'react'
 import useCreate from '~/hooks/admin/brand/useCreate'
 
 const CreateBrand = () => {
@@ -11,8 +12,29 @@ const CreateBrand = () => {
     title,
     navigate,
     handleChangeStatus,
-    status
+    status,
+    role
   } = useCreate()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('brands_create')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('brands_create')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">

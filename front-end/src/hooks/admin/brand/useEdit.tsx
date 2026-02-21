@@ -7,6 +7,7 @@ import { fetchBrandDetailAPI, updateBrandAPI } from '~/apis/admin/brand.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import type { Brand } from '~/interfaces/brand.interface'
 import { singleFileValidator } from '~/validations/validators/validators'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 const useEdit = () => {
   const { id } = useParams()
@@ -16,6 +17,7 @@ const useEdit = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const { role } = useAuth()
 
   useEffect(() => {
     if (!id) return
@@ -115,7 +117,8 @@ const useEdit = () => {
     handleChange,
     handleSubmit,
     brand,
-    navigate
+    navigate,
+    role
   }
 }
 

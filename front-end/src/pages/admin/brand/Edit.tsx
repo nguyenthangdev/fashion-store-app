@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material'
+import { useEffect } from 'react'
 import useEdit from '~/hooks/admin/brand/useEdit'
 
 const EditBrand = () => {
@@ -10,8 +11,29 @@ const EditBrand = () => {
     handleChange,
     handleSubmit,
     brand,
-    navigate
+    navigate,
+    role
   } = useEdit()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('brands_edit')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('brands_edit')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   if (isLoading) return <div className="p-6 flex justify-center"><CircularProgress /></div>
 

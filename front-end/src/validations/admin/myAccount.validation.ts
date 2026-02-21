@@ -60,7 +60,13 @@ export const editMyAccountSchema = z.object({
       }
     }),
 
-  avatar: z.any().optional()
+  avatar: z
+    .union([
+      z.instanceof(File),
+      z.string(),
+      z.null()
+    ])
+    .optional()
 })
 
 export type EditMyAccountFormData = z.infer<typeof editMyAccountSchema>
