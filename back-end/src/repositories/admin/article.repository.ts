@@ -1,5 +1,5 @@
-import { FindInterface, PaginationInterface } from "~/interfaces/admin/general.interface"
-import ArticleModel from "~/models/article.model"
+import { FindInterface, PaginationInterface } from '~/interfaces/admin/general.interface'
+import ArticleModel from '~/models/article.model'
 
 const getAllArticles = async (find: FindInterface, sort: Record<string, 1 | -1>, objectPagination: PaginationInterface) => {
   const [articles, allArticles] = await Promise.all([

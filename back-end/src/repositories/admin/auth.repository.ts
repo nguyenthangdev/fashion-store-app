@@ -1,5 +1,5 @@
-import AccountModel from "~/models/account.model"
-import RoleModel from "~/models/role.model"
+import AccountModel from '~/models/account.model'
+import RoleModel from '~/models/role.model'
 
 
 const findAccountByEmail = async (email: string) => {

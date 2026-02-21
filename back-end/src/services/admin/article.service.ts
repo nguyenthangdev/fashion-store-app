@@ -3,7 +3,7 @@ import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
 import { ArticleInterface } from '~/interfaces/admin/article.interface'
 import { FindInterface, QueryInterface } from '~/interfaces/admin/general.interface'
-import { articleRepositories } from '~/repositories/article.repository'
+import { articleRepositories } from '~/repositories/admin/article.repository'
 
 export const getAllArticles = async (query: QueryInterface) => {
   const find: FindInterface = { deleted: false }

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { CreateAccountDTO } from '~/dtos/admin/account.dto'
 import { accountServices } from '~/services/admin/account.service'
 
 // [GET] /admin/accounts

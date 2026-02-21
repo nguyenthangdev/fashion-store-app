@@ -1,9 +1,7 @@
 import AccountModel from '~/models/account.model'
 import bcrypt from 'bcrypt'
 import { AccountInterface } from '~/interfaces/admin/account.interface'
-// import { AccountsWithRolesResponseDTO, CreateAccountDTO, CreateAccountResponseDTO } from '~/dtos/admin/account.dto'
-import { accountRepositories } from '~/repositories/account.repository'
-import { CreateAccountDTO } from '~/dtos/admin/account.dto'
+import { accountRepositories } from '~/repositories/admin/account.repository'
 import { pickAccount } from '~/utils/formatters'
 
 const getAllAccounts = async () => {
@@ -18,9 +16,15 @@ const getAllRoles = async () => {
   return roles || []
 }
 
-const createAccount = async (reqBody: CreateAccountDTO) => {
+const createAccount = async (reqBody: AccountInterface) => {
   const data = {
-    ...reqBody
+    fullName: reqBody.fullName,
+    email: reqBody.email,
+    password: reqBody.password,
+    phone: reqBody.phone,
+    avatar: reqBody.avatar,
+    role_id: reqBody.role_id,
+    status: reqBody.status
   }
   
   const account = await accountRepositories.findAccountByEmail(data.email)

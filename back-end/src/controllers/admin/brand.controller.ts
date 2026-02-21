@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
-import * as brandService from '~/services/admin/brand.service'
 import { StatusCodes } from 'http-status-codes'
+import { brandServices } from '~/services/admin/brand.service'
 
 // [GET] /admin/brands
-export const index = async (req: Request, res: Response) => {
+export const getBrands = async (req: Request, res: Response) => {
   try {
-    const { brands, objectPagination } = await brandService.getBrands(req.query)
+    const { brands, objectPagination } = await brandServices.getBrands(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: 'Thành công!',
+      message: 'Lấy thành công danh sách thương hiệu!',
       brands,
       pagination: objectPagination
     })
@@ -24,14 +24,14 @@ export const index = async (req: Request, res: Response) => {
 // [POST] /admin/brands/create
 export const createBrand = async (req: Request, res: Response) => {
   try {
-    const brandToObject = await brandService.createBrand(
+    const brandToObject = await brandServices.createBrand(
         req.body, 
-        req['accountAdmin'].id
+        req['accountAdmin']._id
     )
 
     res.status(StatusCodes.CREATED).json({ 
         code: 201, 
-        message: 'Tạo mới thương hiệu thành công!', 
+        message: 'Tạo mới thành công thương hiệu !', 
         data: brandToObject 
     })
   } catch (error) {
@@ -45,11 +45,11 @@ export const createBrand = async (req: Request, res: Response) => {
 // [GET] /admin/brands/detail/:id
 export const detailBrand = async (req: Request, res: Response) => {
   try {
-    const brand = await brandService.detailBrand(req.params.id)
+    const brand = await brandServices.detailBrand(req.params.id)
 
     res.status(StatusCodes.OK).json({ 
         code: 200, 
-        message: 'Thành công!', 
+        message: 'Lấy thành công thông tin thương hiệu!', 
         brand 
     })
   } catch (error) {
@@ -63,11 +63,11 @@ export const detailBrand = async (req: Request, res: Response) => {
 // [PATCH] /admin/brands/edit/:id
 export const editBrand = async (req: Request, res: Response) => {
   try {
-    await brandService.editBrand(req.body, req.params.id, req['accountAdmin'].id)
+    await brandServices.editBrand(req.body, req.params.id, req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({ 
         code: 200, 
-        message: 'Cập nhật thành công!' 
+        message: 'Cập nhật thành công thương hiệu!' 
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -80,11 +80,11 @@ export const editBrand = async (req: Request, res: Response) => {
 // [DELETE] /admin/brands/delete/:id
 export const deleteBrand = async (req: Request, res: Response) => {
   try {
-    await brandService.deleteBrand(req.params.id, req['accountAdmin'].id)
+    await brandServices.deleteBrand(req.params.id, req['accountAdmin']._id)
 
     res.json({ 
         code: 204, 
-        message: 'Xóa thành công!' 
+        message: 'Xóa thành công thương hiệu!' 
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

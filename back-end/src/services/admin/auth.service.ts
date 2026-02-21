@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt' 
 import { JWTProvider } from '~/providers/jwt.provider'
-import { authRepositories } from '~/repositories/auth.repository'
+import { authRepositories } from '~/repositories/admin/auth.repository'
 
 export const loginAdmin = async (data: any) => {
   const { email, password } = data

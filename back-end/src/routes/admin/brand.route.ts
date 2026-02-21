@@ -6,7 +6,7 @@ import * as validate from '~/validations/admin/brand.validation'
 
 const router: Router = Router()
 
-router.get('/', controller.index)
+router.get('/', controller.getBrands)
 
 router.post(
   '/create',

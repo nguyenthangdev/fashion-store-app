@@ -7,7 +7,7 @@ import ArticleCategoryModel from '~/models/articleCategory.model'
 import { updateStatusRecursiveForOneItem } from '~/helpers/updateStatusItem'
 import { LogNodeInterface, TreeInterface } from '~/interfaces/admin/general.interface'
 import { ArticleCategoryInterface } from '~/interfaces/admin/articleCategory.interface'
-import { articleCategoryRepositories } from '~/repositories/articleCategory.repository'
+import { articleCategoryRepositories } from '~/repositories/admin/articleCategory.repository'
 
 const getArticleCategories = async (query: any) => {
   const find: any = { deleted: false }

@@ -1,6 +1,6 @@
-import { PaginationInterface } from "~/interfaces/admin/general.interface"
-import AccountModel from "~/models/account.model"
-import ArticleCategoryModel from "~/models/articleCategory.model"
+import { PaginationInterface } from '~/interfaces/admin/general.interface'
+import AccountModel from '~/models/account.model'
+import ArticleCategoryModel from '~/models/articleCategory.model'
 
 const getArticleCategories = async (parentFind: any, sort: Record<string, 1 | -1>, objectPagination: PaginationInterface) => {
   const [parentCategories, accounts, allCategories] = await Promise.all([
