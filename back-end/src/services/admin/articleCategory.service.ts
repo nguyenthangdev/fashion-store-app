@@ -9,7 +9,7 @@ import { LogNodeInterface, TreeInterface } from '~/interfaces/admin/general.inte
 import { ArticleCategoryInterface } from '~/interfaces/admin/articleCategory.interface'
 import { articleCategoryRepositories } from '~/repositories/articleCategory.repository'
 
-export const getArticleCategories = async (query: any) => {
+const getArticleCategories = async (query: any) => {
   const find: any = { deleted: false }
   if (query.status) {
     find.status = query.status.toString()
@@ -84,7 +84,7 @@ export const getArticleCategories = async (query: any) => {
   }
 }
 
-export const changeStatusWithChildren = async (status: string, category_id: string, account_id: string) => {
+const changeStatusWithChildren = async (status: string, category_id: string, account_id: string) => {
   const updatedBy = {
     account_id,
     updatedAt: new Date()
@@ -93,11 +93,11 @@ export const changeStatusWithChildren = async (status: string, category_id: stri
   await updateStatusRecursiveForOneItem(ArticleCategoryModel, status, category_id, updatedBy)
 }
 
-export const deleteArticleCategory = async (id: string, account_id: string) => {
+const deleteArticleCategory = async (id: string, account_id: string) => {
   await articleCategoryRepositories.deleteArticleCategory(id, account_id)
 }
 
-export const createArticleCategory = async (data: ArticleCategoryInterface, account_id: string) => {
+const createArticleCategory = async (data: ArticleCategoryInterface, account_id: string) => {
   const dataTemp = {
     title: data.title,
     parent_id: data.parent_id,
@@ -116,7 +116,7 @@ export const createArticleCategory = async (data: ArticleCategoryInterface, acco
   return articleCategoryToObject
 }
 
-export const editArticleCategory = async (data: any, id: string, account_id: string) => {
+const editArticleCategory = async (data: any, id: string, account_id: string) => {
   const updatedBy = {
     account_id,
     updatedAt: new Date()
@@ -132,7 +132,7 @@ export const editArticleCategory = async (data: any, id: string, account_id: str
   await articleCategoryRepositories.editArticleCategory(id, dataTemp, updatedBy)
 }
 
-export const detailArticleCategory = async (id: string) => {
+const detailArticleCategory = async (id: string) => {
   const articleCategory = await articleCategoryRepositories.detailArticleCategory(id)
 
   return articleCategory

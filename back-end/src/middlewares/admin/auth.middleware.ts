@@ -23,6 +23,7 @@ export const requireAuth = async (
       email: string,
       role_id: string  
     }
+
     if (!accessTokenDecoded) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Token không hợp lệ!!' })
     }
@@ -32,6 +33,7 @@ export const requireAuth = async (
       deleted: false,
       status: 'ACTIVE'
     }).lean()
+
     if (!accountAdmin) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Người quản trị không tồn tại!' })
     }
@@ -40,11 +42,14 @@ export const requireAuth = async (
       _id: accountAdmin.role_id,
       deleted: false
     })
+
     if (!role){
       return res.status(StatusCodes.FORBIDDEN).json({ message: 'Không thể xác định quyền tài khoản!' })
     }
+
     req['accountAdmin'] = accountAdmin
     req['accountAdmin.roleName'] = role.titleId
+
     next()
   } catch (error: any) {
     if (error.message?.includes('jwt expired')) {

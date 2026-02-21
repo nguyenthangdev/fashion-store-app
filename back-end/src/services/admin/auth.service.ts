@@ -1,15 +1,11 @@
-import AccountModel from '~/models/account.model'
 import bcrypt from 'bcrypt' 
 import { JWTProvider } from '~/providers/jwt.provider'
-import RoleModel from '~/models/role.model'
+import { authRepositories } from '~/repositories/auth.repository'
 
 export const loginAdmin = async (data: any) => {
   const { email, password } = data
 
-  const accountAdmin = await AccountModel.findOne({
-    email: email,
-    deleted: false
-  }).select('+password')
+  const accountAdmin = await authRepositories.findAccountByEmail(email)
 
   if (!accountAdmin) {
     return { 
@@ -54,10 +50,7 @@ export const loginAdmin = async (data: any) => {
     process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN as string,
     '14d'
   )
-  const role = await RoleModel.findOne({ 
-    _id: accountAdmin.role_id, 
-    deleted: false 
-  }).lean()
+  const role = await authRepositories.findRoleById(accountAdmin.role_id.toString())
 
   const accountToObject = accountAdmin.toObject()
   delete accountToObject.password
@@ -89,11 +82,7 @@ export const refreshTokenAdmin = async (refreshToken: string) => {
     role_id: string
   }
 
-  const account = await AccountModel.findOne({
-    _id: refreshTokenDecoded.accountId,
-    deleted: false,
-    status: "ACTIVE"
-  }).lean()
+  const account = await authRepositories.findAccountById(refreshTokenDecoded.accountId)
   
   if (!account) {
     return { 
@@ -118,4 +107,9 @@ export const refreshTokenAdmin = async (refreshToken: string) => {
     success: true,
     newAccessToken
   }
+}
+
+export const authServices = {
+  loginAdmin,
+  refreshTokenAdmin
 }
