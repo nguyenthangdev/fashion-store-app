@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as myAccountService from '~/services/admin/myAccount.service'
+import { myAccountServices } from '~/services/admin/myAccount.service'
 
 // [GET] /admin/my-account
 export const index = async (req: Request, res: Response) => {
   try {
-    const { myAccount, role } = await myAccountService.getMyAccount(req['accountAdmin']._id)
+    const { myAccount, role } = await myAccountServices.getMyAccount(req['accountAdmin']._id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -25,7 +25,7 @@ export const index = async (req: Request, res: Response) => {
 // [PATCH] /admin/my-account/edit
 export const editMyAccount = async (req: Request, res: Response) => {
   try {
-    const result = await myAccountService.editMyAccount( req.body, req['accountAdmin'].id)
+    const result = await myAccountServices.editMyAccount( req.body, req['accountAdmin']._id)
     
     if (!result.success) {
       return res.status(StatusCodes.CONFLICT).json({

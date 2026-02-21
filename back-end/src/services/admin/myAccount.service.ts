@@ -2,16 +2,12 @@ import AccountModel from '~/models/account.model'
 import RoleModel from '~/models/role.model'
 import bcrypt from 'bcrypt'
 import { MyAccountInterface } from '~/interfaces/admin/myAccount.interface'
+import { myAccountRepositories } from '~/repositories/admin/myAccount.repository'
 
 export const getMyAccount = async (account_id: string) => {
-  const myAccount = await AccountModel.findOne({ 
-    _id: account_id, 
-    deleted: false 
-  })
-  const role = await RoleModel.findOne({ 
-    _id: myAccount.role_id, 
-    deleted: false 
-  })
+  const myAccount = await myAccountRepositories.findMyAccountById(account_id)
+  const role = await myAccountRepositories.findRoleById(myAccount.role_id.toString())
+
   return { myAccount, role }
 }
 
@@ -23,11 +19,8 @@ export const editMyAccount = async (data: MyAccountInterface, account_id: string
     phone: data.phone,
     avatar: data.avatar
   }
-  const isEmailExist = await AccountModel.findOne({
-    _id: { $ne: account_id }, // $ne ($notequal) -> Tránh trường hợp khi tìm bị lặp và không cập nhật lại lên đc.
-    email: dataTemp.email,
-    deleted: false
-  })
+
+  const isEmailExist = await myAccountRepositories.isEmailExist(account_id, dataTemp.email)
 
   if (isEmailExist) {
     return { 
@@ -44,7 +37,13 @@ export const editMyAccount = async (data: MyAccountInterface, account_id: string
   } else {
     delete dataTemp.password // Xóa value password, tránh cập nhật lại vào db xóa mất mật khẩu cũ
   }
-  await AccountModel.updateOne({ _id: account_id }, dataTemp)
+  await myAccountRepositories.editMyAccount(account_id, dataTemp)
   
   return { success: true }
 }
+
+export const myAccountServices = {
+  getMyAccount,
+  editMyAccount
+}
+

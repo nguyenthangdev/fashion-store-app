@@ -21,14 +21,6 @@ const getAllRoles = async () => {
   return roles 
 }
 
-const isEmailExist = async (email: string) => {
-  const account = await AccountModel
-    .findOne({ email: email, deleted: false })
-    .lean()
-
-  return !!account
-}
-
 const changeAccountStatusById = async (account_id: string, status: string) => {
   await AccountModel.updateOne(
     { _id: account_id }, 
@@ -80,7 +72,6 @@ const editAccountById = async (account_id: string, data: AccountInterface) => {
 export const accountRepositories = {
   getAllAccounts,
   getAllRoles,
-  isEmailExist,
   changeAccountStatusById,
   deleteAccountById,
   findAccountById,

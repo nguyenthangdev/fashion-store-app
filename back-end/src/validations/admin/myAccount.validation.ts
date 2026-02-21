@@ -61,7 +61,7 @@ export const editMyAccount = (
     avatar: Joi.string()
       .trim()
       .optional()
-      .allow('')
+      .allow(null, '')
       .uri()
       .messages({
         "string.uri": "URL avatar không hợp lệ!"

@@ -82,8 +82,9 @@ export const createAccount = (
       }),
       
     avatar: Joi.string()
+      .trim()
       .optional()
-      .allow(null)
+      .allow(null, '')
       .uri()
       .messages({
         "string.uri": "URL avatar không hợp lệ!"
@@ -186,7 +187,7 @@ export const editAccountById = (
       }),
     avatar: Joi.string()
       .optional()
-      .allow('')
+      .allow(null, '')
       .uri()
       .messages({
         "string.uri": "URL avatar không hợp lệ!"
