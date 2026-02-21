@@ -55,7 +55,11 @@ const AdminChat = () => {
                 }`}
               >
                 {room.user_id?.avatar ? (
-                  <img src={room.user_id.avatar} alt={room.user_id.fullName} className="w-12 h-12 rounded-full object-cover" />
+                  <img
+                    src={room.user_id.avatar}
+                    alt={room.user_id.fullName}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
                 ) : (
                   <FaUserCircle size={48} className="text-gray-400" />
                 )}
@@ -92,7 +96,11 @@ const AdminChat = () => {
                 <FaArrowLeft size={18} />
               </button>
               {activeRoom.user_id.avatar ? (
-                <img src={activeRoom.user_id.avatar} alt={activeRoom.user_id.fullName} className="w-10 h-10 rounded-full object-cover" />
+                <img
+                  src={activeRoom.user_id.avatar}
+                  alt={activeRoom.user_id.fullName}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
               ) : (
                 <FaUserCircle size={40} className="text-gray-400" />
               )}
@@ -154,4 +162,3 @@ const AdminChat = () => {
 }
 
 export default AdminChat
-

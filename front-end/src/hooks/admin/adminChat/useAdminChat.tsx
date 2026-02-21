@@ -1,12 +1,13 @@
-
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useRef, type FormEvent } from 'react'
 import { fetchAdminChatRoomsAPI, fetchAdminChatHistoryAPI } from '~/apis/admin/chat.api'
 import { API_ROOT } from '~/utils/constants'
 import io from 'socket.io-client'
 import type { ChatRoom, Message } from '~/interfaces/chat.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
 
 const useAdminChat = () => {
   const { myAccount } = useAuth()
@@ -17,6 +18,7 @@ const useAdminChat = () => {
   const [newMessage, setNewMessage] = useState('')
   const [loadingRooms, setLoadingRooms] = useState(true)
   const [loadingMessages, setLoadingMessages] = useState(false)
+  const { dispatchAlert } = useAlertContext()
 
   // Lưu socket xuyên suốt vòng đời component
   const socketRef = useRef<ReturnType<typeof io> | null>(null)
@@ -39,22 +41,26 @@ const useAdminChat = () => {
           setRooms(res.chatRooms)
         }
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách phòng chat:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đã xảy ra lỗi khi tải danh sách phòng chat!', severity: 'error' }
+        })
       } finally {
         setLoadingRooms(false)
       }
     }
 
     getRooms()
-  }, [myAccount])
+  }, [dispatchAlert, myAccount])
 
   // Khởi tạo Socket
   useEffect(() => {
     if (!myAccount) return
 
-    const socket = io(API_ROOT, {
-      withCredentials: true
-    } as any)
+    const socket = io(
+      API_ROOT,
+      { withCredentials: true } as any
+    )
     socketRef.current = socket
 
     socket.emit('ADMIN_CLIENT_JOIN_ROOM', 'ADMIN_ROOM') // event: 'ADMIN_CLIENT_JOIN_ROOM', data: 'ADMIN_ROOM'
@@ -62,7 +68,7 @@ const useAdminChat = () => {
     socket.on('SERVER_RETURN_MESSAGE', (newMessage: Message & { user_id: string }) => {
       setActiveRoom(prevRoom => {
         // Chỉ thêm tin nhắn nếu admin đang mở đúng phòng
-        if (prevRoom && newMessage.user_id === prevRoom.user_id._id) {
+        if (prevRoom && (newMessage.user_id === prevRoom.user_id._id)) {
           setMessages(prevMessages => [...prevMessages, newMessage])
         }
         return prevRoom
@@ -104,7 +110,10 @@ const useAdminChat = () => {
         socketRef.current?.emit('ADMIN_CLIENT_JOIN_ROOM', room.user_id._id)
       }
     } catch (error) {
-      console.error('Lỗi khi lấy lịch sử chat:', error)
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Đã xảy ra lỗi khi lấy lịch sử chat!', severity: 'error' }
+      })
     } finally {
       setLoadingMessages(false)
     }
