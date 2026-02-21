@@ -19,7 +19,7 @@ const Forgot = () => {
       <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-[70px] p-8 md:p-[70px] mt-[40px] mb-[80px] bg-[#96D5FE]">
 
         <div className='flex flex-col gap-[10px] text-center text-[20px] mb-8 md:mb-0'>
-          <div className='font-[600]'>LUXUES STORE</div>
+          <div className='font-[600] uppercase'>Luxues store</div>
           <div>Shop thời trang được yêu thích nhất tại Việt Nam</div>
         </div>
         <div className="w-full max-w-md md:w-[40%] lg:w-[30%]">

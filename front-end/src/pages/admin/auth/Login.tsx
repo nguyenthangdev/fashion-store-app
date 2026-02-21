@@ -5,6 +5,7 @@ import logo from '~/assets/images/header/logo.jpg'
 import { Link } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 
 const Login = () => {
   const {
@@ -36,7 +37,7 @@ const Login = () => {
             >
               <div className='flex items-center justify-center gap-[10px] mb-[20px]'>
                 <img src={logo} className='w-[50px] h-[50px]'/>
-                <span className='text-[20px] font-[600] uppercase'>LUXUES STORE</span>
+                <span className='text-[20px] font-[600] uppercase'>Luxues store</span>
               </div>
               <div className='flex flex-col gap-[5px]'>
                 <input
@@ -45,7 +46,9 @@ const Login = () => {
                   className="border rounded-[5px] p-[10px] w-full pr-10 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white"
                   placeholder='Email'
                 />
-                <div className='flex items-center justify-start'>{errors.email && <span className="text-red-500 text-xs ml-1">{errors.email.message}</span>}</div>
+                <div className='flex items-center justify-start'>
+                  <FieldErrorAlert errors={errors} fieldName="email" />
+                </div>
               </div>
               <div className='flex flex-col gap-[5px]'>
                 <div className="relative">
@@ -64,7 +67,7 @@ const Login = () => {
                   </button>
                 </div>
                 <div className='flex items-center justify-start'>
-                  {errors.password && <span className="text-red-500 text-xs ml-1">{errors.password.message}</span>}
+                  <FieldErrorAlert errors={errors} fieldName="password" />
                 </div>
               </div>
               <div className='flex items-center justify-start'>

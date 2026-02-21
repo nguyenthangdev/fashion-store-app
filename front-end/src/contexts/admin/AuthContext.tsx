@@ -24,7 +24,7 @@ export const AuthAdminProvider = ({ children }: { children: ReactNode }) => {
   const [myAccount, setMyAccount] = useState<AuthContextType['myAccount']>(null)
   const [role, setRole] = useState<AuthContextType['role']>(null)
   const [isLoading, setIsLoading] = useState(true)
-  // authChecked = “đã kiểm tra session hiện tại chưa”
+  // authChecked: đã kiểm tra session hiện tại chưa
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
@@ -57,9 +57,10 @@ export const AuthAdminProvider = ({ children }: { children: ReactNode }) => {
       setAuthChecked(true)
     }
 
-    window.addEventListener('force-logout', handleForceLogout)
-    return () => window.removeEventListener('force-logout', handleForceLogout)
+    window.addEventListener('force-logout', handleForceLogout) // Lắng nghe sự kiện 'force-logout'
+    return () => window.removeEventListener('force-logout', handleForceLogout) // Cleanup khi component unmount
   }, [])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -67,13 +68,14 @@ export const AuthAdminProvider = ({ children }: { children: ReactNode }) => {
       </div>
     )
   }
-  const logout = async (): Promise<void> => {
+
+  const logout = async () => {
     setMyAccount(null)
     setRole(null)
     setAuthChecked(true)
   }
 
-  const refreshUser = async (): Promise<void> => {
+  const refreshUser = async () => {
     const response: MyAccountAPIResponse = await fetchMyAccountAPI()
     if (response.myAccount && response.role) {
       setMyAccount(response.myAccount)

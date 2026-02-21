@@ -20,8 +20,12 @@ export const useLoginAdmin = () => {
     formState: { errors, isSubmitting }
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' }
+    defaultValues: {
+      email: '',
+      password: ''
+    }
   })
+
   const onSubmit = async (data: LoginFormData): Promise<void> => {
     try {
       const response = await fetchLoginAPI(data.email, data.password)
@@ -43,20 +47,10 @@ export const useLoginAdmin = () => {
         })
       }
     } catch (error: any) {
-      // if (error.status === 429) {
-      //   dispatchAlert({
-      //     type: 'SHOW_ALERT',
-      //     payload: { message: error.response.data.message, severity: 'error' }
-      //   })
-      // }
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: error.response.data.message, severity: 'error' }
       })
-      // dispatchAlert({
-      //   type: 'SHOW_ALERT',
-      //   payload: { message: 'Đã xảy ra lỗi, vui lòng thử lại.', severity: 'error' }
-      // })
     }
   }
   return {

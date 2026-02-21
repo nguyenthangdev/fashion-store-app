@@ -8,9 +8,9 @@ const LayoutAuthClient = () => {
         <div className='container flex flex-wrap justify-center md:justify-between items-center gap-4 px-4'>
           <Link
             to={'/'}
-            className='font-[500] hover:text-[#2F57EF] text-sm md:text-base text-center md:text-left'
+            className='font-[500] hover:text-[#2F57EF] text-sm md:text-base text-center md:text-left uppercase'
           >
-            LUXUES STORE / CỦA HÀNG THỜI TRANG ĐẸP - RẺ - CHẤT
+            Luxues store / CỦA HÀNG THỜI TRANG ĐẸP - RẺ - CHẤT
           </Link>
           <Link
             to={'/help'}

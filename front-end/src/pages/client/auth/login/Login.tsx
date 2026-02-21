@@ -24,7 +24,7 @@ const LoginClient = () => {
       </Backdrop>
       <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-[70px] p-8 md:p-[70px] mt-[40px] mb-[80px] bg-[#96D5FE]">
         <div className='flex flex-col gap-[10px] text-center text-[20px] mb-8 md:mb-0'>
-          <div className='font-[600]'>LUXUES STORE</div>
+          <div className='font-[600] uppercase'>Luxues store</div>
           <div>Shop thời trang được yêu thích nhất tại Việt Nam</div>
         </div>
 
@@ -90,7 +90,7 @@ const LoginClient = () => {
               <span>Đăng nhập bằng Google</span>
             </a>
             <div className="flex items-center justify-center gap-[5px]">
-              <p className='text-[15px]'>Bạn mới biết đến LUXUES STORE?</p>
+              <p className='text-[15px] uppercase'>Bạn mới biết đến Luxues store?</p>
               <Link
                 to={'/user/register'}
                 className='text-[#525FE1] font-[600] hover:underline'
