@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState, type FormEvent } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailOrderAPI, fetchEditEstimatedConfirmedDay, fetchEditEstimatedDeliveryDay } from '~/apis/admin/order.api'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { OrderDetailInterface, OrderInfoInterface } from '~/interfaces/order.interface'
+import type { OrderInfoInterface } from '~/interfaces/order.interface'
 
 export const useDetail = () => {
   const [orderDetail, setOrderDetail] = useState<OrderInfoInterface | null>(null)
@@ -11,16 +13,30 @@ export const useDetail = () => {
   const id = params.id as string
   const { role } = useAuth()
   const { dispatchAlert } = useAlertContext()
+  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
-    fetchDetailOrderAPI(id)
-      .then((response: OrderDetailInterface) => {
-        setOrderDetail(response.order)
-      })
-  }, [id])
 
-  const handleSubmitDeliveryDay = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    const fetchData = async () => {
+      try {
+        const res = await fetchDetailOrderAPI(id)
+        setOrderDetail(res.order)
+      } catch (error) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đã xảy ra lỗi khi tải dữ liệu đơn hàng!', severity: 'error' }
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [dispatchAlert, id])
+
+  const handleSubmitDeliveryDay = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!orderDetail || !id) return
     const estimatedDeliveryDay = e.currentTarget.estimatedDeliveryDay.value
@@ -35,12 +51,11 @@ export const useDetail = () => {
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }
       })
-      // 4. Cập nhật state để UI thay đổi ngay lập tức
       setOrderDetail({ ...orderDetail, estimatedDeliveryDay: estimatedDeliveryDay })
     }
   }
 
-  const handleSubmitConfirmedDay = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmitConfirmedDay = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!orderDetail || !id) return
     const estimatedConfirmedDay = e.currentTarget.estimatedConfirmedDay.value
@@ -60,12 +75,13 @@ export const useDetail = () => {
     }
   }
 
-
   return {
     orderDetail,
     id,
     role,
     handleSubmitConfirmedDay,
-    handleSubmitDeliveryDay
+    handleSubmitDeliveryDay,
+    navigate,
+    isLoading
   }
 }

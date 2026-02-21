@@ -54,7 +54,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
 
   const handleChangeStatus = async (id: string, newStatus: OrderStatus): Promise<void> => {
 
-    const response = await fetchChangeStatusAPI(newStatus, id)
+    const response = await fetchChangeStatusAPI(newStatus.toLowerCase(), id)
     if (response.code === 200) {
       const updatedOrder = response
       const updatedAllOrders = (stateOrder.allOrders ?? []).map(order =>
