@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { fetchStatisticAPI } from '~/apis/admin/statistic.api'
-import type { StatisticInterface } from '~/interfaces/statistic.interface'
 import type { ChartData } from 'chart.js'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 type AnyChartData =
   | ChartData<'line'>
@@ -10,6 +10,7 @@ type AnyChartData =
   | ChartData<'doughnut'>
 
 export const useStatistic = () => {
+  const navigate = useNavigate()
   const [statistic, setStatistic] = useState({
     user: {
       total: 0
@@ -33,7 +34,7 @@ export const useStatistic = () => {
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
-        const res: StatisticInterface = await fetchStatisticAPI()
+        const res = await fetchStatisticAPI()
         setStatistic(res.statistic)
         if (res && res.labels && res.data) {
           setChartData({
@@ -61,6 +62,7 @@ export const useStatistic = () => {
   return {
     statistic,
     chartData,
-    role
+    role,
+    navigate
   }
 }
