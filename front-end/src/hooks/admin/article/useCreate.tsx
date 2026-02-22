@@ -77,8 +77,10 @@ export const useCreate = () => {
       formData.append('title', data.title)
       formData.append('article_category_id', data.article_category_id)
       formData.append('featured', data.featured)
+
       formData.append('descriptionShort', data.descriptionShort || '')
       formData.append('descriptionDetail', data.descriptionDetail || '')
+
       formData.append('status', data.status)
 
       if (data.thumbnail instanceof File) {

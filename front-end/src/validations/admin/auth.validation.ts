@@ -5,7 +5,8 @@ export const loginSchema = z.object({
     .trim()
     .lowercase()
     .min(1, 'Vui lòng nhập email!')
-    .pipe(z.email('Email không hợp lệ')),
+    .pipe(z.email('Email không hợp lệ!')),
+
   password: z.string()
     .min(1, 'Vui lòng nhập mật khẩu!')
 })

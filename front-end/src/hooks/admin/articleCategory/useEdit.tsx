@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { fetchDetailArticleCategoryAPI, fetchEditArticleCategoryAPI } from '~/apis/admin/articleCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useArticleCategoryContext } from '~/contexts/admin/ArticleCategoryContext'
-import type { ArticleCategoryDetailInterface } from '~/interfaces/articleCategory.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { editArticleCategorySchema, type EditArticleCategoryFormData } from '~/validations/admin/articleCategory.validation'
 import { singleFileValidator } from '~/validations/validators/validators'
@@ -104,7 +103,7 @@ export const useEdit = () => {
     setThumbnailFile(file)
     setThumbnailPreview(imageUrl)
     setValue('thumbnail', file)
-    // trigger('thumbnail')
+    trigger('thumbnail')
   }
 
   const onSubmit = async (data: EditArticleCategoryFormData): Promise<void> => {

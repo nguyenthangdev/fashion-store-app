@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const createArticleSchema = z.object({
   title: z.string()
     .trim()
-    .min(1, 'Tiêu đề là bắt buộc!')
+    .min(1, 'Vui lòng nhập tiêu đề!')
     .max(200, 'Tiêu đề không được quá 200 ký tự!')
     .transform((val) => val.replace(/\s+/g, ' ')),
 

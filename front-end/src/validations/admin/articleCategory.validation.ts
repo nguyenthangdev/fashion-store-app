@@ -3,11 +3,12 @@ import { z } from 'zod'
 export const createArticleCategorySchema = z.object({
   title: z.string()
     .trim()
-    .min(1, 'Tiêu đề là bắt buộc')
-    .max(100, 'Tiêu đề không được quá 100 ký tự')
+    .min(1, 'Vui lòng nhập tiêu đề!')
+    .max(100, 'Tiêu đề không được quá 100 ký tự!')
     .transform((val) => val.replace(/\s+/g, ' ')),
 
   parent_id: z.string()
+    .trim()
     .optional(),
 
   descriptionShort: z.string()
@@ -23,7 +24,7 @@ export const createArticleCategorySchema = z.object({
   }),
 
   thumbnail: z.any()
-    .refine((val) => val !== null && val !== '', 'Vui lòng chọn ảnh đại diện')
+    .refine((val) => val !== null && val !== '', 'Vui lòng chọn ảnh đại diện!')
 })
 
 export type CreateArticleCategoryFormData = z.infer<typeof createArticleCategorySchema>
@@ -31,8 +32,8 @@ export type CreateArticleCategoryFormData = z.infer<typeof createArticleCategory
 export const editArticleCategorySchema = z.object({
   title: z.string()
     .trim()
-    .min(1, 'Tiêu đề là bắt buộc')
-    .max(100, 'Tiêu đề không được quá 100 ký tự')
+    .min(1, 'Tiêu đề là bắt buộc!')
+    .max(100, 'Tiêu đề không được quá 100 ký tự!')
     .transform((val) => val.replace(/\s+/g, ' ')),
 
   parent_id: z.string()
@@ -51,7 +52,7 @@ export const editArticleCategorySchema = z.object({
   }),
 
   thumbnail: z.any()
-    .refine((val) => val !== null && val !== '', 'Vui lòng chọn ảnh đại diện')
+    .refine((val) => val !== null && val !== '', 'Vui lòng chọn ảnh đại diện!')
 })
 
 export type EditArticleCategoryFormData = z.infer<typeof editArticleCategorySchema>

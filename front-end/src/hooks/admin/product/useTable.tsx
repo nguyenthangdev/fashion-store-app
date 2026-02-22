@@ -54,7 +54,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
 
   const handleToggleStatus = async (id: string, currentStatus: string): Promise<void> => {
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusAPI(newStatus, id)
+    const response = await fetchChangeStatusAPI(newStatus.toLowerCase(), id)
     if (response.code === 200) {
       const updateProduct = response
       const updatedAllProducts = stateProduct.allProducts.map(product =>

@@ -3,22 +3,22 @@ import { z } from 'zod'
 export const editMyAccountSchema = z.object({
   fullName: z.string()
     .trim()
-    .min(1, 'Họ và tên là bắt buộc')
-    .max(50, 'Họ và tên không được quá 50 ký tự')
+    .min(1, 'Họ và tên là bắt buộc!')
+    .max(50, 'Họ và tên không được quá 50 ký tự!')
     .transform((val) => val.replace(/\s+/g, ' ')), // Có dấu cách ở khoảng giữa quá nhiều sẽ đc đưa về chỉ 1 khoảng cách thôi.
 
   email: z.string()
     .trim()
     .lowercase()
-    .min(1, 'Email là bắt buộc')
-    .pipe(z.email('Email không hợp lệ')),
+    .min(1, 'Email là bắt buộc!')
+    .pipe(z.email('Email không hợp lệ!')),
 
   phone: z.string()
     .trim()
-    .min(1, 'Số điện thoại là bắt buộc')
+    .min(1, 'Số điện thoại là bắt buộc!')
     .refine(
       val => /^(0[35789]\d{8}|\+84[35789]\d{8})$/.test(val),
-      { message: 'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 03/05/07/08/09 hoặc +84)' }
+      { message: 'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 03/05/07/08/09 hoặc +84)!' }
     ),
 
   password: z.string()

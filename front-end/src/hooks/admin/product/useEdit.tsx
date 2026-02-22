@@ -5,12 +5,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailProductAPI, fetchEditProductAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryContext'
-import type { ProductDetailInterface } from '~/interfaces/product.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { availableColors, availableSizes } from '~/utils/constants'
 import { editProductSchema, type EditProductFormData } from '~/validations/admin/product.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useEdit = () => {
   const params = useParams()
@@ -27,12 +27,12 @@ export const useEdit = () => {
   const [tempSelectedColors, setTempSelectedColors] = useState<{
     name: string
     code: string
-    images: (File | string)[]
-      }[]>([])
+    images: (File | string)[]}[]>([])
+
   const [tempSelectedSizes, setTempSelectedSizes] = useState<string[]>([])
 
   // Refs
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const colorFileInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null) // Lưu File object gốc
@@ -40,7 +40,7 @@ export const useEdit = () => {
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     setValue,
@@ -50,15 +50,15 @@ export const useEdit = () => {
     resolver: zodResolver(editProductSchema),
     defaultValues: {
       title: '',
-      description: '',
       product_category_id: '',
       featured: '1',
-      status: 'ACTIVE',
+      description: '',
       price: 0,
       discountPercentage: 0,
       stock: 1,
       colors: [],
       sizes: [],
+      status: 'ACTIVE',
       thumbnail: null
     }
   })
@@ -72,20 +72,20 @@ export const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const data: ProductDetailInterface = await fetchDetailProductAPI(id)
-        const product = data.product
+        const res = await fetchDetailProductAPI(id)
+        const product = res.product
 
         // Reset form với data từ API
         reset({
           title: product.title,
           product_category_id: product.product_category_id,
           featured: product.featured,
-          description: product.description || '',
+          description: product.description,
           price: product.price,
-          discountPercentage: product.discountPercentage || 0,
+          discountPercentage: product.discountPercentage,
           stock: product.stock,
-          colors: product.colors || [],
-          sizes: product.sizes || [],
+          colors: product.colors,
+          sizes: product.sizes,
           status: product.status,
           thumbnail: product.thumbnail
         })
@@ -108,35 +108,38 @@ export const useEdit = () => {
     fetchData()
   }, [id, reset, dispatchAlert])
 
-  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      // Cleanup old preview nếu là blob URL
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview?.startsWith('blob:')) {
         URL.revokeObjectURL(thumbnailPreview)
       }
-
-      setThumbnailFile(file)
-      setThumbnailPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
-      trigger('thumbnail')
     }
+  }, [thumbnailPreview])
+
+  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+    if (!file) return
+
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+    const imageUrl = URL.createObjectURL(file)
+
+    setThumbnailFile(file)
+    setThumbnailPreview(imageUrl)
+    setValue('thumbnail', file)
+    trigger('thumbnail')
   }
 
   // Phần xỬ lý colors
@@ -184,32 +187,31 @@ export const useEdit = () => {
 
   const handleAddImagesToColor = (colorIndex: number, event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files) {
-      const newFiles = Array.from(files)
+    if (!files) return
 
-      // Validate
-      for (const file of newFiles) {
-        if (file.size > 5 * 1024 * 1024) {
-          dispatchAlert({
-            type: 'SHOW_ALERT',
-            payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-          })
-          return
-        }
-        if (!file.type.startsWith('image/')) {
-          dispatchAlert({
-            type: 'SHOW_ALERT',
-            payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-          })
-          return
-        }
+    const newFiles = Array.from(files)
+
+    for (const file of newFiles) {
+      const newFile = {
+        name: file?.name || '',
+        size: file?.size || 0,
+        type: file?.type || ''
       }
+      const error = singleFileValidator(newFile)
 
-      const newColors = [...watchedColors]
-      const updatedImages = (newColors[colorIndex].images || []).concat(newFiles)
-      newColors[colorIndex] = { ...newColors[colorIndex], images: updatedImages }
-      setValue('colors', newColors)
+      if (error) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: error, severity: 'error' }
+        })
+        return
+      }
     }
+
+    const newColors = [...watchedColors]
+    const updatedImages = (newColors[colorIndex].images || []).concat(newFiles)
+    newColors[colorIndex] = { ...newColors[colorIndex], images: updatedImages }
+    setValue('colors', newColors)
   }
 
   const handleRemoveImageFromColor = (colorIndex: number, imageIndex: number) => {
@@ -276,7 +278,6 @@ export const useEdit = () => {
   }
   // Hết Phần xử lý sizes
 
-  // ===== SUBMIT =====
   const onSubmit = async (data: EditProductFormData): Promise<void> => {
     // Validate mỗi màu phải có ít nhất 1 ảnh
     const hasColorWithoutImages = data.colors.some(
@@ -306,8 +307,22 @@ export const useEdit = () => {
     }
 
     // Xử lý ảnh theo màu: phân biệt ảnh cũ (string) và ảnh mới (File)
+    let isImageLargerThan15 = false
     data.colors.forEach(color => {
       const colorPayload = { name: color.name, code: color.code, images: [] as string[] }
+
+      if (color.images.length > 15) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: {
+            message: 'Số lượng ảnh không được vượt quá 15 ảnh. Vui lòng chọn lại!',
+            severity: 'error'
+          }
+        })
+        isImageLargerThan15 = true
+        return
+      }
+
       if (color.images && Array.isArray(color.images)) {
         color.images.forEach(image => {
           if (image instanceof File) {
@@ -321,6 +336,8 @@ export const useEdit = () => {
       }
       productDataPayload.colors.push(colorPayload)
     })
+
+    if (isImageLargerThan15) return
 
     // Gắn files và data vào FormData
     filesToUpload.forEach(file => formData.append('files', file))
@@ -343,20 +360,20 @@ export const useEdit = () => {
     }
   }
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    inputRef: React.RefObject<HTMLInputElement | null>
-  ) => {
-    event.preventDefault()
-    inputRef.current?.click()
-  }
+  // const handleClick = (
+  //   event: React.MouseEvent<HTMLButtonElement>,
+  //   inputRef: React.RefObject<HTMLInputElement | null>
+  // ) => {
+  //   event.preventDefault()
+  //   inputRef.current?.click()
+  // }
 
   return {
     isLoading,
     allProductCategories,
-    uploadImageInputRef,
+    // uploadImageInputRef,
     colorFileInputRefs,
-    handleSubmit: handleSubmitForm(onSubmit),
+    handleSubmit,
     role,
     handleRemoveColor,
     handleRemoveSize,
@@ -364,7 +381,7 @@ export const useEdit = () => {
     handleThumbnailChange,
     handleAddImagesToColor,
     handleRemoveImageFromColor,
-    handleClick,
+    // handleClick,
     showPopupSize,
     showPopupColor,
     availableSizes,
@@ -390,6 +407,8 @@ export const useEdit = () => {
     setValue,
     watch,
     colors: watchedColors,
-    sizes: watchedSizes
+    sizes: watchedSizes,
+    navigate,
+    onSubmit
   }
 }

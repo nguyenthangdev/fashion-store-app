@@ -69,7 +69,13 @@ const EditBrand = () => {
             Đổi Logo
             <input type="file" hidden accept="image/*" onChange={handleImageChange} />
           </Button>
-          {preview && <img src={preview} alt="Logo preview" className="w-32 h-32 object-contain mt-4 border" />}
+          {preview &&
+            <img
+              src={preview}
+              alt="Logo preview"
+              className="w-32 h-32 object-contain mt-4 border"
+            />
+          }
         </div>
         <div className="flex gap-4">
           <Button type="submit" variant="contained" color="primary">Cập nhật</Button>

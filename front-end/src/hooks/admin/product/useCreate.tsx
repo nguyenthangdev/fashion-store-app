@@ -1,5 +1,4 @@
-
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchCreateProductAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -8,7 +7,8 @@ import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { availableColors, availableSizes } from '~/utils/constants'
-import { productSchema, type ProductFormData } from '~/validations/admin/product.validation'
+import { createProductSchema, type CreateProductFormData } from '~/validations/admin/product.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useCreate = () => {
   const { stateProductCategory } = useProductCategoryContext()
@@ -19,15 +19,19 @@ export const useCreate = () => {
 
   const [showPopupSize, setShowPopupSize] = useState(false)
   const [showPopupColor, setShowPopupColor] = useState(false)
+
+  // State tạm thời để lưu màu được chọn trong popup trước khi xác nhận
   const [tempSelectedColors, setTempSelectedColors] = useState<{
     name: string
     code: string
-    images: (File | string)[]
-      }[]>([])
+    images: (File | string)[]}[]>([])
+
+  // State tạm thời để lưu size được chọn trong popup trước khi xác nhận
   const [tempSelectedSizes, setTempSelectedSizes] = useState<string[]>([])
 
   // Ref cho thumbnail
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+
   // Tạo một mảng ref để quản lý các input file của từng màu
   const colorFileInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -37,81 +41,89 @@ export const useCreate = () => {
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
     watch,
     trigger
-  } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
+  } = useForm<CreateProductFormData>({
+    resolver: zodResolver(createProductSchema),
     defaultValues: {
       title: '',
-      thumbnail: null,
-      status: 'ACTIVE',
+      product_category_id: '',
+      featured: '1',
+      description: '',
       price: 0,
       discountPercentage: 0,
       stock: 1,
-      featured: '1',
-      product_category_id: '',
-      description: '',
       colors: [],
-      sizes: []
+      sizes: [],
+      status: 'ACTIVE',
+      thumbnail: null
     }
   })
 
-  // Watch colors và sizes để validate
+  // Màu đã được chọn rồi
   const watchedColors = watch('colors')
+  // Size đã được chọn rồi
   const watchedSizes = watch('sizes')
 
-  // Hàm xử lý ảnh đại diện
-  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate image size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(thumbnailPreview)
       }
-      // Validate image type
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview) // Giải phóng bộ nhớ
-      setThumbnailFile(file)
-      setThumbnailPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
-      trigger('thumbnail') // Trigger validation
     }
+  }, [thumbnailPreview])
+
+  const handleThumbnailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+    if (!file) return
+
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+    const imageUrl = URL.createObjectURL(file)
+
+    setThumbnailFile(file)
+    setThumbnailPreview(imageUrl)
+    setValue('thumbnail', file)
+    trigger('thumbnail') // Trigger validation
   }
 
   // Phần xử lý màu sắc
+  // Mở popup
   const handleOpenPopupColor = () => {
-    setTempSelectedColors([...watchedColors])
     setShowPopupColor(true)
+    setTempSelectedColors([...watchedColors])
   }
+
   // Đóng popup mà không lưu
   const handleClosePopupColor = () => {
     setShowPopupColor(false)
     setTempSelectedColors([])
   }
 
-  // Toggle chọn/bỏ chọn màu trong popup
+  // Toggle chọn/bỏ màu trong popup
   const handleToggleColor = (color: { code: string, name: string }) => {
     const isSelected = tempSelectedColors.some(c => c.code === color.code)
 
     if (isSelected) {
-      // Bỏ chọn
+      // Bỏ chọn, bỏ color vừa tick ra khỏi tempSelectedColors
       setTempSelectedColors(tempSelectedColors.filter(c => c.code !== color.code))
     } else {
-      // Chọn
+      // Chọn, thêm color vừa tick vào tempSelectedColors
       setTempSelectedColors([...tempSelectedColors, { ...color, images: [] }])
     }
   }
@@ -129,7 +141,7 @@ export const useCreate = () => {
 
   // Lưu màu đã chọn khi ấn nút "Xong"
   const handleConfirmSelectionColors = () => {
-    // Giữ lại images của các màu đã có trước đó
+    // Giữ lại các màu đã có trước đó rồi, nếu chưa có thì thêm mới vào
     const updatedColors = tempSelectedColors.map(tempColor => {
       const existingColor = watchedColors.find(c => c.code === tempColor.code)
       return existingColor ? existingColor : tempColor
@@ -144,40 +156,43 @@ export const useCreate = () => {
   // Hàm xử lý thêm ảnh cho một màu cụ thể
   const handleAddImagesToColor = (colorIndex: number, event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files) {
-      const newFiles = Array.from(files)
-      // Validate each file
-      for (const file of newFiles) {
-        if (file.size > 5 * 1024 * 1024) {
-          dispatchAlert({
-            type: 'SHOW_ALERT',
-            payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-          })
-          return
-        }
-        if (!file.type.startsWith('image/')) {
-          dispatchAlert({
-            type: 'SHOW_ALERT',
-            payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-          })
-          return
-        }
+    if (!files) return
+
+    const newFiles = Array.from(files) // Chuyển về mảng để dùng đc nhiều hàm có sẵn trong Array, ban đầu có dạng FileList (ít hỗ trợ các hàm phụ trợ)
+    // Validate each file
+    for (const file of files) {
+      const newFile = {
+        name: file?.name || '',
+        size: file?.size || 0,
+        type: file?.type || ''
       }
-      const newColors = [...watchedColors]
-      // Lưu trữ File object trực tiếp vào mảng images của màu đó
-      const updatedImages = (newColors[colorIndex].images || []).concat(newFiles)
-      newColors[colorIndex] = { ...newColors[colorIndex], images: updatedImages }
-      setValue('colors', newColors)
+      const error = singleFileValidator(newFile)
+
+      if (error) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: error, severity: 'error' }
+        })
+        return
+      }
     }
+
+    const newColors = [...watchedColors]
+    // Lưu trữ File object trực tiếp vào mảng images của màu đó
+    const updatedImages = (newColors[colorIndex].images || []).concat(newFiles)
+    newColors[colorIndex] = { ...newColors[colorIndex], images: updatedImages }
+    setValue('colors', newColors)
   }
 
-  // Hàm xóa một ảnh khỏi gallery của một màu
+  // xóa 1 ảnh của 1 màu đc chỉ định
   const handleRemoveImageFromColor = (colorIndex: number, imageIndex: number) => {
     const newColors = [...watchedColors]
     const imageToRemove = newColors[colorIndex].images[imageIndex]
+
     if (imageToRemove instanceof File) {
       URL.revokeObjectURL(URL.createObjectURL(imageToRemove))
     }
+
     const newImages = newColors[colorIndex].images.filter((_, idx) => idx !== imageIndex)
     newColors[colorIndex] = { ...newColors[colorIndex], images: newImages }
     setValue('colors', newColors)
@@ -192,10 +207,12 @@ export const useCreate = () => {
   // Hết Phần xử lý màu sắc
 
   // Phần xử lý size
+  // Mở popup
   const handleOpenPopupSize = () => {
     setTempSelectedSizes([...watchedSizes])
     setShowPopupSize(true)
   }
+
   // Đóng popup mà không lưu
   const handleClosePopupSize = () => {
     setShowPopupSize(false)
@@ -234,6 +251,7 @@ export const useCreate = () => {
     setTempSelectedSizes([])
   }
 
+  // Xóa size sau khi đã chọn
   const handleRemoveSize = (indexToRemove: number) => {
     const newSizes = watchedSizes.filter((_, index) => index !== indexToRemove)
     setValue('sizes', newSizes)
@@ -241,9 +259,9 @@ export const useCreate = () => {
   }
   // Hết Phần xử lý size
 
-  const onSubmit = async (data: ProductFormData): Promise<void> => {
-    // Validate colors have images
+  const onSubmit = async (data: CreateProductFormData) => {
     const hasColorWithoutImages = data.colors.some(color => !color.images || color.images.length === 0)
+
     if (hasColorWithoutImages) {
       dispatchAlert({
         type: 'SHOW_ALERT',
@@ -251,6 +269,7 @@ export const useCreate = () => {
       })
       return
     }
+
     const formData = new FormData()
     // 1. Chuẩn bị dữ liệu và tập hợp các file cần upload
     const filesToUpload: File[] = []
@@ -269,8 +288,22 @@ export const useCreate = () => {
     }
 
     // Xử lý ảnh theo từng màu
+    let isImageLargerThan15 = false
     data.colors.forEach(color => {
       const colorPayload = { name: color.name, code: color.code, images: [] as string[] }
+
+      if (color.images.length > 15) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: {
+            message: 'Số lượng ảnh không được vượt quá 15 ảnh. Vui lòng chọn lại!',
+            severity: 'error'
+          }
+        })
+        isImageLargerThan15 = true
+        return
+      }
+
       if (color.images && Array.isArray(color.images)) {
         (color.images).forEach(image => {
           if (image instanceof File) {
@@ -283,11 +316,14 @@ export const useCreate = () => {
       productDataPayload.colors.push(colorPayload)
     })
 
+    if (isImageLargerThan15) return
+
     // 2. Gắn dữ liệu vào FormData
     // Gắn tất cả các file ảnh vào MỘT trường duy nhất là 'files'
     filesToUpload.forEach(file => {
       formData.append('files', file)
     })
+
     // Gắn tất cả các thông tin còn lại vào MỘT trường 'productData' dưới dạng JSON
     formData.append('productData', JSON.stringify(productDataPayload))
 
@@ -308,16 +344,17 @@ export const useCreate = () => {
       })
     }
   }
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, inputRef: React.RefObject<HTMLInputElement | null>) => {
-    event.preventDefault()
-    inputRef.current?.click()
-  }
+
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>, inputRef: React.RefObject<HTMLInputElement | null>) => {
+  //   event.preventDefault()
+  //   inputRef.current?.click()
+  // }
 
   return {
     allProductCategories,
-    uploadImageInputRef,
     colorFileInputRefs,
-    handleSubmit: handleSubmitForm(onSubmit),
+    handleSubmit,
+    onSubmit,
     role,
     handleRemoveColor,
     handleRemoveSize,
@@ -325,7 +362,6 @@ export const useCreate = () => {
     handleThumbnailChange,
     handleAddImagesToColor,
     handleRemoveImageFromColor,
-    handleClick,
     showPopupSize,
     showPopupColor,
     availableSizes,
@@ -350,6 +386,7 @@ export const useCreate = () => {
     setValue,
     watch,
     colors: watchedColors,
-    sizes: watchedSizes
+    sizes: watchedSizes,
+    navigate
   }
 }
