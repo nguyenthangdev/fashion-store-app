@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchChangeMultiAPI } from '~/apis/admin/productCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryContext'
@@ -16,6 +16,7 @@ export const useProductCategory = () => {
   const [actionType, setActionType] = useState('')
   const [open, setOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   // Parse URL params một lần
   const urlParams = useMemo(() => ({
@@ -149,6 +150,7 @@ export const useProductCategory = () => {
     role,
     handleConfirmDeleteAll,
     handleClose,
-    open
+    open,
+    navigate
   }
 }

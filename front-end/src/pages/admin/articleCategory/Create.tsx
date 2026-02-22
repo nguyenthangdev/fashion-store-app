@@ -1,7 +1,7 @@
 import { Editor } from '@tinymce/tinymce-react'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import SelectTree from '~/components/admin/tableTree/SelectTreeArticle'
+import SelectTreeArticle from '~/components/admin/tableTree/SelectTreeArticle'
 import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 import { useCreate } from '~/hooks/admin/articleCategory/useCreate'
 import { API_KEY } from '~/utils/constants'
@@ -69,17 +69,15 @@ const CreateArticleCategory = () => {
             className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
           >
             <option value="">-- Chọn danh mục --</option>
-            {allArticleCategories?.length > 0 && (
-              allArticleCategories.map(articleCategory => (
-                <SelectTree
-                  key={articleCategory._id}
-                  articleCategory={articleCategory}
-                  level={1}
-                  allArticleCategories={allArticleCategories}
-                  parent_id={''}
-                />
-              ))
-            )}
+            {allArticleCategories?.map(articleCategory => (
+              <SelectTreeArticle
+                key={articleCategory._id}
+                articleCategory={articleCategory}
+                level={1}
+                // allArticleCategories={allArticleCategories}
+                // parent_id={''}
+              />
+            ))}
           </select>
         </div>
 
@@ -92,7 +90,11 @@ const CreateArticleCategory = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionShort')}
-            onEditorChange={(newValue) => setValue('descriptionShort', newValue)}
+            onEditorChange={(newValue) => setValue(
+              'descriptionShort',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionShort"
           />
         </div>
@@ -106,7 +108,11 @@ const CreateArticleCategory = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionDetail')}
-            onEditorChange={(newValue) => setValue('descriptionDetail', newValue)}
+            onEditorChange={(newValue) => setValue(
+              'descriptionDetail',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionDetail"
           />
         </div>
@@ -126,7 +132,9 @@ const CreateArticleCategory = () => {
             // type="button"
             // onClick={handleClick}
             htmlFor='thumbnail-upload'
-            className="bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white"
+            className={`bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white ${
+              errors.thumbnail ? 'border-red-500' : ''
+            }`}
           >
             Chọn ảnh
           </label>

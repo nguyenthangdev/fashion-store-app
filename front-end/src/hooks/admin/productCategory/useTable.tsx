@@ -46,7 +46,7 @@ export const useTable = ({ selectedIds, setSelectedIds }: Props) => {
     //   updatedAt: new Date()
     // }
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusWithChildren(newStatus, id)
+    const response = await fetchChangeStatusWithChildren(newStatus.toLowerCase(), id)
     // const updatedAllProductsCategory = stateProductCategory.allProductCategories.map(productCategory =>
     //   productCategory._id === id
     //     ? { ...productCategory, status: newStatus, updatedBy: [...(productCategory.updatedBy || []), currentUser] }

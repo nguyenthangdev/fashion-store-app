@@ -230,12 +230,13 @@ const EditProduct = () => {
         <div className="flex flex-col gap-2">
           <label>Ảnh đại diện <span className="text-red-500">*</span></label>
           <input
-            onChange={handleThumbnailChange}
+            {...register('thumbnail')}
             // ref={uploadImageInputRef}
             type="file"
             id="thumbnail-upload"
             className='hidden'
             accept="image/*"
+            onChange={handleThumbnailChange}
           />
           {/* <button
             type="button"

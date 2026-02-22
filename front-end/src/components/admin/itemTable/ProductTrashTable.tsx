@@ -30,7 +30,8 @@ const ProductTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     handleRecover,
     handlePermanentlyDelete,
-    pagination
+    pagination,
+    role
   } = useTrashTable({ selectedIds, setSelectedIds })
 
   if (isLoading) {
@@ -217,20 +218,23 @@ const ProductTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
                     </TableCell>
                     <TableCell align='center' sx={{ padding: '6px 0px' }}>
                       <>
-                        <button
-                          onClick={() => handleRecover(product._id ?? '')}
-                          className='nav-link border rounded-[5px] bg-[#525FE1] p-[5px] text-white'
-                        >
-                          Khôi phục
-                        </button>
-                        <button
-                          onClick={() => handleOpenPermanentlyDelete(product._id ?? '')}
-                          className='border rounded-[5px] bg-[#BC3433] p-[5px] text-white'
-                        >
-                          Xóa vĩnh viễn
-                        </button>
+                        {role && role.permissions.includes('products-trash_delete') && (
+                          <button
+                            onClick={() => handleRecover(product._id ?? '')}
+                            className='nav-link border rounded-[5px] bg-[#525FE1] p-[5px] text-white'
+                          >
+                            Khôi phục
+                          </button>
+                        )}
+                        {role && role.permissions.includes('products-trash_delete') && (
+                          <button
+                            onClick={() => handleOpenPermanentlyDelete(product._id ?? '')}
+                            className='border rounded-[5px] bg-[#BC3433] p-[5px] text-white'
+                          >
+                            Xóa vĩnh viễn
+                          </button>
+                        )}
                       </>
-
                     </TableCell>
                   </TableRow>
                 ))}

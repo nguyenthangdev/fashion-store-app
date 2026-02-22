@@ -94,13 +94,13 @@ const CreateAccount = () => {
             // ref={uploadImageInputRef}
             {...register('avatar')}
             type="file"
-            id="avatar"
+            id="avatar-upload"
             className="hidden"
             accept="image/*"
             onChange={handleImageChange}
           />
           <label
-            htmlFor="avatar"
+            htmlFor="avatar-upload"
             className="bg-[#9D9995] font-[500] border rounded-[5px] w-[5%] py-[4px] text-[14px] text-center cursor-pointer"
           >
               Chọn ảnh

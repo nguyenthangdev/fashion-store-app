@@ -21,7 +21,7 @@ export const useEdit = () => {
   const navigate = useNavigate()
   const { role } = useAuth()
 
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
@@ -106,7 +106,7 @@ export const useEdit = () => {
     trigger('thumbnail')
   }
 
-  const onSubmit = async (data: EditArticleCategoryFormData): Promise<void> => {
+  const onSubmit = async (data: EditArticleCategoryFormData) => {
     const formData = new FormData()
 
     formData.append('title', data.title)
@@ -141,27 +141,24 @@ export const useEdit = () => {
     }
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     isLoading,
     allArticleCategories,
-    uploadImageInputRef,
     thumbnailPreview,
     handleThumbnailChange,
-    handleClick,
     handleSubmit,
-    onSubmit,
     role,
-    // React Hook Form
     register,
     errors,
     isSubmitting,
     setValue,
     watch,
-    navigate
+    navigate,
+    onSubmit
   }
 }

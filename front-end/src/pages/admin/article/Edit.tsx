@@ -1,7 +1,7 @@
 import { Editor } from '@tinymce/tinymce-react'
 import { API_KEY } from '~/utils/constants'
 import { useEdit } from '~/hooks/admin/article/useEdit'
-import SelectTree from '~/components/admin/tableTree/SelectTreeArticle'
+import SelectTreeArticle from '~/components/admin/tableTree/SelectTreeArticle'
 import Skeleton from '@mui/material/Skeleton'
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
@@ -105,18 +105,16 @@ const EditArticle = () => {
             className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
             defaultValue={watch('article_category_id')}
           >
-            <option value="">-- Chọn danh mục --</option>
-            {allArticleCategories?.length > 0 && (
-              allArticleCategories.map(articleCategory => (
-                <SelectTree
-                  key={articleCategory._id}
-                  articleCategory={articleCategory}
-                  level={1}
-                  allArticleCategories={allArticleCategories}
-                  parent_id={watch('article_category_id')}
-                />
-              ))
-            )}
+            <option value=""> -- Chọn danh mục -- </option>
+            {allArticleCategories?.map(articleCategory => (
+              <SelectTreeArticle
+                key={articleCategory._id}
+                articleCategory={articleCategory}
+                level={1}
+                // allArticleCategories={allArticleCategories}
+                // parent_id={watch('article_category_id')}
+              />
+            ))}
           </select>
           <FieldErrorAlert errors={errors} fieldName='article_category_id'/>
         </div>
@@ -157,7 +155,11 @@ const EditArticle = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionShort')}
-            onEditorChange={(newValue) => setValue('descriptionShort', newValue)}
+            onEditorChange={(newValue) => setValue(
+              'descriptionShort',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionShort"
           />
         </div>
@@ -171,7 +173,11 @@ const EditArticle = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionDetail')}
-            onEditorChange={(newValue) => setValue('descriptionDetail', newValue)}
+            onEditorChange={(newValue) => setValue(
+              'descriptionDetail',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionDetail"
           />
         </div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchChangeMultiTrashAPI } from '~/apis/admin/product.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useAuth } from '~/contexts/admin/AuthContext'
@@ -16,6 +16,7 @@ export const useProductTrash = () => {
   const [open, setOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
   const { role } = useAuth()
+  const navigate = useNavigate()
 
   // Parse URL params một lần
   const urlParams = useMemo(() => ({
@@ -142,6 +143,7 @@ export const useProductTrash = () => {
     open,
     handleClose,
     handleConfirmDeleteAll,
-    role
+    role,
+    navigate
   }
 }

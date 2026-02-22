@@ -3,17 +3,16 @@ import type { ArticleCategoryInfoInterface } from '~/interfaces/articleCategory.
 interface Props {
   articleCategory: ArticleCategoryInfoInterface
   level: number
-  allArticleCategories: ArticleCategoryInfoInterface[]
-  parent_id: string
+  // allArticleCategories: ArticleCategoryInfoInterface[]
+  // parent_id: string
 }
 
-const SelectTreeArticle = ({ articleCategory, level, allArticleCategories, parent_id }: Props) => {
+const SelectTreeArticle = ({ articleCategory, level }: Props) => {
   const prefix = '- '.repeat(level)
   return (
     <>
       <option
         value={articleCategory._id}
-        selected={parent_id === articleCategory._id}
       >
         {prefix}{articleCategory.title}
       </option>
@@ -22,8 +21,6 @@ const SelectTreeArticle = ({ articleCategory, level, allArticleCategories, paren
           key={child._id}
           articleCategory={child}
           level={level + 1}
-          allArticleCategories={allArticleCategories}
-          parent_id={parent_id}
         />
       ))}
     </>

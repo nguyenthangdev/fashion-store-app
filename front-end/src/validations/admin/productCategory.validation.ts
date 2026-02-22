@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const productCategorySchema = z.object({
+export const createProductCategorySchema = z.object({
   title: z.string()
     .trim()
     .min(1, 'Tiêu đề là bắt buộc')
@@ -21,7 +21,7 @@ export const productCategorySchema = z.object({
     .refine((val) => val !== null && val !== '', 'Vui lòng chọn ảnh đại diện')
 })
 
-export type ProductCategoryFormData = z.infer<typeof productCategorySchema>
+export type CreateProductCategoryFormData = z.infer<typeof createProductCategorySchema>
 
 export const editProductCategorySchema = z.object({
   title: z.string()

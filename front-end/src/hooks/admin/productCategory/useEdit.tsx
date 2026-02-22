@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailProductCategoryAPI, fetchEditProductCategoryAPI } from '~/apis/admin/productCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryContext'
-import type { ProductCategoryDetailInterface } from '~/interfaces/productCategory.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { editProductCategorySchema, type EditProductCategoryFormData } from '~/validations/admin/productCategory.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useEdit = () => {
   const params = useParams()
@@ -21,14 +21,13 @@ export const useEdit = () => {
   const navigate = useNavigate()
   const { role } = useAuth()
 
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
-  const [originalThumbnail, setOriginalThumbnail] = useState<string | null>(null)
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     setValue,
@@ -51,7 +50,7 @@ export const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const response: ProductCategoryDetailInterface = await fetchDetailProductCategoryAPI(id)
+        const response = await fetchDetailProductCategoryAPI(id)
         const category = response.productCategory
 
         reset({
@@ -63,12 +62,11 @@ export const useEdit = () => {
         })
 
         setThumbnailPreview(category.thumbnail)
-        setOriginalThumbnail(category.thumbnail)
       } catch (error) {
         dispatchAlert({
           type: 'SHOW_ALERT',
           payload: {
-            message: 'Không thể tải thông tin danh mục. Vui lòng thử lại!',
+            message: 'Không thể tải thông tin danh mục sản phẩm. Vui lòng thử lại!',
             severity: 'error'
           }
         })
@@ -89,39 +87,32 @@ export const useEdit = () => {
     }
   }, [thumbnailPreview])
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate file size
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+    if (!file) return
 
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      // Cleanup old blob
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(thumbnailPreview)
-      }
-
-      setThumbnailFile(file)
-      setThumbnailPreview(URL.createObjectURL(file))
-      setValue('thumbnail', file)
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
     }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+    const imageUrl = URL.createObjectURL(file)
+
+    setThumbnailFile(file)
+    setThumbnailPreview(imageUrl)
+    setValue('thumbnail', file)
   }
 
-  const onSubmit = async (data: EditProductCategoryFormData): Promise<void> => {
+  const onSubmit = async (data: EditProductCategoryFormData) => {
     const formData = new FormData()
 
     formData.append('title', data.title)
@@ -132,8 +123,9 @@ export const useEdit = () => {
     // Nếu có file mới, gửi file. Nếu không, giữ URL cũ
     if (thumbnailFile) {
       formData.append('thumbnail', thumbnailFile)
-    } else {
-      formData.append('thumbnail', originalThumbnail || '')
+    } else if (data.thumbnail) {
+      // Giữ URL ảnh cũ
+      formData.append('thumbnail', data.thumbnail)
     }
 
     const response = await fetchEditProductCategoryAPI(id, formData)
@@ -154,24 +146,26 @@ export const useEdit = () => {
     }
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     isLoading,
     allProductCategories,
-    uploadImageInputRef,
+    // uploadImageInputRef,
     thumbnailPreview,
     handleChange,
-    handleSubmit: handleSubmitForm(onSubmit),
-    handleClick,
+    handleSubmit,
+    onSubmit,
+    // handleClick,
     role,
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate
   }
 }

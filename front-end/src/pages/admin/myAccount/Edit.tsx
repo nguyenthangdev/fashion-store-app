@@ -57,6 +57,7 @@ const EditMyAccount = () => {
         <div className="flex flex-col gap-[10px]">
           <label className="text-[#192335]">Avatar</label>
           <input
+            {...register('avatar')}
             type="file"
             accept="image/*"
             className="hidden"

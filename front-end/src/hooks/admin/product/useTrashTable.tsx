@@ -2,6 +2,7 @@ import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useState } from 'react'
 import { useProductTrashContext } from '~/contexts/admin/ProductTrashContext'
 import { fetchPermanentlyDeleteProductAPI, fetchRecoverProductAPI } from '~/apis/admin/product.api'
+import { useAuth } from '~/contexts/admin/AuthContext'
 
 export interface Props {
   selectedIds: string[],
@@ -14,6 +15,7 @@ export const useTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
   const { dispatchAlert } = useAlertContext()
   const [openPermanentlyDelete, setOpenPermanentlyDelete] = useState(false)
   const [selectedIdPermanentlyDelete, setSelectedIdPermanentlyDelete] = useState<string | null>(null)
+  const { role } = useAuth()
 
   const handleOpenPermanentlyDelete = (id: string) => {
     setSelectedIdPermanentlyDelete(id)
@@ -105,6 +107,7 @@ export const useTrashTable = ({ selectedIds, setSelectedIds }: Props) => {
     isCheckAll,
     handleRecover,
     handlePermanentlyDelete,
-    pagination
+    pagination,
+    role
   }
 }

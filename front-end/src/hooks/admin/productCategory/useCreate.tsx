@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type ChangeEvent } from 'react'
+import { useState, useEffect, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchCreateProductCategoryAPI } from '~/apis/admin/productCategory.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -6,7 +6,8 @@ import { useProductCategoryContext } from '~/contexts/admin/ProductCategoryConte
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { productCategorySchema, type ProductCategoryFormData } from '~/validations/admin/productCategory.validation'
+import { createProductCategorySchema, type CreateProductCategoryFormData } from '~/validations/admin/productCategory.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 export const useCreate = () => {
   const { stateProductCategory } = useProductCategoryContext()
@@ -15,17 +16,17 @@ export const useCreate = () => {
   const { role } = useAuth()
   const navigate = useNavigate()
 
-  const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
+  // const uploadImageInputRef = useRef<HTMLInputElement | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
   const {
     register,
-    handleSubmit: handleSubmitForm,
+    handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
     watch
-  } = useForm<ProductCategoryFormData>({
-    resolver: zodResolver(productCategorySchema),
+  } = useForm<CreateProductCategoryFormData>({
+    resolver: zodResolver(createProductCategorySchema),
     defaultValues: {
       title: '',
       parent_id: '',
@@ -44,39 +45,31 @@ export const useCreate = () => {
     }
   }, [preview])
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-        })
-        return
-      }
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
+    if (!file) return
 
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        dispatchAlert({
-          type: 'SHOW_ALERT',
-          payload: { message: 'Vui lòng chọn file ảnh', severity: 'error' }
-        })
-        return
-      }
-
-      // Cleanup old blob
-      if (preview && preview.startsWith('blob:')) {
-        URL.revokeObjectURL(preview)
-      }
-
-      const imageUrl = URL.createObjectURL(file)
-      setPreview(imageUrl)
-      setValue('thumbnail', file)
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
     }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
+    }
+
+    const imageUrl = URL.createObjectURL(file)
+    setPreview(imageUrl)
+    setValue('thumbnail', file)
   }
 
-  const onSubmit = async (data: ProductCategoryFormData): Promise<void> => {
+  const onSubmit = async (data: CreateProductCategoryFormData) => {
     const formData = new FormData()
 
     formData.append('title', data.title)
@@ -103,23 +96,25 @@ export const useCreate = () => {
     }
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    uploadImageInputRef.current?.click()
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault()
+  //   uploadImageInputRef.current?.click()
+  // }
 
   return {
     allProductCategories,
-    uploadImageInputRef,
+    // uploadImageInputRef,
     preview,
     handleChange,
-    handleSubmit: handleSubmitForm(onSubmit),
-    handleClick,
+    handleSubmit,
+    onSubmit,
+    // handleClick,
     role,
     register,
     errors,
     isSubmitting,
     setValue,
-    watch
+    watch,
+    navigate
   }
 }

@@ -67,18 +67,16 @@ const CreateArticle = () => {
             id="article_category_id"
             className="outline-none border rounded-[5px] border-[#00171F] py-[3px] text-[16px]"
           >
-            <option value="">-- Chọn danh mục --</option>
-            {allArticleCategories?.length > 0 && (
-              allArticleCategories.map(articleCategory => (
-                <SelectTreeArticle
-                  key={articleCategory._id}
-                  articleCategory={articleCategory}
-                  level={1}
-                  allArticleCategories={allArticleCategories}
-                  parent_id={''}
-                />
-              ))
-            )}
+            <option value=""> -- Chọn danh mục -- </option>
+            {allArticleCategories?.map(articleCategory => (
+              <SelectTreeArticle
+                key={articleCategory._id}
+                articleCategory={articleCategory}
+                level={1}
+                // allArticleCategories={allArticleCategories}
+                // parent_id={''}
+              />
+            ))}
           </select>
           <FieldErrorAlert errors={errors} fieldName='article_category_id'/>
         </div>
@@ -119,7 +117,11 @@ const CreateArticle = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionShort')}
-            onEditorChange={newValue => setValue('descriptionShort', newValue, { shouldValidate: true, shouldDirty: true })}
+            onEditorChange={newValue => setValue(
+              'descriptionShort',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionShort"
           />
         </div>
@@ -133,7 +135,11 @@ const CreateArticle = () => {
               toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat'
             }}
             value={watch('descriptionDetail')}
-            onEditorChange={newValue => setValue('descriptionDetail', newValue)}
+            onEditorChange={newValue => setValue(
+              'descriptionDetail',
+              newValue,
+              { shouldValidate: true, shouldDirty: true }
+            )}
             id="descriptionDetail"
           />
         </div>
@@ -144,14 +150,16 @@ const CreateArticle = () => {
             {...register('thumbnail')}
             // ref={uploadImageInputRef}
             type="file"
-            id="thumbnail"
+            id="thumbnail-upload"
             className='hidden'
             accept="image/*"
             onChange={handleThumbnailChange}
           />
           <label
-            htmlFor="thumbnail"
-            className="bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white"
+            htmlFor="thumbnail-upload"
+            className={`bg-gray-400 font-semibold border rounded-md w-fit px-3 py-1 text-sm text-white ${
+              errors.thumbnail ? 'border-red-500' : ''
+            }`}
           >
               Chọn ảnh
           </label>
