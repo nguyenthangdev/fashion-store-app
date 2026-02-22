@@ -217,7 +217,8 @@ export const permissionSections = [
   {
     title: 'Cài đặt chung',
     permissions: [
-      { key: 'settings-general_view', label: 'Xem' }
+      { key: 'settings-general_view', label: 'Xem' },
+      { key: 'settings-general_edit', label: 'Chỉnh sửa' }
     ]
   },
   {

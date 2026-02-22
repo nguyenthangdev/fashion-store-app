@@ -8,21 +8,24 @@ import type { SettingGeneralAPIResponse } from '~/interfaces/setting.interface'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { editSettingsGeneralSchema, type EditSettingGeneralFormData } from '~/validations/admin/setting.validation'
+import { useAuth } from '~/contexts/admin/AuthContext'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 const useEditSettingsGeneral = () => {
   const { dispatchAlert } = useAlertContext()
   const [isLoading, setIsLoading] = useState(true)
   const [preview, setPreview] = useState<string | null>(null)
+  const { role } = useAuth()
 
   const navigate = useNavigate()
   const {
-    register, // Register form fields
-    handleSubmit, // Handle form submission
-    formState: { errors, isSubmitting }, // Form state (errors, isSubmitting, etc.)
-    reset, // Reset form values
-    setValue // Set form field values
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue
   } = useForm<EditSettingGeneralFormData>({
-    resolver: zodResolver(editSettingsGeneralSchema) // Use Zod schema for validation
+    resolver: zodResolver(editSettingsGeneralSchema)
   })
 
   useEffect(() => {
@@ -51,7 +54,6 @@ const useEditSettingsGeneral = () => {
     fetchData()
   }, [reset, dispatchAlert])
 
-  // Cleanup blob URL to prevent memory leak
   useEffect(() => {
     return () => {
       if (preview && preview.startsWith('blob:')) {
@@ -61,33 +63,32 @@ const useEditSettingsGeneral = () => {
   }, [preview])
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0] as File
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: 'Vui lòng chọn một tệp hình ảnh hợp lệ.', severity: 'error' }
-      })
-      return
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
     }
-    if (file.size > 5 * 1024 * 1024) {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: 'Kích thước tệp hình ảnh không được vượt quá 5MB.', severity: 'error' }
-      })
-      return
-    }
+    const error = singleFileValidator(newFile)
 
-    if (preview && preview.startsWith('blob:')) {
-      URL.revokeObjectURL(preview)
+    if (error) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: error, severity: 'error' }
+      })
+      return
     }
+    const imageUrl = URL.createObjectURL(file)
+
     setValue('logo', file)
-    setPreview(URL.createObjectURL(file))
+    setPreview(imageUrl)
   }
   const onSubmit = async (data: EditSettingGeneralFormData) => {
     try {
       const formData = new FormData()
+
       formData.append('websiteName', data.websiteName)
       formData.append('email', data.email)
       formData.append('phone', data.phone)
@@ -97,6 +98,7 @@ const useEditSettingsGeneral = () => {
       if (data.logo instanceof File) {
         formData.append('logo', data.logo)
       }
+
       const response = await fetchEditSettingGeneralAPI(formData)
       if (response.code === 200) {
         dispatchAlert({
@@ -131,7 +133,8 @@ const useEditSettingsGeneral = () => {
     handleImageChange,
     onSubmit,
     preview,
-    navigate
+    navigate,
+    role
   }
 }
 
