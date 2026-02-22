@@ -42,14 +42,12 @@ export const requireAuth = async (
       _id: accountAdmin.role_id,
       deleted: false
     })
-
     if (!role){
       return res.status(StatusCodes.FORBIDDEN).json({ message: 'Không thể xác định quyền tài khoản!' })
     }
 
     req['accountAdmin'] = accountAdmin
     req['accountAdmin.roleName'] = role.titleId
-
     next()
   } catch (error: any) {
     if (error.message?.includes('jwt expired')) {

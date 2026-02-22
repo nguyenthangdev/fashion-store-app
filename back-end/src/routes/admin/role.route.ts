@@ -3,7 +3,7 @@ const router: Router = Router()
 import * as controller from '~/controllers/admin/role.controller'
 import * as validate from '~/validations/admin/role.validation'
 
-router.get('/', controller.index)
+router.get('/', controller.getRoles)
 router.post('/create', validate.createRole, controller.createRole)
 router.patch('/permissions', controller.permissionsPatch)
 router.patch(

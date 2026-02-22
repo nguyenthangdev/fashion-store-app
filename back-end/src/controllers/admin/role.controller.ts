@@ -1,12 +1,13 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as roleService from '~/services/admin/role.service'
+import { roleServices } from '~/services/admin/role.service'
 
 // [GET] /admin/roles
-export const index = async (req: Request, res: Response) => {
+export const getRoles = async (req: Request, res: Response) => {
   try {
-    const { roles, accounts } = await roleService.getRoles()
-
+    const { roles, accounts } = await roleServices.getRoles()
+    console.log('roles: ', roles)
+    console.log('accounts: ', accounts)
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
@@ -24,7 +25,7 @@ export const index = async (req: Request, res: Response) => {
 // [POST] /admin/roles/create
 export const createRole = async (req: Request, res: Response) => {
   try {
-    const roleToObject = await roleService.createRole(req.body)
+    const roleToObject = await roleServices.createRole(req.body)
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
@@ -42,7 +43,7 @@ export const createRole = async (req: Request, res: Response) => {
 // [PATCH] /admin/roles/edit/:id
 export const editRole = async (req: Request, res: Response) => {
   try {
-    await roleService.editRole(req['accountAdmin'].id, req.params.id, req.body)
+    await roleServices.editRole(req['accountAdmin']._id, req.params.id, req.body)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -59,7 +60,7 @@ export const editRole = async (req: Request, res: Response) => {
 // [DELETE] /admin/roles/delete/:id
 export const deleteRole = async (req: Request, res: Response) => {
   try {
-    await roleService.deleteRole(req.params.id, req['accountAdmin'].id)
+    await roleServices.deleteRole(req.params.id, req['accountAdmin']._id)
 
     res.json({
       code: 204,
@@ -76,7 +77,7 @@ export const deleteRole = async (req: Request, res: Response) => {
 // [GET] /admin/roles/detail/:id
 export const detailRole = async (req: Request, res: Response) => {
   try {
-    const role = await roleService.detailRole(req.params.id)
+    const role = await roleServices.detailRole(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -94,7 +95,7 @@ export const detailRole = async (req: Request, res: Response) => {
 // [PATCH] /admin/roles/permissions
 export const permissionsPatch = async (req: Request, res: Response) => {
   try {
-    await roleService.permissionsPatch(req.body.permissions)
+    await roleServices.permissionsPatch(req.body.permissions)
     
     res.status(StatusCodes.OK).json({
       code: 200,
