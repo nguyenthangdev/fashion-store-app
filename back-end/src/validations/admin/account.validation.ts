@@ -24,7 +24,6 @@ export const createAccount = (
     email: Joi.string()
       .trim()
       .required()
-      .min(1)
       .email()
       .lowercase()
       .messages({
@@ -51,7 +50,6 @@ export const createAccount = (
     phone: Joi.string()
       .trim()
       .required()
-      .min(1)
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc!",
@@ -124,13 +122,13 @@ export const editAccountById = (
       .messages({
         "any.required": "Họ tên là bắt buộc!",
         "string.empty": "Họ và tên không được để trống!",
+        "string.min": "Họ và tên chứa ít nhất 3 ký tự!",
         "string.max": "Họ tên không được vượt quá 50 ký tự!"
       }),
     
     email: Joi.string()
       .trim()
       .required()
-      .min(1)
       .email()
       .lowercase()
       .messages({
@@ -156,7 +154,6 @@ export const editAccountById = (
     phone: Joi.string()
       .trim()
       .required()
-      .min(1)
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc!",

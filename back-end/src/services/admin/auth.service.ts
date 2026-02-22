@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { JWTProvider } from '~/providers/jwt.provider'
 import { authRepositories } from '~/repositories/admin/auth.repository'
 
-export const loginAdmin = async (data: any) => {
+const loginAdmin = async (data: any) => {
   const { email, password } = data
 
   const accountAdmin = await authRepositories.findAccountByEmail(email)
@@ -64,7 +64,7 @@ export const loginAdmin = async (data: any) => {
   }
 }
 
-export const refreshTokenAdmin = async (refreshToken: string) => {
+const refreshTokenAdmin = async (refreshToken: string) => {
   if (!refreshToken) {
     return { 
       success: false, 

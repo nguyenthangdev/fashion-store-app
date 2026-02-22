@@ -1,5 +1,3 @@
-import AccountModel from '~/models/account.model'
-import RoleModel from '~/models/role.model'
 import bcrypt from 'bcrypt'
 import { MyAccountInterface } from '~/interfaces/admin/myAccount.interface'
 import { myAccountRepositories } from '~/repositories/admin/myAccount.repository'

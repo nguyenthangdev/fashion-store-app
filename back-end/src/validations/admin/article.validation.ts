@@ -10,7 +10,6 @@ export const createArticle = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(200)
       .messages({
         'any.required': 'Tiêu đề là bắt buộc!',
@@ -21,7 +20,6 @@ export const createArticle = (
     article_category_id: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
         'any.required': 'Danh mục là bắt buộc!',
         'string.empty': 'Danh mục không được để trống!'
@@ -116,7 +114,6 @@ export const editArticle = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(200)
       .messages({
         'any.required': 'Tiêu đề là bắt buộc!',
@@ -127,7 +124,6 @@ export const editArticle = (
     article_category_id: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
         'any.required': 'Danh mục bài viết là bắt buộc!',
         'string.empty': 'Danh mục bài viết không được để trống!'

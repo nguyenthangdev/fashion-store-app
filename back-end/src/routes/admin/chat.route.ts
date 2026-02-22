@@ -7,14 +7,13 @@ const router: Router = Router()
 // Admin: Lấy danh sách tất cả các phòng chat
 router.get(
   '/',
-  authMiddleware.requireAuth, // Bảo vệ route
+  authMiddleware.requireAuth,
   controller.getChatRooms
 )
-
 // Admin: Lấy lịch sử của 1 phòng chat
 router.get(
   '/:userId',
-  authMiddleware.requireAuth, // Bảo vệ route
+  authMiddleware.requireAuth,
   controller.getChatHistory
 )
 

@@ -7,12 +7,12 @@ import { uploadWithOneImageToCloud } from '~/middlewares/admin/uploadCloud.middl
 import * as validate from '~/validations/admin/myAccount.validation'
 import * as controller from '~/controllers/admin/myAccount.controller'
 
-router.get('/', controller.index) // detail
+router.get('/', controller.getMyAccount)
 router.patch(
   '/edit',
   multer().single('avatar'),
   uploadWithOneImageToCloud,
-  validate.editMyAccount, // middleware
+  validate.editMyAccount,
   controller.editMyAccount
 )
 

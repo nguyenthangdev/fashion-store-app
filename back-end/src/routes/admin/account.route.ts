@@ -7,9 +7,7 @@ import { uploadWithOneImageToCloud } from '~/middlewares/admin/uploadCloud.middl
 import * as validate from '~/validations/admin/account.validation'
 
 router.get('/', controller.getAllAccounts)
-
 router.get('/get-roles', controller.getAllRoles)
-
 router.post(
   '/create',
   multer().single('avatar'),
@@ -18,7 +16,6 @@ router.post(
   controller.createAccount
 )
 router.patch('/change-status/:status/:id', controller.changeAccountStatusById)
-
 router.patch(
   '/edit/:id',
   multer().single('avatar'),
@@ -26,9 +23,7 @@ router.patch(
   validate.editAccountById,
   controller.editAccountById
 )
-
 router.get('/detail/:id', controller.accountDetail)
-
 router.delete('/delete/:id', controller.deleteAccountById)
 
 export const accountRoutes: Router = router

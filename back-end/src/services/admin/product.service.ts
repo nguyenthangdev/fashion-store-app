@@ -2,8 +2,9 @@ import ProductModel from '~/models/product.model'
 import searchHelpers from '~/helpers/search'
 import paginationHelpers from '~/helpers/pagination'
 import { ProductInterface } from '~/interfaces/admin/product.interface'
+import { productRepositories } from '~/repositories/admin/product.repository'
 
-export const getProducts = async (query: any) => {
+const getProducts = async (query: any) => {
   const find: any = { deleted: false }
 
   if (query.status) {
@@ -48,19 +49,7 @@ export const getProducts = async (query: any) => {
   )
   // End Pagination
   
-  const [products, allProducts] = await Promise.all([
-    ProductModel
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip)
-      .populate('createdBy.account_id', 'fullName email')
-      .populate('updatedBy.account_id', 'fullName email')
-      .lean(),
-    ProductModel
-      .find({ deleted: false })
-      .lean()
-  ])
+  const { products, allProducts } = await productRepositories.getProducts(find, sort, objectPagination)
 
   return {
     products,
@@ -70,45 +59,22 @@ export const getProducts = async (query: any) => {
   }
 }
 
-export const changeStatusProduct = async (product_id: string, status: string, account_id: string) => {
+const changeStatusProduct = async (product_id: string, status: string, account_id: string) => {
   const updatedBy = {
     account_id: account_id,
     updatedAt: new Date()
   }
 
-  const updater = await ProductModel
-    .findByIdAndUpdate(
-      { _id: product_id },
-      {
-        $set: { status },
-        $push: { updatedBy }
-      },
-      { new: true } // Trả về document sau update
-    )
-    .populate('createdBy.account_id', 'fullName email')
-    .populate('updatedBy.account_id', 'fullName email')
-    .lean() 
+  const updater = await productRepositories.changeStatusProduct(product_id, status, updatedBy)
 
   return updater
 }
 
-export const deleteProduct = async (product_id: string, account_id: string) => {
-  await ProductModel.updateOne(
-    { _id: product_id },
-    {
-      $set: {
-        deleted: true,
-        deletedBy: {
-          account_id: account_id,
-          deletedAt: new Date()
-        }
-      }
-    }
-  )
+const deleteProduct = async (product_id: string, account_id: string) => {
+  await productRepositories.deleteProduct(product_id, account_id)
 }
 
-export const createProduct = async (data: ProductInterface, account_id: string, fileUrls: any) => {
-  // const productData = data
+const createProduct = async (data: ProductInterface, account_id: string, fileUrls: any) => {
   const dataTemp = {
     title: data.title,
     product_category_id: data.product_category_id,
@@ -119,23 +85,23 @@ export const createProduct = async (data: ProductInterface, account_id: string, 
     stock: data.stock,
     colors: data.colors,
     sizes: data.sizes,
-    thumbnail: data.thumbnail,
     status: data.status,
+    thumbnail: data.thumbnail,
     createdBy: {
       account_id
     }
   }
-  // 2. Lấy mảng URL đã được upload từ middleware
+  // Lấy mảng URL đã được upload từ middleware
   const uploadedUrls = fileUrls || []
   let urlIndex = 0
 
-  // 3. Xử lý ảnh đại diện (thumbnail)
+  // Xử lý ảnh đại diện (thumbnail)
   if (dataTemp.thumbnail === '__THUMBNAIL_PLACEHOLDER__') {
     dataTemp.thumbnail = uploadedUrls[urlIndex]
     urlIndex++
   }
   
-  // 4. Lắp ráp URL vào đúng vị trí trong mảng colors
+  // Lắp ráp URL vào đúng vị trí trong mảng colors
   for (const color of dataTemp.colors) {
     const imageCount = color.images.length // Số lượng ảnh cần cho màu này
     if (imageCount > 0) {
@@ -160,8 +126,7 @@ export const createProduct = async (data: ProductInterface, account_id: string, 
   return productToObject
 }
 
-export const editProduct = async (data: ProductInterface, account_id: string, id: string, fileUrls: any) => {
-  // 1. Parse dữ liệu sản phẩm từ chuỗi JSON
+const editProduct = async (data: ProductInterface, account_id: string, product_id: string, fileUrls: any) => {
   const dataTemp = {
     title: data.title,
     product_category_id: data.product_category_id,
@@ -175,17 +140,17 @@ export const editProduct = async (data: ProductInterface, account_id: string, id
     thumbnail: data.thumbnail,
     status: data.status,
   }
-  // 2. Lấy mảng URL của các ảnh MỚI đã được upload
+  // Lấy mảng URL của các ảnh MỚI đã được upload
   const uploadedUrls = fileUrls || []
   let urlIndex = 0
 
-  // 3. Xử lý ảnh đại diện (thumbnail)
+  // Xử lý ảnh đại diện (thumbnail)
   if (dataTemp.thumbnail === '__THUMBNAIL_PLACEHOLDER__') {
     dataTemp.thumbnail = uploadedUrls[urlIndex]
     urlIndex++
   }
 
-  // 4. Lắp ráp lại mảng ảnh cho từng màu
+  // Lắp ráp lại mảng ảnh cho từng màu
   for (const color of dataTemp.colors) {
     // Thay thế các placeholder bằng URL mới
     color.images = color.images.map((image: string) => {
@@ -211,21 +176,16 @@ export const editProduct = async (data: ProductInterface, account_id: string, id
   }
   // delete dataTemp.updatedBy
 
-  await ProductModel.updateOne(
-    { _id: id },
-    {
-      $set: dataTemp,
-      $push: { updatedBy }
-    }
-  )
+  await productRepositories.editProduct(product_id, dataTemp, updatedBy)
 }
 
-export const detaiProduct = async (id: string) => {
-  const product = await ProductModel.findOne({ _id: id, deleted: false }).lean()
+const detaiProduct = async (product_id: string) => {
+  const product = await productRepositories.findProductById(product_id)
+
   return product
 }
 
-export const productTrash = async (query: any) => {
+const productTrash = async (query: any) => {
   const find: any = {
     deleted: true
   }
@@ -270,15 +230,7 @@ export const productTrash = async (query: any) => {
   )
   // End Pagination
 
-  const products = await ProductModel
-    .find(find)
-    .sort(sort)
-    .limit(objectPagination.limitItems)
-    .skip(objectPagination.skip)
-    .lean()
-    .populate('createdBy.account_id', 'fullName email')
-    .populate('deletedBy.account_id', 'fullName email') // Lấy thông tin người tạo
-    .lean()
+  const products = await productRepositories.productTrash(find, sort, objectPagination)
 
   return {
     products,
@@ -287,13 +239,22 @@ export const productTrash = async (query: any) => {
   }
 }
 
-export const permanentlyDeleteProduct = async (id: string) => {
-  await ProductModel.deleteOne({ _id: id })
+const permanentlyDeleteProduct = async (product_id: string) => {
+  await productRepositories.permanentlyDeleteProduct(product_id)
 }
 
-export const recoverProduct = async (id: string) => {
-  await ProductModel.updateOne(
-    { _id: id },
-    { $set: { deleted: false, recoveredAt: new Date() }}
-  )
+const recoverProduct = async (product_id: string) => {
+  await productRepositories.recoverProduct(product_id)
+}
+
+export const productServices ={
+  getProducts,
+  changeStatusProduct,
+  deleteProduct,
+  createProduct,
+  editProduct,
+  detaiProduct,
+  productTrash,
+  permanentlyDeleteProduct,
+  recoverProduct
 }

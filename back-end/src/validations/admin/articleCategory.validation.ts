@@ -10,7 +10,6 @@ export const createArticleCategory = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(100)
       .messages({
         'any.required': 'Tiêu đề là bắt buộc!',
@@ -103,7 +102,6 @@ export const editArticleCategory = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(100)
       .messages({
         'any.required': 'Tiêu đề là bắt buộc!',
@@ -138,8 +136,8 @@ export const editArticleCategory = (
       .required()
       .invalid(null, '')
       .messages({
-        'any.invalid': 'Vui lòng chọn ảnh đại diện!',
-        'any.required': 'Vui lòng chọn ảnh đại diện!'
+        'any.invalid': 'Ảnh đại diện không hợp lệ!',
+        'any.required': 'Ảnh đại diện là bắt buộc!'
       })
   })
 

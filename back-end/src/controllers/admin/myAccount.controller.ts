@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { myAccountServices } from '~/services/admin/myAccount.service'
 
 // [GET] /admin/my-account
-export const index = async (req: Request, res: Response) => {
+export const getMyAccount = async (req: Request, res: Response) => {
   try {
     const { myAccount, role } = await myAccountServices.getMyAccount(req['accountAdmin']._id)
 
@@ -25,8 +25,8 @@ export const index = async (req: Request, res: Response) => {
 // [PATCH] /admin/my-account/edit
 export const editMyAccount = async (req: Request, res: Response) => {
   try {
-    const result = await myAccountServices.editMyAccount( req.body, req['accountAdmin']._id)
-    
+    const result = await myAccountServices.editMyAccount(req.body, req['accountAdmin']._id)
+
     if (!result.success) {
       return res.status(StatusCodes.CONFLICT).json({
         code: result.code,

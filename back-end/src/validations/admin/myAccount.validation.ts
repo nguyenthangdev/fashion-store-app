@@ -10,7 +10,6 @@ export const editMyAccount = (
     fullName: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(50)
       .messages({
         "any.required": "Họ tên là bắt buộc!", // Không gửi gì lên -> Lỗi
@@ -21,7 +20,6 @@ export const editMyAccount = (
     email: Joi.string()
       .trim()
       .required()
-      .min(1)
       .email()
       .lowercase()
       .messages({
@@ -50,7 +48,6 @@ export const editMyAccount = (
     phone: Joi.string()
       .trim()
       .required()
-      .min(1)
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc",
@@ -70,7 +67,7 @@ export const editMyAccount = (
 
   const { error, value } = schema.validate(req.body, {
     abortEarly: false,      // Hiển thị tất cả lỗi
-    stripUnknown: true,     // Loại bỏ trường không có trong schema
+    stripUnknown: true,     // Loại bỏ trường không có trong schema ở trên
     convert: true           // Chuyển đổi kiểu dữ liệu
   })
 

@@ -5,7 +5,7 @@ import OrderModel from '~/models/order.model'
 import { orderServices } from '~/services/admin/order.service'
 
 // [GET] /admin/orders
-export const index = async (req: Request, res: Response) => {
+export const getOrders = async (req: Request, res: Response) => {
   try {
     const {
       orders,

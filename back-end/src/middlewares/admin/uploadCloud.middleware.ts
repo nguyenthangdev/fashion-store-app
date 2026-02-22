@@ -12,7 +12,7 @@ export const uploadWithOneImageToCloud = (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+) => {
   if (req.file) {
     const streamUpload = (req: Request) => {
       return new Promise((resolve, reject) => {
@@ -53,7 +53,7 @@ const streamUpload = (fileBuffer: Buffer): Promise<any> => {
   })
 }
 
-export const uploadCloudWithManyImagesToCloud = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const uploadCloudWithManyImagesToCloud = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // req.files bây giờ là một mảng: Express.Multer.File[]
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {

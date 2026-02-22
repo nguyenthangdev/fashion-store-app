@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
 import ProductModel from '~/models/product.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
-import * as productService from '~/services/admin/product.service'
 import { StatusCodes } from 'http-status-codes'
+import { productServices } from '~/services/admin/product.service'
 
 // [GET] /admin/products
-export const index = async (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response) => {
   try {
     const {
       products,
       allProducts,
       objectSearch,
       objectPagination
-    } = await productService.getProducts(req.query)
+    } = await productServices.getProducts(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -34,10 +34,10 @@ export const index = async (req: Request, res: Response) => {
 // [PATCH] /admin/products/change-status/:status/:id
 export const changeStatusProduct = async (req: Request, res: Response) => {
   try {
-    const updater = await productService.changeStatusProduct(
+    const updater = await productServices.changeStatusProduct(
       req.params.id, 
-      req.params.status, 
-      req['accountAdmin'].id
+      req.params.status.toUpperCase(), 
+      req['accountAdmin']._id
     )
 
     res.status(StatusCodes.OK).json({
@@ -60,7 +60,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     const type = body.type
     const ids = body.ids
     const updatedBy = {
-      account_id: req['accountAdmin'].id,
+      account_id: req['accountAdmin']._id,
       updatedAt: new Date()
     }
     enum Key {
@@ -117,7 +117,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [DELETE] /admin/products/delete/:id
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    await productService.deleteProduct(req.params.id, req['accountAdmin'].id)
+    await productServices.deleteProduct(req.params.id, req['accountAdmin']._id)
 
     res.json({
       code: 204,
@@ -134,9 +134,9 @@ export const deleteProduct = async (req: Request, res: Response) => {
 // [POST] /admin/products/create
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const productToObject = await productService.createProduct(
+    const productToObject = await productServices.createProduct(
       req.body, 
-      req['accountAdmin'].id, 
+      req['accountAdmin']._id, 
       req['fileUrls']
     )
 
@@ -156,9 +156,9 @@ export const createProduct = async (req: Request, res: Response) => {
 // [PATCH] /admin/products/edit/:id
 export const editProduct = async (req: Request, res: Response) => {
   try {
-    await productService.editProduct(
+    await productServices.editProduct(
       req.body, 
-      req['accountAdmin'].id,
+      req['accountAdmin']._id,
       req.params.id,
       req['fileUrls']
     )
@@ -178,7 +178,7 @@ export const editProduct = async (req: Request, res: Response) => {
 // [GET] /admin/products/detail/:id
 export const detaiProduct = async (req: Request, res: Response) => {
   try {
-    const product = await productService.detaiProduct(req.params.id)
+    const product = await productServices.detaiProduct(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -200,7 +200,7 @@ export const productTrash = async (req: Request, res: Response) => {
       products,
       objectSearch,
       objectPagination
-    } = await productService.productTrash(req.query)
+    } = await productServices.productTrash(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -263,7 +263,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
 // [DELETE] /admin/products/trash/permanentlyDelete/:id
 export const permanentlyDeleteProduct = async (req: Request, res: Response) => {
   try {
-    await productService.permanentlyDeleteProduct(req.params.id)
+    await productServices.permanentlyDeleteProduct(req.params.id)
 
     res.json({
       code: 204,
@@ -280,7 +280,7 @@ export const permanentlyDeleteProduct = async (req: Request, res: Response) => {
 // [PATCH] /admin/products/trash/recover/:id
 export const recoverProduct = async (req: Request, res: Response) => {
   try {
-    await productService.recoverProduct(req.params.id)
+    await productServices.recoverProduct(req.params.id)
     
     res.status(StatusCodes.OK).json({
       code: 200,

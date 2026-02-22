@@ -4,12 +4,12 @@ import { StatusCodes } from 'http-status-codes'
 import Session from '~/models/session.model'
 import crypto from 'crypto'
 import { getCookieOptions } from '~/utils/constants'
-import * as authService from '~/services/admin/auth.service'
+import { authServices } from '~/services/admin/auth.service'
 
 // [POST] /admin/auth/login
 export const login = async (req: Request, res: Response) => {
   try {
-    const result = await authService.loginAdmin(req.body)
+    const result = await authServices.loginAdmin(req.body)
 
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.FORBIDDEN
@@ -71,7 +71,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     //   process.env.JWT_REFRESH_TOKEN_SECRET_ADMIN,
     //   '14 days'
     // )
-    const result = await authService.refreshTokenAdmin(req.cookies.refreshToken)
+    const result = await authServices.refreshTokenAdmin(req.cookies.refreshToken)
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.NOT_FOUND
       return res.status(statusCode).json({ 

@@ -7,7 +7,6 @@ import * as validate from '~/validations/admin/brand.validation'
 const router: Router = Router()
 
 router.get('/', controller.getBrands)
-
 router.post(
   '/create',
   multer().single('thumbnail'), // Nhận file logo với field 'thumbnail'
@@ -15,9 +14,7 @@ router.post(
   validate.createBrand,
   controller.createBrand
 )
-
 router.get('/detail/:id', controller.detailBrand)
-
 router.patch(
   '/edit/:id',
   multer().single('thumbnail'), // Nhận file logo mới nếu có
@@ -25,7 +22,6 @@ router.patch(
   validate.editBrand,
   controller.editBrand
 )
-
 router.delete('/delete/:id', controller.deleteBrand)
 
 export const brandRoutes: Router = router

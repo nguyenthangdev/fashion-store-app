@@ -10,20 +10,19 @@ export const createProduct = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(50)
       .messages({
-        "any.required": "Tiêu đề là bắt buộc!", // Không gửi gì lên -> Lỗi
-        "string.empty": "Tiêu đề không được để trống!", // có gửi lên chuỗi rỗng -> Lỗi
+        "any.required": "Tiêu đề là bắt buộc!",
+        "string.empty": "Tiêu đề không được để trống!",
         "string.max": "Tiêu đề không được vượt quá 50 ký tự!",
       }),
+
     product_category_id: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
-        "any.required": "Danh mục sản phẩm là bắt buộc!", // Không gửi gì lên -> Lỗi
-        "string.empty": "Danh mục sản phẩm không được để trống!", // có gửi lên chuỗi rỗng -> Lỗi
+        "any.required": "Danh mục sản phẩm là bắt buộc!",
+        "string.empty": "Danh mục sản phẩm không được để trống!",
       }),
 
     featured: Joi.string()
@@ -66,32 +65,49 @@ export const createProduct = (
     colors: Joi.array()
       .items(
         Joi.object({
-          name: Joi.string().required(),
-          code: Joi.string().required(),
-          images: Joi.array().items(Joi.any().required())
+          name: Joi.string()
+            .required()
+            .messages({ 
+              'string.empty': 'Tên màu không được để trống!',
+              'any.required': 'Tên màu là bắt buộc!'
+            }),
+          code: Joi.string()
+            .required()
+            .messages({ 
+              'string.empty': 'Mã màu không được để trống!',
+              'any.required': 'Mã màu là bắt buộc!' 
+            }),
+          images: Joi.array()
+            .items(Joi.any().required())
+            .required()
+            .min(1)
+            .messages({ 
+              'array.min': 'Vui lòng chọn ít nhất 1 ảnh!',
+              'any.required': 'Ảnh là bắt buộc!'
+            })
         })
       )
       .min(1)
       .required()
       .messages({
         'array.min': 'Vui lòng chọn ít nhất 1 màu!',
-        'any.required': 'Màu sắc là bắt buộc!'
+        'any.required': 'Màu là bắt buộc!'
       }),
     
     sizes: Joi.array()
       .items(
         Joi.string()
-          .min(1)
-          .messages({
-            'string.min': 'Size không được rỗng!',
-            'string.empty': 'Size không được rỗng!'
+          .trim()
+          .required()
+          .messages({ 
+            'string.empty': 'Kích cỡ không được để trống!'
           })
       )
       .min(1)
       .required()
       .messages({
         'array.min': 'Vui lòng chọn ít nhất 1 kích cỡ!',
-        'array.required': 'Kích cỡ là bắt buộc!'
+        'any.required': 'Kích cỡ là bắt buộc!'
       }),
 
     status: Joi.string()
@@ -162,7 +178,6 @@ export const editProduct = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(50)
       .messages({
         "any.required": "Tiêu đề là bắt buộc!",
@@ -173,7 +188,6 @@ export const editProduct = (
     product_category_id: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
         "any.required": "Vui lòng chọn danh mục sản phẩm!",
         "string.empty": "Vui lòng chọn danh mục sản phẩm!",
@@ -220,25 +234,42 @@ export const editProduct = (
     colors: Joi.array()
       .items(
         Joi.object({
-          name: Joi.string().required(),
-          code: Joi.string().required(),
-          images: Joi.array().items(Joi.any().required())
+          name: Joi.string()
+            .required()
+            .messages({ 
+              'string.empty': 'Tên màu không được để trống!',
+              'any.required': 'Tên màu là bắt buộc!'
+            }),
+          code: Joi.string()
+            .required()
+            .messages({ 
+              'string.empty': 'Mã màu không được để trống!',
+              'any.required': 'Mã màu là bắt buộc!' 
+            }),
+          images: Joi.array()
+            .items(Joi.any().required())
+            .required()
+            .min(1)
+            .messages({ 
+              'array.min': 'Vui lòng chọn ít nhất 1 ảnh!',
+              'any.required': 'Ảnh là bắt buộc!'
+            })
         })
       )
       .min(1)
       .required()
       .messages({
         'array.min': 'Vui lòng chọn ít nhất 1 màu!',
-        'any.required': 'Màu sắc là bắt buộc!'
+        'any.required': 'Màu là bắt buộc!'
       }),
     
     sizes: Joi.array()
       .items(
         Joi.string()
-          .min(1)
-          .messages({
-            'string.min': 'Size không được rỗng!',
-            'string.empty': 'Size không được rỗng!'
+          .trim()
+          .required()
+          .messages({ 
+            'string.empty': 'Kích cỡ không được để trống!'
           })
       )
       .min(1)
@@ -252,7 +283,7 @@ export const editProduct = (
       .valid('ACTIVE', 'INACTIVE')
       .required()
       .messages({
-        'any.only': 'Trạng thái không hợp lệ!',
+        'any.only': 'Trạng thái phải là ACTIVE hoặc INACTIVE!',
         'any.required': 'Trạng thái là bắt buộc!'
       }),
     
@@ -260,8 +291,8 @@ export const editProduct = (
       .required()
       .invalid(null, '')
       .messages({
-        'any.invalid': 'Vui lòng chọn ảnh đại diện!',
-        'any.required': 'Vui lòng chọn ảnh đại diện!'
+        'any.invalid': 'Ảnh đại diện không hợp lệ!',
+        'any.required': 'Ảnh đại diện là bắt buộc!'
       })
   })
   
