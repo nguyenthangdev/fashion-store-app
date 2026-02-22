@@ -3,7 +3,7 @@ import ProductCategoryModel from '~/models/productCategory.model'
 import filterStatusHelpers from '~/helpers/filterStatus'
 import { buildTreeForPagedItems } from '~/helpers/createChildForPagedParents'
 import { deleteManyStatusFast, updateManyStatusFast } from '~/helpers/updateStatusItem'
-import * as productCategoryService from '~/services/admin/productCategory.service'
+import { productCategoryServices } from '~/services/admin/productCategory.service'
 import { StatusCodes } from 'http-status-codes'
 import { TreeInterface } from '~/interfaces/admin/general.interface'
 
@@ -16,7 +16,7 @@ export const index = async (req: Request, res: Response) => {
       accounts,
       objectSearch,
       objectPagination
-    } = await productCategoryService.getProductCategories(req.query)
+    } = await productCategoryServices.getProductCategories(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -42,7 +42,7 @@ export const index = async (req: Request, res: Response) => {
 //     const status = req.params.status
 //     const id = req.params.id
 //     const updatedBy = {
-//       account_id: req['accountAdmin'].id,
+//       account_id: req['accountAdmin']._id,
 //       updatedAt: new Date()
 //     }
 //     await ProductCategoryModel.updateOne(
@@ -62,14 +62,12 @@ export const index = async (req: Request, res: Response) => {
 //   }
 // }
 
-
-
 // [PATCH] /admin/change-status-with-children/:status/:id
 export const changeStatusWithChildren = async (req: Request, res: Response) => {
    try {
-    await productCategoryService.changeStatusWithChildren(
-      req['accountAdmin'].id, 
-      req.params.status, 
+    await productCategoryServices.changeStatusWithChildren(
+      req['accountAdmin']._id, 
+      req.params.status.toUpperCase(), 
       req.params.id
     )
 
@@ -92,7 +90,7 @@ export const changeMulti = async (req: Request, res: Response) => {
     const type = body.type
     const ids = body.ids
     const updatedBy = {
-      account_id: req['accountAdmin'].id,
+      account_id: req['accountAdmin']._id,
       updatedAt: new Date()
     }
     enum Key {
@@ -141,7 +139,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [DELETE] /admin/products-category/delete/:id
 export const deleteProductCategory = async (req: Request, res: Response) => {
   try {
-    await productCategoryService.deleteProductCategory(req.params.id, req['accountAdmin'].id)
+    await productCategoryServices.deleteProductCategory(req.params.id, req['accountAdmin']._id)
 
     res.json({
       code: 204,
@@ -158,12 +156,12 @@ export const deleteProductCategory = async (req: Request, res: Response) => {
 // [POST] /admin/products-category/create
 export const createProductCategory = async (req: Request, res: Response) => {
   try {
-    const productCategoryToObject = await productCategoryService.createProductCategory(req.body, req['accountAdmin'].id)
+    const productCategoryToObject = await productCategoryServices.createProductCategory(req.body, req['accountAdmin']._id)
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
       message: 'Thêm thành công danh mục sản phẩm!',
-      data: productCategoryToObject
+      createdProductCategory: productCategoryToObject
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -176,10 +174,10 @@ export const createProductCategory = async (req: Request, res: Response) => {
 // [PATCH] /admin/products-category/edit/:id
 export const editProductCategory = async (req: Request, res: Response) => {
   try {
-    await productCategoryService.editProductCategory(
+    await productCategoryServices.editProductCategory(
       req.body, 
       req.params.id, 
-      req['accountAdmin'].id
+      req['accountAdmin']._id
     )
 
     res.status(StatusCodes.OK).json({
@@ -197,7 +195,7 @@ export const editProductCategory = async (req: Request, res: Response) => {
 // [GET] /admin/products-category/detail/:id
 export const detailProductCategory = async (req: Request, res: Response) => {
   try {
-    const productCategory = await productCategoryService.detailProductCategory(req.params.id)
+    const productCategory = await productCategoryServices.detailProductCategory(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -220,7 +218,7 @@ export const productCategoryTrash = async (req: Request, res: Response) => {
       accounts,
       objectSearch,
       objectPagination
-    } = await productCategoryService.productCategoryTrash(req.query)
+    } = await productCategoryServices.productCategoryTrash(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -328,7 +326,7 @@ export const changeMultiTrash = async (req: Request, res: Response) => {
 // [DELETE] /admin/products-category/trash/permanentlyDelete/:id
 export const permanentlyDeleteProductCategory = async (req: Request, res: Response) => {
   try {
-    const result = await productCategoryService.permanentlyDeleteProductCategory(req.params.id)
+    const result = await productCategoryServices.permanentlyDeleteProductCategory(req.params.id)
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -353,7 +351,7 @@ export const permanentlyDeleteProductCategory = async (req: Request, res: Respon
 // [PATCH] /admin/products-category/trash/recover/:id
 export const recoverProductCategory = async (req: Request, res: Response) => {
   try {
-    await productCategoryService.recoverProductCategory(req.params.id)
+    await productCategoryServices.recoverProductCategory(req.params.id)
     
     res.status(StatusCodes.OK).json({
       code: 200,

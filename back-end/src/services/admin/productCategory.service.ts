@@ -8,8 +8,9 @@ import { updateStatusRecursiveForOneItem } from '~/helpers/updateStatusItem'
 import { buildTreeForItems } from '~/helpers/createChildForAllParents'
 import { LogNodeInterface, TreeInterface, UpdatedByInterface } from '~/interfaces/admin/general.interface'
 import { ProductCategoryInterface } from '~/interfaces/admin/productCategory.interface'
+import { productCategoryRepositories } from '~/repositories/admin/productCategory.repository'
 
-export const getProductCategories = async (query: any) => {
+const getProductCategories = async (query: any) => {
   const find: any = { deleted: false }
 
   if (query.status) {
@@ -55,22 +56,11 @@ export const getProductCategories = async (query: any) => {
   )
   // End Pagination
 
-  //  Query song song bằng Promise.all (giảm round-trip)
-  const [parentCategories, accounts, allCategories] = await Promise.all([
-    ProductCategoryModel
-      .find(parentFind)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip) // chỉ parent
-      .lean(),
-    AccountModel
-      .find({ deleted: false }) // account info
-      .lean(),
-    ProductCategoryModel
-      .find({ deleted: false })
-      .sort(sort) 
-      .lean()
-  ])
+  const { 
+    parentCategories, 
+    accounts, 
+    allCategories 
+  } = await productCategoryRepositories.getProductCategories(parentFind, sort, objectPagination)
   
   // Add children vào cha (Đã phân trang giới hạn 2 item)
   const newProductCategories = buildTreeForPagedItems(parentCategories as unknown as TreeInterface[], allCategories as unknown as TreeInterface[])
@@ -92,33 +82,19 @@ export const getProductCategories = async (query: any) => {
   }
 }
 
-
-
-export const changeStatusWithChildren = async (accoutn_id: string, status: string, id: string) => {
+const changeStatusWithChildren = async (accoutn_id: string, status: string, productCategory_id: string) => {
   const updatedBy: UpdatedByInterface = {
     account_id: accoutn_id,
     updatedAt: new Date()
   }
-
-  await updateStatusRecursiveForOneItem(ProductCategoryModel, status, id, updatedBy)
+  await productCategoryRepositories.changeStatusWithChildren(status, productCategory_id, updatedBy)
 }
 
-export const deleteProductCategory = async (id: string, account_id: string) => {
-  await ProductCategoryModel.updateOne(
-    { _id: id },
-    {
-      $set: {
-        deleted: true,
-        deletedBy: {
-          account_id: account_id,
-          deletedAt: new Date()
-        }
-      }
-    }
-  )
+const deleteProductCategory = async (productCategory_id: string, account_id: string) => {
+  await productCategoryRepositories.deleteProductCategory(productCategory_id, account_id)
 }
 
-export const createProductCategory = async (data: ProductCategoryInterface, account_id: string) => {
+const createProductCategory = async (data: ProductCategoryInterface, account_id: string) => {
   const dataTemp = {
     title: data.title,
     parent_id: data.parent_id,
@@ -136,7 +112,7 @@ export const createProductCategory = async (data: ProductCategoryInterface, acco
   return productCategoryToObject
 }
 
-export const editProductCategory = async (data: ProductCategoryInterface, id: string, account_id: string) => {
+const editProductCategory = async (data: ProductCategoryInterface, productCategory_id: string, account_id: string) => {
   const updatedBy = {
     account_id: account_id,
     updatedAt: new Date()
@@ -148,21 +124,16 @@ export const editProductCategory = async (data: ProductCategoryInterface, id: st
     status: data.status,
     thumbnail: data.thumbnail
   }
-  await ProductCategoryModel.updateOne(
-    { _id: id },
-    {
-      $set: dataTemp,
-      $push: { updatedBy }
-    }
-  )
+  await productCategoryRepositories.editProductCategory(productCategory_id, dataTemp, updatedBy)
 }
 
-export const detailProductCategory = async (id: string) => {
-  const productCategory = await ProductCategoryModel.findOne({ _id: id, deleted: false })
+const detailProductCategory = async (productCategory_id: string) => {
+  const productCategory = await productCategoryRepositories.findProductCategoryById(productCategory_id)
+
   return productCategory
 }
 
-export const productCategoryTrash = async (query: any) => {
+const productCategoryTrash = async (query: any) => {
   const find: any = { deleted: true }
 
   // Search
@@ -206,17 +177,7 @@ export const productCategoryTrash = async (query: any) => {
   // End Pagination
 
   //  Query song song bằng Promise.all (giảm round-trip)
-  const [parentCategories, accounts] = await Promise.all([
-    ProductCategoryModel
-      .find(find)
-      .sort(sort)
-      .limit(objectPagination.limitItems)
-      .skip(objectPagination.skip) // chỉ parent
-      .lean(),
-    AccountModel
-      .find({ deleted: false }) // account info
-      .lean()
-  ])
+  const { parentCategories, accounts } = await productCategoryRepositories.productCategoryTrash(find, sort, objectPagination)
 
   return {
     parentCategories,
@@ -226,9 +187,9 @@ export const productCategoryTrash = async (query: any) => {
   }
 }
 
-export const permanentlyDeleteProductCategory = async (id: string) => {
+const permanentlyDeleteProductCategory = async (productCategory_id: string) => {
   // Lấy danh mục gốc cần xóa
-  const rootCategory = await ProductCategoryModel.findOne({ _id: id }).lean()
+  const rootCategory = await productCategoryRepositories.findProductCategoryById(productCategory_id)
   
   if (!rootCategory) {
     return { 
@@ -239,7 +200,7 @@ export const permanentlyDeleteProductCategory = async (id: string) => {
   }
   
   // Lấy tất cả danh mục để tìm con
-  const allCategories = await ProductCategoryModel.find({}).lean()
+  const allCategories = await productCategoryRepositories.findAllProductCategories()
   
   // Tạo cây từ danh mục gốc
   const tree = buildTreeForPagedItems(
@@ -268,16 +229,23 @@ export const permanentlyDeleteProductCategory = async (id: string) => {
   const allIdsToDelete = getAllIdsFromTree(tree)
   
   // Xóa tất cả danh mục
-  await ProductCategoryModel.deleteMany({
-    _id: { $in: allIdsToDelete }
-  })
+  await productCategoryRepositories.deleteProductCategoriesByIds(allIdsToDelete)
 
   return { success: true, allIdsToDelete }
 }
 
-export const recoverProductCategory = async (id: string) => {
-  await ProductCategoryModel.updateOne(
-    { _id: id },
-    { $set: { deleted: false, recoveredAt: new Date() }}
-  )
+const recoverProductCategory = async (productCategory_id: string) => {
+  await productCategoryRepositories.recoverProductCategory(productCategory_id)
+}
+
+export const productCategoryServices = {
+  getProductCategories,
+  changeStatusWithChildren,
+  deleteProductCategory,
+  createProductCategory,
+  editProductCategory,
+  detailProductCategory,
+  productCategoryTrash,
+  permanentlyDeleteProductCategory,
+  recoverProductCategory
 }
