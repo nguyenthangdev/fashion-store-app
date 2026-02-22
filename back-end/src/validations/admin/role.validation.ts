@@ -11,7 +11,6 @@ export const createRole = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .min(3)
       .max(100)
       .messages({
@@ -24,7 +23,6 @@ export const createRole = (
     titleId: Joi.string()
       .trim()
       .required()
-      .min(1)
       .min(3)
       .max(50)
       .messages({
@@ -65,7 +63,6 @@ export const editRole = (
     title: Joi.string()
       .trim()
       .required()
-      .min(1)
       .min(3)
       .max(100)
       .messages({
@@ -78,7 +75,6 @@ export const editRole = (
     titleId: Joi.string()
       .trim()
       .required()
-      .min(1)
       .min(3)
       .max(50)
       .messages({

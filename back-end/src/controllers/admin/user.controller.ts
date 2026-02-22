@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as userService from '~/services/admin/user.service'
+import { userServices } from '~/services/admin/user.service'
 
 // [GET] /admin/users
-export const index = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await userService.getUsers()
+    const users = await userServices.getUsers()
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -23,7 +23,7 @@ export const index = async (req: Request, res: Response) => {
 // [PATCH] /admin/users/change-status/:status/:id
 export const changeStatusUser = async (req: Request, res: Response) => {
   try {
-    await userService.changeStatusUser(req.params.status, req.params.id)
+    await userServices.changeStatusUser(req.params.status.toUpperCase(), req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -40,7 +40,7 @@ export const changeStatusUser = async (req: Request, res: Response) => {
 // [PATCH] /admin/users/edit/:id
 export const editUser = async (req: Request, res: Response) => {
   try {
-    const result = await userService.editUser(req.body, req.params.id)
+    const result = await userServices.editUser(req.body, req.params.id)
     if (!result.success) {
       res.status(StatusCodes.CONFLICT).json({
         code: result.code,
@@ -63,7 +63,7 @@ export const editUser = async (req: Request, res: Response) => {
 // [GET] /admin/users/detail/:id
 export const detailUser = async (req: Request, res: Response) => {
   try {
-    const accountUser = await userService.detailUser(req.params.id)
+    const accountUser = await userServices.detailUser(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -81,7 +81,7 @@ export const detailUser = async (req: Request, res: Response) => {
 // [DELETE] /admin/users/delete/:id
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    await userService.deleteUser(req.params.id)
+    await userServices.deleteUser(req.params.id)
 
     res.json({
       code: 204,

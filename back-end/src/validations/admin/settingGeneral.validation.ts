@@ -10,7 +10,6 @@ export const editSettingGeneral = (
     websiteName: Joi.string()
       .trim()
       .required()
-      .min(1)
       .max(50)
       .messages({
         "any.required": "Tên website là bắt buộc!",
@@ -21,7 +20,6 @@ export const editSettingGeneral = (
     email: Joi.string()
       .trim()
       .required()
-      .min(1)
       .email()
       .lowercase()
       .messages({
@@ -33,7 +31,6 @@ export const editSettingGeneral = (
     phone: Joi.string()
       .trim()
       .required()
-      .min(1)
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc!",
@@ -44,7 +41,6 @@ export const editSettingGeneral = (
     address: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
         "any.required": "Địa chỉ là bắt buộc!",
         "string.empty": "Vui lòng nhập địa chỉ!"
@@ -53,7 +49,6 @@ export const editSettingGeneral = (
     copyright: Joi.string()
       .trim()
       .required()
-      .min(1)
       .messages({
         "any.required": "Thông tin bản quyền là bắt buộc!",
         "string.empty": "Vui lòng nhập thông tin bản quyền!",

@@ -1,6 +1,6 @@
 import { statisticRepositories } from '~/repositories/admin/statistic.repository'
 
-export const getStatistic = async () => {
+const getStatistic = async () => {
   const statistic = {
     user: {
       total: 0,

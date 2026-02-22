@@ -51,7 +51,6 @@ export const editUser = (
     phone: Joi.string()
       .trim()
       .required()
-      .min(1)
       .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
       .messages({
         "any.required": "Số điện thoại là bắt buộc",

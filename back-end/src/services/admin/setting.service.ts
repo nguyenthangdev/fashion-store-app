@@ -2,7 +2,7 @@ import { SettingInterface } from '~/interfaces/admin/setting.interface'
 import SettingsGeneralModel from '~/models/settingGeneral.model'
 import { settingRepositories } from '~/repositories/admin/setting.repository'
 
-export const getSettingGeneral = async () => {
+const getSettingGeneral = async () => {
   const settingGeneral = await settingRepositories.findAllSetting()
 
   return settingGeneral

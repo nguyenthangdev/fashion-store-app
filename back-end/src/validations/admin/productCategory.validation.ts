@@ -4,7 +4,6 @@ import Joi from 'joi'
 const createProductCategorySchema = Joi.object({
   title: Joi.string()
     .trim()
-    .min(1)
     .max(100)
     .required()
     .messages({
@@ -42,7 +41,6 @@ const createProductCategorySchema = Joi.object({
 const editProductCategorySchema = Joi.object({
   title: Joi.string()
     .trim()
-    .min(1)
     .max(100)
     .required()
     .messages({
