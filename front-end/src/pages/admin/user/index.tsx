@@ -13,6 +13,7 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
 import useUser from '~/hooks/admin/user/useUser'
+import { useEffect } from 'react'
 
 const User = () => {
   const {
@@ -23,8 +24,29 @@ const User = () => {
     handleToggleStatus,
     handleOpen,
     handleClose,
-    handleDelete
+    handleDelete,
+    navigate
   } = useUser()
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('users_view')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('users_view')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+              Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -111,114 +133,112 @@ const User = () => {
 
   return (
     <>
-      {role && role.permissions.includes('users_view') && (
-        <div className='flex flex-col gap-[15px] bg-[#FFFFFF] p-[15px] shadow-md mt-[15px]'>
-          <h1 className="text-[24px] font-[700] text-[#000000]">Danh sách khách hàng</h1>
-          <TableContainer sx={{ maxHeight: 600 }}>
-            <Table stickyHeader sx={{
-              borderCollapse: 'collapse',
-              '& th, & td': {
-                border: '1px solid #000000', // đường kẻ,
-                zIndex: 1
-              },
-              '& th': {
-                backgroundColor: '#252733', // nền header
-                color: '#fff',
-                zIndex: 2,
-                borderTop: '1px solid #000000 !important',
-                borderBottom: '1px solid #000000 !important'
-              }
-            }}>
-              <TableHead>
-                <TableRow className='bg-gray-100'>
-                  <TableCell align='center'>STT</TableCell>
-                  <TableCell align='center'>Avatar</TableCell>
-                  <TableCell align='center'>Họ và tên</TableCell>
-                  <TableCell align='center'>Email</TableCell>
-                  <TableCell align='center'>Số điện thoại</TableCell>
-                  <TableCell align='center'>Địa chỉ</TableCell>
-                  <TableCell align='center'>Trạng thái</TableCell>
-                  <TableCell align='center'>Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users ? (
-                  users.map((user, index) => (
-                    <TableRow key={index}>
-                      <TableCell align='center'>{index + 1}</TableCell>
-                      <TableCell align='center'>
-                        <div className='flex items-center justify-center'>
-                          <img
-                            src={user.avatar}
-                            className='w-[100px] h-[100px] rounded-full object-cover'
-                            alt="Avatar"
-                          />
-                        </div>
-                      </TableCell>
-                      <TableCell align='center'>{user.fullName}</TableCell>
-                      <TableCell align='center'>{user.email}</TableCell>
-                      <TableCell align='center'>{user.phone}</TableCell>
-                      <TableCell align='center'>{user.address}</TableCell>
-                      <TableCell align='center'>
-                        <button
-                          onClick={() => handleToggleStatus(user._id, user.status)}
-                          className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
+      <div className='flex flex-col gap-[15px] bg-[#FFFFFF] p-[15px] shadow-md mt-[15px]'>
+        <h1 className="text-[24px] font-[700] text-[#000000]">Danh sách khách hàng</h1>
+        <TableContainer sx={{ maxHeight: 600 }}>
+          <Table stickyHeader sx={{
+            borderCollapse: 'collapse',
+            '& th, & td': {
+              border: '1px solid #000000', // đường kẻ,
+              zIndex: 1
+            },
+            '& th': {
+              backgroundColor: '#252733', // nền header
+              color: '#fff',
+              zIndex: 2,
+              borderTop: '1px solid #000000 !important',
+              borderBottom: '1px solid #000000 !important'
+            }
+          }}>
+            <TableHead>
+              <TableRow className='bg-gray-100'>
+                <TableCell align='center'>STT</TableCell>
+                <TableCell align='center'>Avatar</TableCell>
+                <TableCell align='center'>Họ và tên</TableCell>
+                <TableCell align='center'>Email</TableCell>
+                <TableCell align='center'>Số điện thoại</TableCell>
+                <TableCell align='center'>Địa chỉ</TableCell>
+                <TableCell align='center'>Trạng thái</TableCell>
+                <TableCell align='center'>Hành động</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users ? (
+                users.map((user, index) => (
+                  <TableRow key={index}>
+                    <TableCell align='center'>{index + 1}</TableCell>
+                    <TableCell align='center'>
+                      <div className='flex items-center justify-center'>
+                        <img
+                          src={user.avatar}
+                          className='w-[100px] h-[100px] rounded-full object-cover'
+                          alt="Avatar"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell align='center'>{user.fullName}</TableCell>
+                    <TableCell align='center'>{user.email}</TableCell>
+                    <TableCell align='center'>{user.phone}</TableCell>
+                    <TableCell align='center'>{user.address}</TableCell>
+                    <TableCell align='center'>
+                      <button
+                        onClick={() => handleToggleStatus(user._id, user.status)}
+                        className={`cursor-pointer border rounded-[5px] p-[5px] text-white 
                           ${user.status === 'ACTIVE' ? 'bg-[#18BA2A]' : 'bg-[#BC3433]'}`}
-                        >
-                          {user.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
-                        </button>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <Link
-                          to={`/admin/users/detail/${user._id}`}
-                          className='nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white'
-                        >
+                      >
+                        {user.status === 'ACTIVE' ? 'Hoạt động' : 'Ngừng hoạt động'}
+                      </button>
+                    </TableCell>
+                    <TableCell align='center'>
+                      <Link
+                        to={`/admin/users/detail/${user._id}`}
+                        className='nav-link border rounded-[5px] bg-[#0542AB] p-[5px] text-white'
+                      >
                         Chi tiết
-                        </Link>
-                        <Link
-                          to={`/admin/users/edit/${user._id}`}
-                          className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white'
-                        >
+                      </Link>
+                      <Link
+                        to={`/admin/users/edit/${user._id}`}
+                        className='nav-link border rounded-[5px] bg-[#FFAB19] p-[5px] text-white'
+                      >
                         Sửa
-                        </Link>
-                        <button
-                          onClick={() => handleOpen(user._id)}
-                          className='nav-link border rounded-[5px] bg-[#BC3433] p-[5px] text-white'>
+                      </Link>
+                      <button
+                        onClick={() => handleOpen(user._id)}
+                        className='nav-link border rounded-[5px] bg-[#BC3433] p-[5px] text-white'>
                         Xóa
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={10} align="center" sx={{ fontWeight: '500', fontSize: '17px' }}>
-                      Không có người dùng nào
+                      </button>
                     </TableCell>
                   </TableRow>
-                )}
-                <Dialog
-                  open={open}
-                  onClose={handleClose}
-                  aria-labelledby="delete-dialog-title"
-                >
-                  <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={10} align="center" sx={{ fontWeight: '500', fontSize: '17px' }}>
+                      Không có người dùng nào
+                  </TableCell>
+                </TableRow>
+              )}
+              <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="delete-dialog-title"
+              >
+                <DialogTitle id="delete-dialog-title">Xác nhận xóa</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
                     Bạn có chắc chắn muốn xóa người dùng này không?
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose}>Hủy</Button>
-                    <Button onClick={handleDelete} color="error" variant="contained">
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Hủy</Button>
+                  <Button onClick={handleDelete} color="error" variant="contained">
                     Xóa
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      )}
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </>
   )
 }

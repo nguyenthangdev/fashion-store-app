@@ -9,6 +9,7 @@ import { useAuth } from '~/contexts/admin/AuthContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { editUserSchema, type EditUserFormData } from '~/validations/admin/user.validation'
+import { singleFileValidator } from '~/validations/validators/validators'
 
 const useEdit = () => {
   // const [userInfo, setUserInfo] = useState<UserInfoInterface | null>(null)
@@ -39,7 +40,7 @@ const useEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const response: UserAPIResponse = await fetchDetailUserAPI(id)
+        const response = await fetchDetailUserAPI(id)
         const user = response.accountUser
         reset({
           fullName: user.fullName,
@@ -74,35 +75,28 @@ const useEdit = () => {
       }
     }
   }, [preview])
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File
     if (!file) return
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const newFile = {
+      name: file?.name || '',
+      size: file?.size || 0,
+      type: file?.type || ''
+    }
+    const error = singleFileValidator(newFile)
+
+    if (error) {
       dispatchAlert({
         type: 'SHOW_ALERT',
-        payload: { message: 'Vui lòng chọn file ảnh hợp lệ', severity: 'error' }
+        payload: { message: error, severity: 'error' }
       })
       return
     }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      dispatchAlert({
-        type: 'SHOW_ALERT',
-        payload: { message: 'Kích thước ảnh không được vượt quá 5MB', severity: 'error' }
-      })
-      return
-    }
-
-    // Revoke old preview URL if exists
-    if (preview && preview.startsWith('blob:')) {
-      URL.revokeObjectURL(preview)
-    }
+    const imageUrl = URL.createObjectURL(file)
 
     setValue('avatar', file)
-    setPreview(URL.createObjectURL(file))
+    setPreview(imageUrl)
   }
   const onSubmit = async (data: EditUserFormData) => {
     if (!id) return
@@ -163,7 +157,8 @@ const useEdit = () => {
     handleImageChange,
     onSubmit,
     preview,
-    isSubmitting
+    isSubmitting,
+    navigate
   }
 }
 

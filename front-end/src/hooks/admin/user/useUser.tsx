@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { fetchChangeStatusAPI, fetchDeleteUserAPI, fetchUsersAPI } from '~/apis/admin/user.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { UserInfoInterface, UsersDetailInterface } from '~/interfaces/user.interface'
+import type { UserInfoInterface } from '~/interfaces/user.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const useUser = () => {
   const [users, setUsers] = useState<UserInfoInterface[]>([])
@@ -11,12 +12,13 @@ const useUser = () => {
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const { role } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res: UsersDetailInterface = await fetchUsersAPI()
+        const res = await fetchUsersAPI()
         setUsers(res.users)
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -30,7 +32,7 @@ const useUser = () => {
 
   const handleToggleStatus = async (id: string, currentStatus: string): Promise<void> => {
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const response = await fetchChangeStatusAPI(id, newStatus)
+    const response = await fetchChangeStatusAPI(id, newStatus.toLowerCase())
     if (response.code === 200) {
       setUsers((prev) => prev.map((user) => user._id === id ? {
         ...user,
@@ -75,6 +77,7 @@ const useUser = () => {
       })
     }
   }
+
   return {
     users,
     loading,
@@ -83,7 +86,8 @@ const useUser = () => {
     handleToggleStatus,
     handleOpen,
     handleClose,
-    handleDelete
+    handleDelete,
+    navigate
   }
 }
 
