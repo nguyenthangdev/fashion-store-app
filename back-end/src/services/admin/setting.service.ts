@@ -1,8 +1,10 @@
 import { SettingInterface } from '~/interfaces/admin/setting.interface'
 import SettingsGeneralModel from '~/models/settingGeneral.model'
+import { settingRepositories } from '~/repositories/admin/setting.repository'
 
 export const getSettingGeneral = async () => {
-  const settingGeneral = await SettingsGeneralModel.find({})
+  const settingGeneral = await settingRepositories.findAllSetting()
+
   return settingGeneral
 }
 
@@ -15,7 +17,7 @@ export const editSettingGeneral = async (data: SettingInterface) => {
     copyright: data.copyright,
     logo: data.logo
   }
-  const settingsGeneral = await SettingsGeneralModel.findOne({}) // Lấy một document bất kỳ trong collection (thường là document đầu tiên)
+  const settingsGeneral = await settingRepositories.findOneSetting()
   if (settingsGeneral) {
     await SettingsGeneralModel.findByIdAndUpdate(
       { _id: settingsGeneral._id }, 
@@ -27,4 +29,9 @@ export const editSettingGeneral = async (data: SettingInterface) => {
     await settingGeneral.save()
   } 
   return settingsGeneral
+}
+
+export const settingServices = {
+  getSettingGeneral,
+  editSettingGeneral
 }

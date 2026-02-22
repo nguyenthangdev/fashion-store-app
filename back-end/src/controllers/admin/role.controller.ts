@@ -6,8 +6,7 @@ import { roleServices } from '~/services/admin/role.service'
 export const getRoles = async (req: Request, res: Response) => {
   try {
     const { roles, accounts } = await roleServices.getRoles()
-    console.log('roles: ', roles)
-    console.log('accounts: ', accounts)
+
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
