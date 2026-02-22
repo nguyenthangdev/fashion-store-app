@@ -45,6 +45,8 @@ export const useCreate = () => {
     }
   }, [preview])
 
+  const watchedDescription = watch('description')
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] as File
     if (!file) return
@@ -114,7 +116,7 @@ export const useCreate = () => {
     errors,
     isSubmitting,
     setValue,
-    watch,
-    navigate
+    navigate,
+    watchedDescription
   }
 }

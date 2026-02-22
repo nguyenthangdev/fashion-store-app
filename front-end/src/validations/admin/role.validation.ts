@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const roleSchema = z.object({
+export const createRoleSchema = z.object({
   title: z.string()
     .trim()
     .min(1, 'Tiêu đề không được để trống!')
@@ -16,7 +16,7 @@ export const roleSchema = z.object({
   description: z.string().optional()
 })
 
-export type RoleFormData = z.infer<typeof roleSchema>
+export type CreateRoleFormData = z.infer<typeof createRoleSchema>
 
 export const editRoleSchema = z.object({
   title: z.string()

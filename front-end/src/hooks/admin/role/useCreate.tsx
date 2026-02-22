@@ -5,7 +5,7 @@ import { useAuth } from '~/contexts/admin/AuthContext'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { roleSchema, type RoleFormData } from '~/validations/admin/role.validation'
+import { createRoleSchema, type CreateRoleFormData } from '~/validations/admin/role.validation'
 
 const useCreate = () => {
   const { dispatchAlert } = useAlertContext()
@@ -18,8 +18,8 @@ const useCreate = () => {
     formState: { errors, isSubmitting },
     setValue,
     watch
-  } = useForm<RoleFormData>({
-    resolver: zodResolver(roleSchema),
+  } = useForm<CreateRoleFormData>({
+    resolver: zodResolver(createRoleSchema),
     defaultValues: {
       title: '',
       titleId: '',
@@ -27,7 +27,9 @@ const useCreate = () => {
     }
   })
 
-  const onSubmit = async (data: RoleFormData) => {
+  const watchedDescription = watch('description')
+
+  const onSubmit = async (data: CreateRoleFormData) => {
     try {
       const response = await fetchCreateRoleAPI(data)
 
@@ -54,11 +56,13 @@ const useCreate = () => {
   return {
     role,
     register,
-    handleSubmit: handleSubmit(onSubmit),
+    handleSubmit,
+    onSubmit,
     errors,
     isSubmitting,
     setValue,
-    watch
+    navigate,
+    watchedDescription
   }
 }
 

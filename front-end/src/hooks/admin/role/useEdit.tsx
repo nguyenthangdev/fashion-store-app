@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { fetchDetailRoleAPI, fetchEditRoleAPI } from '~/apis/admin/role.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -15,6 +15,7 @@ const useEdit = () => {
   const { dispatchAlert } = useAlertContext()
   const navigate = useNavigate()
   const { role } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -22,29 +23,46 @@ const useEdit = () => {
     reset,
     setValue,
     watch,
-    formState: { errors, isSubmitting, isLoading } // isLoading của hook-form cho biết đang chờ defaultValues
+    formState: { errors, isSubmitting }
   } = useForm<EditRoleFormData>({
     resolver: zodResolver(editRoleSchema)
   })
 
-  // Fetch dữ liệu cũ và đổ vào Form
   useEffect(() => {
     if (!id) return
-    fetchDetailRoleAPI(id).then((response) => {
-      if (response?.role) {
-        // Dùng reset để map toàn bộ data vào các field tương ứng
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        const res = await fetchDetailRoleAPI(id)
+        const role = res.role
         reset({
-          title: response.role.title,
-          titleId: response.role.titleId,
-          description: response.role.description
+          title: role.title,
+          titleId: role.titleId,
+          description: role.description
         })
+      } catch (error) {
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: {
+            message: 'Không thể tải thông tin nhóm quyền. Vui lòng thử lại!',
+            severity: 'error'
+          }
+        })
+      } finally {
+        setIsLoading(false)
       }
-    })
-  }, [id, reset])
+    }
+
+    fetchData()
+  }, [dispatchAlert, id, reset])
+
+  const watchedDescription = watch('description')
 
   const onSubmit = async (data: EditRoleFormData) => {
     try {
       const response = await fetchEditRoleAPI(id, data)
+
       if (response.code === 200) {
         dispatchAlert({
           type: 'SHOW_ALERT',
@@ -68,16 +86,17 @@ const useEdit = () => {
   }
 
   return {
-    handleSubmit: handleSubmit(onSubmit),
+    handleSubmit,
+    onSubmit,
     register,
     errors,
     isSubmitting,
-    role, // Dùng để check quyền
+    role,
     setValue,
     watch,
-    // Kiểm tra xem đã load được dữ liệu cũ chưa
-    hasData: !!watch('title'),
-    isLoading
+    isLoading,
+    watchedDescription,
+    navigate
   }
 }
 

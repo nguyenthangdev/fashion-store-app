@@ -1,5 +1,7 @@
 import { Editor } from '@tinymce/tinymce-react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 import useCreate from '~/hooks/admin/role/useCreate'
 import { API_KEY } from '~/utils/constants'
 
@@ -10,45 +12,60 @@ const CreateRole = () => {
     handleSubmit,
     errors,
     isSubmitting,
-    setValue
+    setValue,
+    navigate,
+    onSubmit,
+    watchedDescription
   } = useCreate()
 
-  if (!role || !role.permissions.includes('roles_create')) return null
+
+  useEffect(() => {
+    if (!role || !role.permissions.includes('roles_create')) {
+      const timer = setTimeout(() => {
+        navigate('/admin/admin-welcome', { replace: true })
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [role, navigate])
+
+  if (!role || !role.permissions.includes('roles_create')) {
+    return (
+      <div className="bg-white p-6 rounded shadow-md mt-4">
+        <p className="text-red-500 text-center text-lg font-medium">
+            Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className='flex flex-col gap-[15px] text-[17px] font-[500] bg-white p-[15px] shadow-md mt-[40px]'
     >
       <h1 className="text-[24px] font-[600] text-[#192335]">
         Thêm mới nhóm quyền
       </h1>
 
-      {/* Tiêu đề */}
       <div className="form-group">
         <label>Tiêu đề <span className="text-red-500">*</span></label>
         <input
           {...register('title')}
           className='py-[6px] text-[16px] border rounded'
         />
-        {errors.title && (
-          <p className="text-red-500 text-sm">{errors.title.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName='title'/>
       </div>
 
-      {/* Mã định danh */}
       <div className="form-group">
         <label>Mã định danh <span className="text-red-500">*</span></label>
         <input
           {...register('titleId')}
           className='py-[6px] text-[16px] border rounded'
         />
-        {errors.titleId && (
-          <p className="text-red-500 text-sm">{errors.titleId.message}</p>
-        )}
+        <FieldErrorAlert errors={errors} fieldName='titleId'/>
       </div>
 
-      {/* Mô tả */}
       <div className="form-group">
         <label>Mô tả</label>
         <Editor
@@ -60,9 +77,12 @@ const CreateRole = () => {
             toolbar:
               'undo redo | bold italic underline | align | bullist numlist | removeformat'
           }}
-          onEditorChange={(value) =>
-            setValue('description', value, { shouldValidate: true })
-          }
+          value={watchedDescription}
+          onEditorChange={(value) => setValue(
+            'description',
+            value,
+            { shouldValidate: true }
+          )}
         />
       </div>
 
