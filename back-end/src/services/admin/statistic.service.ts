@@ -1,6 +1,4 @@
-import ProductModel from '~/models/product.model'
-import UserModel from '~/models/user.model'
-import OrderModel from '~/models/order.model'
+import { statisticRepositories } from '~/repositories/admin/statistic.repository'
 
 export const getStatistic = async () => {
   const statistic = {
@@ -17,16 +15,7 @@ export const getStatistic = async () => {
       total: 0,
     }
   }
-  const result = await OrderModel.aggregate([
-    { $match: { "paymentInfo.status": "PAID" } }, // chỉ tính đơn đã thanh toán
-    {
-      $group: {
-        _id: { $month: "$createdAt" },            // group theo tháng
-        totalRevenue: { $sum: "$amount" }     // cộng dồn doanh thu
-      }
-    },
-    { $sort: { "_id": 1 } } // sắp xếp theo tháng tăng dần
-  ])
+  const result = await statisticRepositories.getStatistic()
 
   const currentMonth = new Date().getMonth() + 1
   const currentMonthData = result.find(r => r._id === currentMonth)
@@ -35,22 +24,21 @@ export const getStatistic = async () => {
   const labels = result.map(month => `Tháng ${month._id}`)
   const data = result.map(revenue => revenue.totalRevenue)
 
-  statistic.user.total = await UserModel.countDocuments({
-    deleted: false
-  })
+  statistic.user.total = await statisticRepositories.countUser()
 
-  statistic.product.total = await ProductModel.countDocuments({
-    deleted: false
-  })
+  statistic.product.total = await statisticRepositories.countProduct()
 
-  statistic.order.total = await OrderModel.countDocuments({
-    deleted: false
-  })
+  statistic.order.total = await statisticRepositories.countOrder()
 
   statistic.revenue.total = currentMonthRevenue
+
   return {
     statistic,
     labels,
     data
   }
+}
+
+export const statisticServices = {
+  getStatistic
 }

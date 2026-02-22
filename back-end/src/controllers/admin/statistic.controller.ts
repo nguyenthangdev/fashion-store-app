@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as statisticService from '~/services/admin/statistic.service'
+import { statisticServices } from '~/services/admin/statistic.service'
 
 // [GET] /admin/statistics
-export const index = async (req: Request, res: Response) => {
+export const getStatistic = async (req: Request, res: Response) => {
   try {
     const {
       statistic,
       labels,
       data
-    } = await statisticService.getStatistic() 
+    } = await statisticServices.getStatistic() 
     
     res.status(StatusCodes.OK).json({
       code: 200,
