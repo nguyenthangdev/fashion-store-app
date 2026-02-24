@@ -24,7 +24,7 @@ export const orderPost = (
         .pattern(/^(0[35789]\d{8}|\+84[35789]\d{8})$/)
         .messages({
         "any.required": "Số điện thoại là bắt buộc!",
-        "string.empty": "Vui lòng nhập số điện thoại của bạn!",
+        "string.empty": "Vui lòng nhập số điện thoại!",
         "string.pattern.base": "Số điện thoại phải có 10 số và bắt đầu bằng 03/05/07/08/09 hoặc +84!"
         }),
     address: Joi.string()
@@ -33,7 +33,7 @@ export const orderPost = (
         .min(1)
         .messages({
         "any.required": "Địa chỉ là bắt buộc!",
-        "string.empty": "Vui lòng nhập địa chỉ của bạn!",
+        "string.empty": "Vui lòng nhập địa chỉ!",
         'string.base': 'Địa chỉ phải là chuỗi ký tự'
         }),
     note: Joi.string()

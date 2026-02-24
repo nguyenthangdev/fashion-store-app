@@ -24,7 +24,7 @@ export const editMyAccount = (
       .lowercase()
       .messages({
         "any.required": "Họ tên là bắt buộc!", // Không gửi gì lên -> Lỗi
-        "string.empty": "Vui lòng nhập email của bạn!",
+        "string.empty": "Vui lòng nhập email!",
         "string.email": "Email không đúng định dạng!",
       }),
     

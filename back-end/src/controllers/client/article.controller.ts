@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as articleService from '~/services/client/article.service'
+import { articleServices } from '~/services/client/article.service'
 
 // [GET] /articles
 export const index = async (req: Request, res: Response) => {
@@ -9,7 +9,7 @@ export const index = async (req: Request, res: Response) => {
       articles,
       objectPagination,
       allArticles
-    } = await articleService.getArticles(req.query)
+    } = await articleServices.getArticles(req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -29,7 +29,7 @@ export const index = async (req: Request, res: Response) => {
 // [GET] /articles/:slugCategory
 export const category = async (req: Request, res: Response) => {
   try {
-    const { articles, category } = await articleService.category(req.params.slugCategory)
+    const { articles, category } = await articleServices.category(req.params.slugCategory)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -48,7 +48,7 @@ export const category = async (req: Request, res: Response) => {
 // [GET] /articles/detail/:slugArticle
 export const detailArticle = async (req: Request, res: Response) => {
   try {
-    const article = await articleService.detailArticle(req.params.slugArticle)
+    const article = await articleServices.detailArticle(req.params.slugArticle)
 
     res.status(StatusCodes.OK).json({
       code: 200,
