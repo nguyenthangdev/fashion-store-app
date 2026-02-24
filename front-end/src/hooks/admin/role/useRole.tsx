@@ -53,7 +53,7 @@ const useRole = () => {
 
     const response = await fetchDeleteRoleAPI(selectedId)
     if (response.code === 204) {
-      setRoles((prev) => prev.filter((role) => role._id !== selectedId))
+      setRoles((prev) => prev.filter(role => role._id !== selectedId))
       dispatchAlert({
         type: 'SHOW_ALERT',
         payload: { message: response.message, severity: 'success' }

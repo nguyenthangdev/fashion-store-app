@@ -1,35 +1,41 @@
-/* eslint-disable no-console */
-// ~/hooks/client/article/useDetail.ts
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchDetailArticleAPI } from '~/apis/client/article.api' // (Giả sử bạn đã có hàm này)
-import type { ArticleDetailInterface, ArticleInfoInterface } from '~/interfaces/article.interface'
+import { fetchDetailArticleAPI } from '~/apis/client/article.api'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
+import type { ArticleInfoInterface } from '~/interfaces/article.interface'
 
 const useDetail = () => {
   const [articleDetail, setArticleDetail] = useState<ArticleInfoInterface | null>(null)
-  const [loading, setLoading] = useState(true) // THÊM STATE NÀY
+  const [isLoading, setIsLoading] = useState(true)
   const params = useParams()
   const slugArticle = params.slugArticle as string
+  const { dispatchAlert } = useAlertContext()
 
   useEffect(() => {
     if (!slugArticle) return
+
     const fetchData = async () => {
-      setLoading(true)
       try {
-        const res: ArticleDetailInterface = await fetchDetailArticleAPI(slugArticle)
+        setIsLoading(true)
+        const res = await fetchDetailArticleAPI(slugArticle)
         setArticleDetail(res.article)
       } catch (error) {
-        console.error('Lỗi khi fetch chi tiết bài viết:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đã xảy ra lỗi khi tải dữ liệu bài viết!', severity: 'error' }
+        })
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
     fetchData()
-  }, [slugArticle])
+  }, [dispatchAlert, slugArticle])
 
   return {
     articleDetail,
-    loading // TRẢ RA STATE NÀY
+    isLoading
   }
 }
 

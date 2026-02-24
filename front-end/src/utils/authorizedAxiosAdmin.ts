@@ -21,7 +21,6 @@ let refreshTokenPromise: Promise<any> | null = null
 authorizedAxiosInstance.interceptors.response.use((response) => {
   return response
 }, async (error) => {
-
   if (error.response?.status === 401) {
     await fetchLogoutAPI().catch(() => {}) // Logout phía server
 

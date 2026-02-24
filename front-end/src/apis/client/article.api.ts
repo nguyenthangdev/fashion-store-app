@@ -20,13 +20,13 @@ export const fetchAllArticlesAPI = async (
   return response.data
 }
 
-export const fetchArticlesAPI = async (): Promise<ArticleAPIResponse> => {
-  const response = await axios.get(
-    `${API_ROOT}/articles`,
-    { withCredentials: true }
-  )
-  return response.data
-}
+// export const fetchArticlesAPI = async (): Promise<ArticleAPIResponse> => {
+//   const response = await axios.get(
+//     `${API_ROOT}/articles`,
+//     { withCredentials: true }
+//   )
+//   return response.data
+// }
 
 export const fetchDetailArticleAPI = async (id: string): Promise<ArticleDetailInterface> => {
   const response = await axios.get(

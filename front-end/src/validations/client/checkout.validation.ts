@@ -13,7 +13,7 @@ export const checkoutSchema = z.object({
 
   address: z.string()
     .trim()
-    .min(1, 'Vui lòng nhập địa chỉ của bạn!'),
+    .min(1, 'Vui lòng nhập địa chỉ!'),
 
   note: z.string().trim().optional(),
   paymentMethod: z.enum(['COD', 'MOMO', 'VNPAY', 'ZALOPAY'], {

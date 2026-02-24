@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { fetchPermissions, fetchRoleAPI } from '~/apis/admin/role.api'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
-import type { PermissionsInterface, RoleInfoInterface, RolesResponseInterface } from '~/interfaces/role.interface'
+import type { PermissionsInterface, RoleInfoInterface } from '~/interfaces/role.interface'
 import { useAuth } from '~/contexts/admin/AuthContext'
 import { permissionSections } from '~/utils/constants'
+import { useNavigate } from 'react-router-dom'
 
 const usePermission = () => {
   const [roles, setRoles] = useState<RoleInfoInterface[]>([])
@@ -13,14 +14,20 @@ const usePermission = () => {
   const { dispatchAlert } = useAlertContext()
   const [loading, setLoading] = useState(false)
   const { role } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res: RolesResponseInterface = await fetchRoleAPI()
+        const res = await fetchRoleAPI()
         setRoles(res.roles)
-        setPermissionsData(res.roles.map(role => ({ _id: String(role._id), permissions: role.permissions || [] })))
+        setPermissionsData(res.roles.map(role => (
+          {
+            _id: String(role._id),
+            permissions: role.permissions || []
+          }
+        )))
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Fetch roles error:', error)
@@ -57,6 +64,7 @@ const usePermission = () => {
       })
     }
   }
+
   return {
     permissionSections,
     roles,
@@ -64,7 +72,8 @@ const usePermission = () => {
     role,
     handleCheckboxChange,
     handleSubmit,
-    permissionsData
+    permissionsData,
+    navigate
   }
 }
 

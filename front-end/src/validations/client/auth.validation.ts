@@ -4,7 +4,7 @@ export const loginSchema = z.object({
   email: z.string()
     .trim()
     .lowercase()
-    .min(1, 'Vui lòng nhập email của bạn!')
+    .min(1, 'Vui lòng nhập email!')
     .pipe(z.email('Email không hợp lệ')),
   password: z.string()
     .min(1, 'Vui lòng nhập mật khẩu!')
@@ -16,7 +16,7 @@ export const forgotPasswordSchema = z.object({
   email: z.string()
     .trim()
     .lowercase()
-    .min(1, 'Vui lòng nhập email của bạn!')
+    .min(1, 'Vui lòng nhập email!')
     .pipe(z.email('Email không đúng định dạng!'))
 })
 
@@ -43,14 +43,14 @@ export type ResetFormData = z.infer<typeof resetSchema>
 export const registerSchema = z.object({
   fullName: z.string()
     .trim()
-    .min(1, 'Vui lòng nhập họ tên!')
+    .min(1, 'Vui lòng nhập họ và tên!')
     .max(50, 'Họ tên không được vượt quá 50 ký tự!')
     .transform((val) => val.replace(/\s+/g, ' ')),
 
   email: z.string()
     .trim()
     .lowercase()
-    .min(1, 'Vui lòng nhập email của bạn!')
+    .min(1, 'Vui lòng nhập email!')
     .pipe(z.email('Email không hợp lệ')),
 
   password: z.string()

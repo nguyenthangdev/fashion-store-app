@@ -5,7 +5,7 @@ import type { AllParams } from '~/interfaces/helper.interface'
 
 const useIndex = () => {
   const { stateArticle, fetchArticle } = useArticleContext()
-  const { articles, pagination, loading } = stateArticle
+  const { articles, pagination, isLoading } = stateArticle
   const [searchParams, setSearchParams] = useSearchParams()
 
   // Parse URL params một lần
@@ -36,7 +36,7 @@ const useIndex = () => {
     articles,
     pagination,
     updateParams,
-    loading
+    isLoading
   }
 }
 

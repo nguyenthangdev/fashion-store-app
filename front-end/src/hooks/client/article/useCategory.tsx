@@ -15,6 +15,7 @@ const useCategory = () => {
       setPageTitle(res.pageTitle)
     })
   }, [slugCategory])
+
   return {
     pageTitle,
     articleCategory

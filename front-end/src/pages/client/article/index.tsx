@@ -30,7 +30,7 @@ const ArticleClient = () => {
     articles,
     pagination,
     updateParams,
-    loading
+    isLoading
   } = useIndex()
 
   return (
@@ -39,7 +39,7 @@ const ArticleClient = () => {
         <div className="container flex flex-col mb-[100px]">
           <BoxHead title={'Tất cả bài viết'} />
 
-          {loading ? (
+          {isLoading ? (
             <div className='grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[15px]'>
               {Array.from({ length: 8 }).map((_, index) => (
                 <CardItemSkeleton key={index} />

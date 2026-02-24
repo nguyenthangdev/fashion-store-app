@@ -6,10 +6,10 @@ import { FaUserCircle } from 'react-icons/fa'
 const DetailArticleClient = () => {
   const {
     articleDetail,
-    loading
+    isLoading
   } = useDetail()
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container max-w-3xl mx-auto px-4 py-8 md:py-16">
         <Skeleton variant="text" width="80%" height={60} sx={{ fontSize: '2.5rem' }} />

@@ -18,7 +18,11 @@ export const fetchEditInfoUserAPI = async (formData: FormData): Promise<UserAPIR
   return response.data
 }
 
-export const fetchChangePasswordInfoUserAPI = async (currentPassword: string, password: string, confirmPassword: string): Promise<UserAPIResponse> => {
+export const fetchChangePasswordInfoUserAPI = async (
+  currentPassword: string,
+  password: string,
+  confirmPassword: string
+): Promise<UserAPIResponse> => {
   const response = await authorizedAxiosInstance.patch(
     `${API_ROOT}/user/account/info/change-password`,
     { currentPassword, password, confirmPassword }
