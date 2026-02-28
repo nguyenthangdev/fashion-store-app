@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
 import { useEffect, useState } from 'react'
 import { fetchCartAPI } from '~/apis/client/cart.api'
 import type { CartInfoInterface } from '~/interfaces/cart.interface'
@@ -38,45 +39,51 @@ const useCheckout = () => {
       paymentMethod: 'COD'
     }
   })
+
   useEffect(() => {
     setValue('paymentMethod', paymentMethod as any)
   }, [paymentMethod, setValue])
 
-  // Tự động điền thông tin khi accountUser thay đổi
   useEffect(() => {
-    if (accountUser) {
-      reset({
-        fullName: accountUser.fullName || '',
-        phone: accountUser.phone || '',
-        address: accountUser.address || '',
-        paymentMethod: paymentMethod as any
-      })
-    }
+    if (!accountUser) return
+
+    reset({
+      fullName: accountUser.fullName,
+      phone: accountUser.phone,
+      address: accountUser.address,
+      paymentMethod: paymentMethod as any
+    })
   }, [accountUser, reset])
 
-  // Lấy dữ liệu giỏ hàng
   useEffect(() => {
     const fetchData = async () => {
       try {
         const cartRes = await fetchCartAPI()
         setCartDetail(cartRes.cartDetail)
       } catch (error) {
-        console.error('Lỗi khi fetch dữ liệu:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Lỗi khi tải dữ liệu giỏ hàng!', severity: 'error' }
+        })
       }
     }
-    fetchData()
-  }, [])
 
-  // Xử lý Submit
+    fetchData()
+  }, [dispatchAlert])
+
   const onOrderSubmit = async (data: CheckoutFormData) => {
     setIsLoading(true)
     const payload = { ...data, note: data.note || '', paymentMethod }
+
     try {
       const response = await fetchOrderAPI(payload)
       if (response.code === 201) {
         await refreshCart()
         if (paymentMethod === 'COD') {
-          dispatchAlert({ type: 'SHOW_ALERT', payload: { message: response.message, severity: 'success' } })
+          dispatchAlert({
+            type: 'SHOW_ALERT',
+            payload: { message: response.message, severity: 'success' }
+          })
           navigate(`/checkout/success/${response.order._id}`)
         } else if (paymentMethod === 'VNPAY' && response.paymentUrl) {
           window.location.href = response.paymentUrl
@@ -86,10 +93,16 @@ const useCheckout = () => {
           window.location.href = response.data.payUrl
         }
       } else {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: response.message, severity: 'error' } })
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: response.message, severity: 'error' }
+        })
       }
     } catch (error) {
-      console.log(error)
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Đã xảy ra lỗi khi đặt hàng!', severity: 'error' }
+      })
     } finally {
       setIsLoading(false)
     }
@@ -97,7 +110,8 @@ const useCheckout = () => {
 
   return {
     register,
-    handleSubmit: handleSubmit(onOrderSubmit),
+    handleSubmit,
+    onOrderSubmit,
     errors,
     paymentMethod,
     setPaymentMethod,

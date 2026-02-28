@@ -1,4 +1,6 @@
-/* eslint-disable no-console */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAlertContext } from '~/contexts/alert/AlertContext'
@@ -16,17 +18,21 @@ const useHeader = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   // const [accountUser, setAccountUser] = useState<UserInfoInterface | null>(null)
+
   const [openProduct, setOpenProduct] = useState(false)
   const [openArticle, setOpenArticle] = useState(false)
+
   const [searchTerm, setSearchTerm] = useState(searchParams.get('keyword') || '')
   const [suggestions, setSuggestions] = useState<ProductInfoInterface[]>([])
   const [isSuggestLoading, setIsSuggestLoading] = useState(false)
   const [visibleCount, setVisibleCount] = useState(4)
+
+  // Ref để cuộn xuống dưới khi người dùng bấm "Xem thêm"
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
   const { accountUser, logout } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
 
-  // === THÊM STATE CHO RESPONSIVE ===
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
 
@@ -34,7 +40,7 @@ const useHeader = () => {
   const { dataHome, setDataHome } = useHome()
   const { settingGeneral } = useSettingGeneral()
   const { cartDetail } = useCart()
-  console.log('cartDetail: ',cartDetail)
+
   const [closeTopHeader, setCloseTopHeader] = useState<boolean>(() => {
     const saved = sessionStorage.getItem('closeTopHeader')
     return saved === 'true'
@@ -47,14 +53,16 @@ const useHeader = () => {
         const homeRes = await fetchHomeAPI()
         setDataHome(homeRes)
       } catch (error) {
-        console.log('error' + error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Lỗi khi fetch home', severity: 'error' }
+        })
       } finally {
         setIsLoading(false)
       }
     }
     fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [dispatchAlert])
 
   // useEffect cho debounce
   useEffect(() => {
@@ -62,6 +70,8 @@ const useHeader = () => {
       setSuggestions([])
       return
     }
+
+    // Ngăn việc gọi api quá nhiều sau mỗi lần gõ
     const delayDebounceFn = setTimeout(async () => {
       setIsSuggestLoading(true)
       try {
@@ -71,14 +81,38 @@ const useHeader = () => {
           setVisibleCount(4)
         }
       } catch (error) {
-        console.error('Lỗi khi fetch gợi ý:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Lỗi khi fetch gợi ý', severity: 'error' }
+        })
         setSuggestions([])
       } finally {
         setIsSuggestLoading(false)
       }
     }, 300)
     return () => clearTimeout(delayDebounceFn)
-  }, [searchTerm])
+
+    // Code bị spam gọi api sau mỗi lần gõ
+    // const fetchData = async () => {
+    //   setIsSuggestLoading(true)
+    //   try {
+    //     const response = await fetchSearchSuggestionsAPI(searchTerm)
+    //     if (response.code === 200) {
+    //       setSuggestions(response.products)
+    //       setVisibleCount(4)
+    //     }
+    //   } catch (error) {
+    //     dispatchAlert({
+    //       type: 'SHOW_ALERT',
+    //       payload: { message: 'Lỗi khi fetch gợi ý', severity: 'error' }
+    //     })
+    //     setSuggestions([])
+    //   } finally {
+    //     setIsSuggestLoading(false)
+    //   }
+    // }
+    // fetchData()
+  }, [dispatchAlert, searchTerm])
 
   // Khóa cuộn trang khi menu/search mobile mở
   useEffect(() => {
@@ -97,10 +131,6 @@ const useHeader = () => {
   useEffect(() => {
     setSearchTerm(searchParams.get('keyword') || '')
   }, [searchParams])
-
-  const handleSearchTermChange = (newTerm: string) => {
-    setSearchTerm(newTerm)
-  }
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -131,6 +161,10 @@ const useHeader = () => {
   const handleCloseTopHeader = () => {
     setCloseTopHeader(true)
     sessionStorage.setItem('closeTopHeader', 'true')
+  }
+
+  const handleSearchTermChange = (newTerm: string) => {
+    setSearchTerm(newTerm)
   }
 
   const handleSearchSubmit = () => {
@@ -164,10 +198,9 @@ const useHeader = () => {
     }
   }, [visibleCount])
 
-  // === HÀM MỞ/ĐÓNG MENU/SEARCH MOBILE ===
   const toggleMobileMenu = () => {
     setIsMobileSearchOpen(false) // Đóng search nếu mở nav
-    setIsMobileMenuOpen(prev => !prev)
+    setIsMobileMenuOpen(prev => !prev) // Đảo ngược trạng thái menu (mở nếu đang đóng, đóng nếu đang mở)
   }
 
   const toggleMobileSearch = () => {

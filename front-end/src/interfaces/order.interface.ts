@@ -14,39 +14,40 @@ interface PaymentDetails {
 export type OrderStatus = 'PENDING' | 'TRANSPORTING' | 'CONFIRMED' | 'CANCELED'
 
 export interface OrderInfoInterface {
-    deleted?: boolean,
-    _id: string,
-    cartId: string,
-    userInfo: {
-      fullName: string,
-      phone: string,
-      address: string
-    },
-    products: {
-      product_id: string,
-      title: string,
-      price: number,
-      discountPercentage: number,
-      quantity: number,
-      thumbnail: string,
-      color: string,
-      size: string
-    }[]
-    status: OrderStatus,
-    createdBy: CreatedBy
-    updatedBy: UpdatedBy[],
-    deletedBy: DeletedBy,
-    createdAt: Date | null
-    updatedAt: Date | null,
-    paymentInfo: {
-      method: 'COD' | 'VNPAY' | 'MOMO' | 'ZALOPAY'
-      status: 'PENDING' | 'PAID' | 'FAILED'
-      details?: PaymentDetails
-    },
-    note?: string,
-    amount: number,
-    estimatedDeliveryDay: string,
-    estimatedConfirmedDay: string
+  deleted?: boolean,
+  _id: string,
+  cartId: string,
+  userInfo: {
+    fullName: string,
+    phone: string,
+    address: string
+  },
+  products: {
+    product_id: string,
+    title: string,
+    price: number,
+    discountPercentage: number,
+    quantity: number,
+    thumbnail: string,
+    color: string,
+    size: string,
+    slug: string
+  }[]
+  status: OrderStatus,
+  createdBy: CreatedBy
+  createdAt: Date | null
+  updatedBy: UpdatedBy[],
+  updatedAt: Date | null,
+  deletedBy: DeletedBy,
+  paymentInfo: {
+    method: 'COD' | 'VNPAY' | 'MOMO' | 'ZALOPAY'
+    status: 'PENDING' | 'PAID' | 'FAILED'
+    details?: PaymentDetails
+  },
+  note?: string,
+  amount: number,
+  estimatedDeliveryDay: string,
+  estimatedConfirmedDay: string
 }
 export interface OrderDetailInterface {
   order: OrderInfoInterface,

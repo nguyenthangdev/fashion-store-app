@@ -43,6 +43,7 @@ export const AuthClientProvider = ({ children }: { children: ReactNode }) => {
 
     initAuth()
   }, [])
+
   // (Trung tâm điều khiển): Đang lắng nghe loa phóng thanh (addEventListener) -> Nghe thấy tiếng báo động -> Thực hiện hành động dọn dẹp (setAccountUser(null)).
   useEffect(() => {
     const handleForceLogout = () => {
@@ -53,6 +54,7 @@ export const AuthClientProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener('force-logout', handleForceLogout)
     return () => window.removeEventListener('force-logout', handleForceLogout)
   }, [])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

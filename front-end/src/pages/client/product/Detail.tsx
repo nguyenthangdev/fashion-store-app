@@ -12,7 +12,7 @@ import useDetail from '~/hooks/client/product/useDetail'
 
 const DetailProductClient = () => {
   const {
-    loading,
+    isLoading,
     setReviewFilter,
     mainImage,
     relatedProducts,
@@ -33,7 +33,7 @@ const DetailProductClient = () => {
     visibleCount
   } = useDetail()
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto my-12 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -56,10 +56,8 @@ const DetailProductClient = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-[150px] px-4">
-      {/* Breadcrumb */}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        {/* === CỘT TRÁI: GALLERY ẢNH === */}
+        {/* Cột trái */}
         <div className="flex flex-col-reverse sm:flex-row gap-4">
           {/* SLIDER THUMBNAILS DỌC */}
           <div className="flex-shrink-0 sm:h-[530px] w-full sm:w-24">
@@ -96,7 +94,7 @@ const DetailProductClient = () => {
           </div>
         </div>
 
-        {/* === CỘT PHẢI: THÔNG TIN VÀ LỰA CHỌN === */}
+        {/* Cột phải */}
         <div className='flex flex-col gap-5'>
           <h1 className='font-bold text-4xl text-gray-800'>{productDetail.title}</h1>
           {/* Đánh giá sao */}
@@ -116,8 +114,12 @@ const DetailProductClient = () => {
             </span>
             {productDetail.discountPercentage > 0 && (
               <>
-                <span className='line-through text-gray-400 text-xl'>{(productDetail.price).toLocaleString('vi-VN')}đ</span>
-                <span className="text-red-600 font-semibold px-2 py-1 bg-red-100 rounded-md text-sm">-{productDetail.discountPercentage}%</span>
+                <span className='line-through text-gray-400 text-xl'>
+                  {(productDetail.price).toLocaleString('vi-VN')}đ
+                </span>
+                <span className="text-red-600 font-semibold px-2 py-1 bg-red-100 rounded-md text-sm">
+                  -{productDetail.discountPercentage}%
+                </span>
               </>
             )}
           </div>
@@ -128,7 +130,10 @@ const DetailProductClient = () => {
               <h3 className='font-semibold text-gray-600'>Chọn màu sắc</h3>
               <div className='flex flex-wrap gap-3'>
                 {productDetail.colors.map((color) => (
-                  <button key={color.name} type="button" onClick={() => handleColorSelect(color)}
+                  <button
+                    key={color.name}
+                    type="button"
+                    onClick={() => handleColorSelect(color)}
                     className={`w-10 h-10 rounded-full border-2 p-1 flex justify-center items-center transition-all ${selectedColor?.name === color.name ? 'border-black' : 'border-gray-300'}`}
                     title={color.name}
                   >
@@ -145,7 +150,10 @@ const DetailProductClient = () => {
               <h3 className='font-semibold text-gray-600'>Chọn kích cỡ</h3>
               <div className='flex flex-wrap gap-3'>
                 {productDetail.sizes.map((size) => (
-                  <button key={size} type="button" onClick={() => setSelectedSize(size)}
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => setSelectedSize(size)}
                     className={`border px-6 py-2 rounded-full font-semibold transition-colors duration-200 ${selectedSize === size ? 'bg-black text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}
                   >
                     {size}
@@ -157,15 +165,27 @@ const DetailProductClient = () => {
 
           {/* Form thêm vào giỏ */}
           <form onSubmit={handleSubmit} className='flex items-center gap-4 pt-4 border-t'>
-            {/* Input số lượng */}
             <div className="flex items-center border rounded-full bg-gray-100 font-bold">
-              <button type="button" onClick={() => handleQuantityChange(-1)} className="px-5 py-3 text-lg">-</button>
+              <button
+                type="button"
+                onClick={() => handleQuantityChange(-1)}
+                className="px-5 py-3 text-lg">
+                  -
+              </button>
               <input
                 className='w-14 h-full text-center bg-transparent outline-none'
-                type='number' value={quantity} readOnly
+                type='number'
+                value={quantity}
+                readOnly
               />
-              <button type="button" onClick={() => handleQuantityChange(1)} className="px-5 py-3 text-lg">+</button>
+              <button
+                type="button"
+                onClick={() => handleQuantityChange(1)}
+                className="px-5 py-3 text-lg">
+                  +
+              </button>
             </div>
+
             {/* Nút thêm vào giỏ */}
             <button
               type='submit'
@@ -175,20 +195,19 @@ const DetailProductClient = () => {
               {productDetail.stock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
             </button>
           </form>
+
           <div className='border rounded-[5px] p-[4px] text-center w-[30%]'>
             {productDetail.stock} sản phẩm có sẵn
           </div>
-
         </div>
       </div>
 
-      {/* Phần mô tả chi tiết */}
       <div className='mt-20 pt-8 border-t'>
         <h2 className='text-2xl font-bold mb-4'>Mô tả sản phẩm</h2>
         <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: productDetail.description }} />
       </div>
 
-      {/* === PHẦN ĐÁNH GIÁ SẢN PHẨM === */}
+      {/* Đánh giá sản phẩm */}
       {productDetail.comments && productDetail.comments.length > 0 && (
         <div className='mt-20 pt-8 border-t'>
           <h2 className='text-2xl font-bold mb-4'>Đánh giá sản phẩm</h2>
@@ -278,7 +297,7 @@ const DetailProductClient = () => {
               />
             ))}
           </div>
-          {/* Logic: Chỉ hiện khi số lượng đang hiện < tổng số comment sau khi lọc */}
+          {/* tổng số comment sau khi lọc > Chỉ hiện khi số lượng đang hiện */}
           {filteredComments.length > visibleCount && (
             <div className="mt-8 text-center">
               <button
@@ -292,7 +311,7 @@ const DetailProductClient = () => {
         </div>
       )}
 
-      {/* === PHẦN SẢN PHẨM CÙNG LOẠI === */}
+      {/* Sản phẩm có liên quan */}
       {relatedProducts.length > 0 && (
         <div className='mt-20 pt-8 border-t'>
           <h2 className='text-3xl font-bold mb-6 text-center'>Sản phẩm cùng loại</h2>

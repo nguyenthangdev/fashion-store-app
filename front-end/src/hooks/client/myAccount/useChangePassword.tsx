@@ -65,7 +65,6 @@ const useChangePassword = () => {
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
-    // Trả về các phương thức cần thiết cho UI
     register,
     errors,
     isSubmitting,

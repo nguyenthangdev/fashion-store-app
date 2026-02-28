@@ -42,7 +42,7 @@ const User = () => {
     return (
       <div className="bg-white p-6 rounded shadow-md mt-4">
         <p className="text-red-500 text-center text-lg font-medium">
-              Bạn không có quyền truy cập trang này. Đang chuyển hướng...
+          Bạn không có quyền truy cập trang này. Đang chuyển hướng...
         </p>
       </div>
     )

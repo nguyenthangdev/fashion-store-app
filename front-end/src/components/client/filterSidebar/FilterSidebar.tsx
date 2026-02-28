@@ -1,11 +1,13 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { useState, type ChangeEvent, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchFilterDataAPI } from '~/apis/client/product.api'
 import Skeleton from '@mui/material/Skeleton'
 import { FilterSection } from '../filterSection/FilterSection'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
 
-// Định nghĩa kiểu dữ liệu cho bộ lọc
 interface Color { name: string; code: string }
 interface Category { _id: string; title: string; slug: string }
 interface FilterData {
@@ -15,7 +17,6 @@ interface FilterData {
   maxPrice: number
 }
 
-// Component Skeleton cho bộ lọc
 const FilterSkeleton = () => (
   <div className="w-full bg-white rounded-lg p-4">
     <div className="flex items-center justify-between border-b pb-6">
@@ -60,13 +61,14 @@ const FilterSkeleton = () => (
 )
 
 interface FilterSidebarProps {
-  onClose?: () => void; // Làm cho nó tùy chọn
+  onClose?: () => void
 }
 
 export const FilterSidebar = ({ onClose }: FilterSidebarProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [filterData, setFilterData] = useState<FilterData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { dispatchAlert } = useAlertContext()
 
   // Đọc giá trị filter hiện tại từ URL
   const activeCategory = searchParams.get('category') || ''
@@ -75,7 +77,6 @@ export const FilterSidebar = ({ onClose }: FilterSidebarProps) => {
   // Lấy maxPrice từ URL, nếu không có thì set mặc định khi có data
   const currentMaxPrice = searchParams.get('maxPrice')
 
-  // Gọi API để lấy dữ liệu filter
   useEffect(() => {
     const getData = async () => {
       try {
@@ -85,15 +86,18 @@ export const FilterSidebar = ({ onClose }: FilterSidebarProps) => {
           setFilterData(res.filters)
         }
       } catch (error) {
-        console.error('Lỗi khi fetch dữ liệu filter:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Lỗi khi fetch dữ liệu filter', severity: 'error' }
+        })
       } finally {
         setIsLoading(false)
       }
     }
     getData()
-  }, [])
+  }, [dispatchAlert])
 
-  // Hàm helper để cập nhật URL
+  // Hàm để cập nhật URL
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams)
     if (value && newParams.get(key) !== value) {
@@ -101,7 +105,7 @@ export const FilterSidebar = ({ onClose }: FilterSidebarProps) => {
     } else {
       newParams.delete(key)
     }
-    newParams.set('page', '1') // Luôn reset về trang 1 khi filter
+    newParams.set('page', '1')
     setSearchParams(newParams)
     if (onClose) {
       onClose()

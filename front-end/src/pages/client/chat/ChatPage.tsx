@@ -10,7 +10,7 @@ const ChatPage = () => {
   const {
     setIsOpen,
     handleSubmit,
-    loading,
+    isLoading,
     isOpen,
     accountUser,
     messages,
@@ -53,7 +53,7 @@ const ChatPage = () => {
                   </p>
                   <p className="text-xs">Việc đăng nhập giúp chúng tôi hỗ trợ bạn tốt hơn.</p>
                 </div>
-              ) : loading ? (
+              ) : isLoading ? (
                 <div className="space-y-4">
                   <Skeleton variant="rounded" width="60%" height={40} />
                   <Skeleton variant="rounded" width="70%" height={50} sx={{ ml: 'auto' }} />
@@ -87,12 +87,12 @@ const ChatPage = () => {
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder={accountUser ? 'Nhập tin nhắn...' : 'Bạn cần đăng nhập để chat'}
                 className="flex-1 border rounded-full py-2 px-4 outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={loading || !accountUser} // Vô hiệu hóa nếu đang tải hoặc chưa login
+                disabled={isLoading || !accountUser} // Vô hiệu hóa nếu đang tải hoặc chưa login
               />
               <button
                 type="submit"
                 className="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center disabled:bg-gray-400"
-                disabled={loading || !newMessage.trim() || !accountUser} // Vô hiệu hóa nếu đang tải hoặc chưa login
+                disabled={isLoading || !newMessage.trim() || !accountUser} // Vô hiệu hóa nếu đang tải hoặc chưa login
               >
                 <IoIosSend />
               </button>

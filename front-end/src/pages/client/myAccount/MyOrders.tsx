@@ -10,7 +10,6 @@ import { formatDateIntl } from '~/helpers/formatDateIntl.helper'
 import useMyOrder from '~/hooks/client/myAccount/useMyOrder'
 import { MYORDER_STATUSES } from '~/utils/constants'
 
-// MUI Imports
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'

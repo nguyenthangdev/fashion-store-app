@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination } from 'swiper/modules'
 import TestimonialCard, {
@@ -14,31 +15,33 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 import '~/testimonial-slider.css'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
 
 const Section6 = () => {
-  // 5. Thêm state
   const [reviews, setReviews] = useState<Testimonial[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const { dispatchAlert } = useAlertContext()
 
-  // 6. Thêm useEffect để fetch data
   useEffect(() => {
     const loadReviews = async () => {
       try {
-        setLoading(true)
+        setIsLoading(true)
         const res = await fetchTopRatedReviewsAPI()
         if (res.code === 200) {
           setReviews(res.reviews)
         }
       } catch (error) {
-        console.error('Không thể tải cảm nhận:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Không thể tải cảm nhận', severity: 'error' }
+        })
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
     loadReviews()
-  }, [])
+  }, [dispatchAlert])
 
-  // Component Skeleton cho loading
   const CardSkeleton = () => (
     <div className="flex h-full flex-col justify-between rounded-lg border border-gray-200 bg-white p-6">
       <div>
@@ -54,7 +57,6 @@ const Section6 = () => {
   return (
     <div className="py-16 md:py-24 bg-gray-50">
       <div className="container mx-auto px-4">
-        {/* Tiêu đề và Nút điều hướng (không đổi) */}
         <div className="mb-8 flex flex-col items-center text-center md:flex-row md:justify-between md:text-left">
           <h2 className="flex flex-wrap justify-center font-bold sm:text-[40px] text-[32px] text-primary sm:mb-0 mb-6 uppercase">
             Cảm nhận của khách hàng
@@ -75,7 +77,6 @@ const Section6 = () => {
           </div>
         </div>
 
-        {/* 7. Cập nhật Slider */}
         <Swiper
           modules={[Navigation, Pagination]}
           spaceBetween={30}
@@ -104,17 +105,15 @@ const Section6 = () => {
               slidesPerView: 5
             }
           }}
-          className="testimonial-swiper" // Thêm class để CSS tùy chỉnh
+          className="testimonial-swiper"
         >
-          {loading ? (
-            // Hiển thị skeleton khi đang tải
+          {isLoading ? (
             [...Array(3)].map((_, index) => (
               <SwiperSlide key={index} className="h-auto p-1 pb-12">
                 <CardSkeleton />
               </SwiperSlide>
             ))
           ) : (
-            // Hiển thị dữ liệu thật
             reviews.map((testimonial, index) => (
               <SwiperSlide key={index} className="h-auto p-1 pb-12">
                 <TestimonialCard testimonial={testimonial} />

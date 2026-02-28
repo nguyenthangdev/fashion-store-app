@@ -252,7 +252,11 @@ const Header = () => {
                         className="flex items-center gap-4 hover:bg-gray-100 p-2 rounded-md"
                         onClick={() => setSuggestions([])}
                       >
-                        <img src={product.thumbnail} alt={product.title} className="w-16 h-16 object-contain border rounded" />
+                        <img
+                          src={product.thumbnail}
+                          alt={product.title}
+                          className="w-16 h-16 object-contain border rounded"
+                        />
                         <div className="flex-1">
                           <p className="font-semibold line-clamp-2">{product.title}</p>
                           <div className="flex items-center gap-2 text-sm">
@@ -285,7 +289,6 @@ const Header = () => {
               )}
             </div>
 
-            {/* Action Icons */}
             <div className="flex items-center xl:gap-x-[20px] gap-x-[15px] text-[26px]">
               {/* Mobile Search Button */}
               <button
@@ -412,7 +415,7 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -438,7 +441,11 @@ const Header = () => {
               {/* User Info Mobile */}
               {accountUser && (
                 <div className="flex items-center gap-3 p-4 bg-[#E0F2FE] rounded-lg mb-4">
-                  <img src={accountUser.avatar} alt='Avatar' className='border rounded-full w-12 h-12 object-cover'/>
+                  <img
+                    src={accountUser.avatar}
+                    alt='Avatar'
+                    className='border rounded-full w-12 h-12 object-cover'
+                  />
                   <span className='text-[16px] font-semibold'>{accountUser.fullName}</span>
                 </div>
               )}
@@ -501,7 +508,6 @@ const Header = () => {
                     </Link>
                   </li>
 
-                  {/* Articles with dropdown */}
                   <li>
                     {dataHome && dataHome.articleCategories && dataHome.articleCategories.length > 0 && (
                       <SubMenuArticle
@@ -603,7 +609,7 @@ const Header = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Search Overlay */}
+      {/* Mobile Search */}
       <AnimatePresence>
         {isMobileSearchOpen && (
           <motion.div
@@ -647,7 +653,11 @@ const Header = () => {
                           toggleMobileSearch()
                         }}
                       >
-                        <img src={product.thumbnail} alt={product.title} className="w-14 h-14 object-contain border rounded" />
+                        <img
+                          src={product.thumbnail}
+                          alt={product.title}
+                          className="w-14 h-14 object-contain border rounded"
+                        />
                         <div className="flex-1">
                           <p className="font-semibold line-clamp-2 text-sm">{product.title}</p>
                           <div className="flex items-center gap-2 text-xs">

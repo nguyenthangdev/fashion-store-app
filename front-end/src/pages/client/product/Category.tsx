@@ -8,7 +8,7 @@ const ProductCategory = () => {
   const {
     productCategory,
     pageTitle,
-    loading
+    isLoading
   } = useCategory()
 
   const CardItemSkeleton = () => (
@@ -21,7 +21,8 @@ const ProductCategory = () => {
       </div>
     </div>
   )
-  if (loading) {
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center">
         <div className="container flex flex-col mb-[150px] px-4">

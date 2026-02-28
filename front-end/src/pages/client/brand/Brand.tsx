@@ -12,7 +12,7 @@ const BrandSkeleton = () => (
 const BrandPage = () => {
   const {
     brandGroups,
-    loading
+    isLoading
   } = useBrand()
 
   return (
@@ -21,7 +21,7 @@ const BrandPage = () => {
         Tất Cả Thương Hiệu
       </h1>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex flex-col gap-12">
           <div>
             <Skeleton variant="text" width={250} height={40} sx={{ fontSize: '1.875rem' }} />
@@ -33,7 +33,6 @@ const BrandPage = () => {
           </div>
         </div>
       ) : brandGroups.length > 0 ? (
-        // === Hiển thị dữ liệu ===
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
           {brandGroups.map((group) => (
             <Link

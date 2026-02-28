@@ -1,33 +1,41 @@
-/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { fetchSuccessAPI } from '~/apis/client/checkout.api'
-import type { OrderDetailInterface, OrderInfoInterface } from '~/interfaces/order.interface'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
+import type { OrderInfoInterface } from '~/interfaces/order.interface'
 
 const useSuccess = () => {
   const params = useParams()
   const orderId = params.orderId as string
   const [order, setOrder] = useState<OrderInfoInterface | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const { dispatchAlert } = useAlertContext()
 
   useEffect(() => {
     if (!orderId) return
-    setLoading(true)
+
+    setIsLoading(true)
     const fetchData = async () => {
       try {
-        const res: OrderDetailInterface = await fetchSuccessAPI(orderId)
+        const res = await fetchSuccessAPI(orderId)
         setOrder(res.order)
       } catch (error) {
-        console.error('Lỗi khi fetch đơn hàng:', error)
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đã xảy ra lỗi đơn hàng!', severity: 'error' }
+        })
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
     fetchData()
-  }, [orderId])
+  }, [dispatchAlert, orderId])
+
   return {
     order,
-    loading
+    isLoading
   }
 }
 

@@ -47,7 +47,7 @@ const SubMenu = ({
 
   const toggleMain = (e: React.MouseEvent) => {
     e.preventDefault()
-    e.stopPropagation()
+    e.stopPropagation() // Ngăn sự kiện lan ra ngoài để tránh ảnh hưởng đến các phần tử khác
     setIsMainExpanded(!isMainExpanded)
     if (!isMainExpanded) {
       setExpandedParent(null)
@@ -116,10 +116,9 @@ const SubMenu = ({
     )
   }
 
-  // Mobile Version - Accordion Style
+  // Mobile Version
   return (
     <div className="bg-white w-full">
-      {/* Main Parent Link with Dropdown (nếu có showParentLink) */}
       {showParentLink && parentLinkPath && parentLinkText && (
         <div className="border-b border-gray-200">
           <div className="flex items-center w-full">

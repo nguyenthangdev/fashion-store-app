@@ -20,6 +20,7 @@ const ProductsFeatured = () => {
       </div>
     </div>
   )
+
   if (isLoading) {
     return (
       <>
@@ -39,6 +40,7 @@ const ProductsFeatured = () => {
       </>
     )
   }
+
   return (
     <>
       <div className="flex items-center justify-center">

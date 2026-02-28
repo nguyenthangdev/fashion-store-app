@@ -6,11 +6,11 @@ import useSuccess from '~/hooks/client/checkout/useSuccess'
 const Success = () => {
   const {
     order,
-    loading
+    isLoading
   } = useSuccess()
 
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className='container mx-auto p-8'>
         <Skeleton variant="text" width="60%" height={50} />
@@ -82,7 +82,11 @@ const Success = () => {
             <h2 className="text-lg font-semibold mb-2">Sản phẩm đã đặt</h2>
             <div className="border rounded-lg overflow-hidden">
               {order.products.map((product) => (
-                <Link to={`/products/detail/${''}`} key={product.product_id} className="flex items-center gap-4 p-4 border-b last:border-b-0">
+                <Link
+                  to={`/products/detail/${product.slug}`}
+                  key={product.product_id}
+                  className="flex items-center gap-4 p-4 border-b last:border-b-0"
+                >
                   <img src={product.thumbnail} className="w-20 h-20 object-cover rounded"/>
                   <div className="flex-1">
                     <p className="font-semibold">{product.title}</p>

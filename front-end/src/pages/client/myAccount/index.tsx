@@ -8,20 +8,18 @@ const MyAccountClient = () => {
     <>
       {accountUser && (
         <div className='
-            mx-auto /* Căn giữa container */
-            flex
-            w-[95%] sm:w-[90%] lg:w-[70%] /* Mobile rộng 95%, sm 90%, lg về lại 70% */
-            flex-col-reverse md:flex-row /* Mobile: Cột đảo ngược (ảnh lên đầu), PC: Hàng ngang */
-            justify-between md:justify-around
-            items-center md:items-start /* Mobile: căn giữa, PC: căn trái */
-            gap-6 md:gap-[15px]
-            border rounded-[15px]
-            p-4 md:p-[10px]
-            text-[16px]
-            bg-white shadow-sm /* Thêm chút nền/bóng cho đẹp (tuỳ chọn) */
+          mx-auto /* Căn giữa container */
+          flex
+          w-[95%] sm:w-[90%] lg:w-[70%] /* Mobile rộng 95%, sm 90%, lg về lại 70% */
+          flex-col-reverse md:flex-row /* Mobile: Cột đảo ngược (ảnh lên đầu), PC: Hàng ngang */
+          justify-between md:justify-around
+          items-center md:items-start /* Mobile: căn giữa, PC: căn trái */
+          gap-6 md:gap-[15px]
+          border rounded-[15px]
+          p-4 md:p-[10px]
+          text-[16px]
+          bg-white shadow-sm
         '>
-
-          {/* --- Cột Thông Tin --- */}
           <div className='flex flex-col gap-[15px] w-full md:w-auto items-center md:items-start text-center md:text-left'>
             <div>
               <h1 className='text-[22px] md:text-[25px] font-[600]'>Hồ sơ của tôi</h1>
@@ -44,16 +42,15 @@ const MyAccountClient = () => {
                 <b>Địa chỉ: </b> {accountUser.address}
               </div>
 
-              {/* Button: Mobile full width, PC auto width */}
               <Link
                 to={'/user/account/info/edit'}
                 className='
-                    mt-2 md:mt-0
-                    border rounded-[5px] p-[7px]
-                    bg-[#525FE1] text-white
-                    text-center text-[14px]
-                    md:w-auto md:min-w-[120px] /* Responsive độ rộng nút */
-                    hover:bg-[#414cb3] transition-colors
+                  mt-2 md:mt-0
+                  border rounded-[5px] p-[7px]
+                  bg-[#525FE1] text-white
+                  text-center text-[14px]
+                  md:w-auto md:min-w-[120px] /* Responsive độ rộng nút */
+                  hover:bg-[#414cb3] transition-colors
                 '
               >
                 Chỉnh sửa
@@ -61,7 +58,6 @@ const MyAccountClient = () => {
             </div>
           </div>
 
-          {/* --- Cột Ảnh Đại Diện --- */}
           <div className='flex flex-col gap-[5px] items-center text-center'>
             <span className='text-[18px] md:text-[20px] font-[600]'>Ảnh đại diện:</span>
             <img

@@ -40,7 +40,7 @@ const ProductClient = () => {
       <div className="flex items-center justify-center">
         <div className="container flex flex-col mb-[100px] px-4 md:px-6 lg:px-8">
           <BoxHead title={'Tất cả sản phẩm'}/>
-          {/* === NÚT MỞ FILTER TRÊN MOBILE === */}
+          {/* filter mobile */}
           <div className="lg:hidden flex items-center justify-between mb-4">
             <button
               onClick={() => setIsFilterOpen(true)}
@@ -58,7 +58,6 @@ const ProductClient = () => {
             </button>
           </div>
 
-          {/* 4. CẬP NHẬT BỐ CỤC 2 CỘT */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-8">
 
             {/* Cột Filter (chỉ hiển thị trên desktop) */}
@@ -66,9 +65,7 @@ const ProductClient = () => {
               <FilterSidebar />
             </aside>
 
-            {/* Cột Sản phẩm */}
             <main className="lg:col-span-3">
-              {/* === THANH SẮP XẾP (DESKTOP) === */}
               <div className="hidden lg:flex justify-between items-center mb-6">
                 <span className="text-sm text-gray-600">
                   {pagination.currentPage}/{pagination.totalPage || 0} trang
@@ -88,15 +85,17 @@ const ProductClient = () => {
                 </div>
               ) : products.length > 0 ? (
                 <>
-                  {/* 6. Grid sản phẩm bên trong cột main */}
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6'>
                     {products.map((product) => (
-                      <Link to={`/products/detail/${product.slug}`} key={product._id || product.slug} className="h-full">
+                      <Link
+                        to={`/products/detail/${product.slug}`}
+                        key={product._id || product.slug}
+                        className="h-full"
+                      >
                         <CardItem item={product}/>
                       </Link>
                     ))}
                   </div>
-                  {/* 7. Pagination */}
                   {pagination && pagination.totalPage > 1 && (
                     <Pagination
                       pagination={pagination}
@@ -114,7 +113,8 @@ const ProductClient = () => {
           </div>
         </div>
       </div>
-      {/* === MOBILE FILTER DRAWER === */}
+
+      {/* Mobile filter */}
       <AnimatePresence>
         {isFilterOpen && (
           <>
@@ -149,7 +149,8 @@ const ProductClient = () => {
           </>
         )}
       </AnimatePresence>
-      {/* === MOBILE SORT DRAWER (Mới) === */}
+
+      {/* Mobile sort */}
       <AnimatePresence>
         {isSortOpen && (
           <>

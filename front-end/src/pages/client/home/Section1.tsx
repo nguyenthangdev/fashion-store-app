@@ -6,6 +6,7 @@ import { Link } from 'react-scroll'
 
 const Section1 = () => {
   const { ref, inView } = useInView({ triggerOnce: true }) // chỉ chạy 1 lần khi vào view
+
   return (
     <>
       {/* Section 1 */}

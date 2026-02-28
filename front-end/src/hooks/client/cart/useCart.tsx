@@ -15,23 +15,25 @@ const useCart = () => {
   const [cartDetail, setCartDetail] = useState<CartInfoInterface | null>(null)
   const [openDeleteOne, setOpenDeleteOne] = useState(false)
   const [selectedItem, setSelectedItem] = useState<CartItemInterface | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const { dispatchAlert } = useAlertContext()
 
   const refreshCart = useCallback(async () => {
     try {
       const cartRes = await fetchCartAPI()
-      console.log('cartRes: ', cartRes)
       setCartDetail(cartRes.cartDetail)
     } catch (error) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Lỗi khi fetch giỏ hàng', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Lỗi khi fetch giỏ hàng', severity: 'error' }
+      })
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    setLoading(true)
+    setIsLoading(true)
     refreshCart()
   }, [refreshCart])
 
@@ -45,34 +47,31 @@ const useCart = () => {
     setOpenDeleteOne(false)
   }
 
-  // const totalBill = useMemo(() => {
-  //   if (!cartDetail?.products) return 0
-  //   return cartDetail?.products.reduce((acc, item) => {
-  //     const priceNewForOneProduct =
-  //   item.product_id.price * (100 - item.product_id.discountPercentage) / 100
-
-  //     return acc + priceNewForOneProduct * item.quantity
-  //   }, 0)
-  // }, [cartDetail])
-
   const handleDelete = async () => {
     if (!selectedItem) return
+
     const response = await fetchDeleteProductInCartAPI({
       productId: selectedItem.product_id._id as string,
       color: selectedItem.color,
       size: selectedItem.size
     })
     if (response.code === 204) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: response.message, severity: 'success' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: response.message, severity: 'success' }
+      })
       refreshCart()
       handleCloseDeleteDialog()
     } else {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Xóa thất bại!', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Xóa thất bại!', severity: 'error' }
+      })
       return
     }
   }
 
-  // === HÀM ĐỂ CẬP NHẬT COLOR/SIZE ===
+  // Cập nhật lại color và size của sản phẩm trong giỏ hàng
   const handleVariantChange = async (
     item: CartItemInterface,
     newVariant: { color?: string; size?: string }
@@ -90,13 +89,22 @@ const useCart = () => {
     try {
       const response = await fetchUpdateVariantAPI(payload)
       if (response.code === 200) {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: response.message, severity: 'success' } })
-        refreshCart() // Tải lại giỏ hàng để hiển thị thay đổi
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: response.message, severity: 'success' }
+        })
+        refreshCart()
       } else {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: response.message || 'Lỗi cập nhật', severity: 'error' } })
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: response.message || 'Lỗi cập nhật', severity: 'error' }
+        })
       }
     } catch (error) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Lỗi khi cập nhật phân loại', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Lỗi khi cập nhật phân loại', severity: 'error' }
+      })
     }
   }
 
@@ -105,11 +113,18 @@ const useCart = () => {
 
     if (cartDetail) {
       const updatedProducts = cartDetail.products.map(p =>
-        (p.product_id._id === item.product_id._id && p.color === item.color && p.size === item.size)
-          ? { ...p, quantity: newQuantity, totalPrice: (p.product_id?.['priceNew'] || 0) * newQuantity }
+      {
+        const priceNew = Math.floor((p.product_id.price * (100 - p.product_id.discountPercentage) / 100))
+        return (p.product_id._id === item.product_id._id && p.color === item.color && p.size === item.size)
+          ? { ...p, quantity: newQuantity, totalPrice: (priceNew || 0) * newQuantity }
           : p
+      }
       )
-      setCartDetail({ ...cartDetail, products: updatedProducts })
+      setCartDetail(prev => {
+        if (!prev) return prev
+
+        return { ...prev, products: updatedProducts }
+      })
     }
 
     try {
@@ -123,7 +138,10 @@ const useCart = () => {
       refreshCart()
     } catch (error) {
       refreshCart()
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Lỗi cập nhật số lượng', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Lỗi cập nhật số lượng', severity: 'error' }
+      })
     }
   }
 
@@ -135,7 +153,7 @@ const useCart = () => {
     openDeleteOne,
     handleCloseDeleteDialog,
     handleDelete,
-    loading
+    isLoading
   }
 }
 

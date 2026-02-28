@@ -18,7 +18,6 @@ const useMyOrder = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
 
-  // Parse URL params một lần
   const urlParams = useMemo(() => ({
     status: searchParams.get('status') || '',
     page: parseInt(searchParams.get('page') || '1', 10),
@@ -30,6 +29,7 @@ const useMyOrder = () => {
 
   const [typeStatusOrder, setTypeStatusOrder] = useState((urlParams.status || '').toUpperCase())
   const [selectedDate, setSelectedDate] = useState(urlParams.date || '')
+
   useEffect(() => {
     setTypeStatusOrder((urlParams.status || '').toUpperCase())
     setSelectedDate(urlParams.date || '')
@@ -168,12 +168,22 @@ const useMyOrder = () => {
 
   const handleReviewSubmit = async () => {
     if (!productToReview || reviewRating === 0) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Vui lòng chọn số sao!', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Vui lòng chọn số sao!', severity: 'error' } 
+      })
       return
     }
 
     const formData = new FormData()
     formData.append('rating', String(reviewRating))
+    if (!reviewContent.trim()) {
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Vui lòng nhập nội dung đánh giá!', severity: 'error' } 
+      })
+      return
+    }
     formData.append('content', reviewContent)
     reviewImages.forEach(file => {
       formData.append('images', file)
@@ -187,12 +197,18 @@ const useMyOrder = () => {
     try {
       const response = await submitReviewAPI(productToReview.product_id, formData)
       if (response.code === 201) {
-        dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Đánh giá đã được gửi!', severity: 'success' } })
+        dispatchAlert({
+          type: 'SHOW_ALERT',
+          payload: { message: 'Đánh giá đã được gửi!', severity: 'success' }
+        })
         handleCloseReview()
         // Cập nhật lại trạng thái đơn hàng (ví dụ: đã đánh giá) nếu cần
       }
     } catch (error) {
-      dispatchAlert({ type: 'SHOW_ALERT', payload: { message: 'Có lỗi xảy ra', severity: 'error' } })
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Có lỗi xảy ra', severity: 'error' }
+      })
     }
   }
   return {

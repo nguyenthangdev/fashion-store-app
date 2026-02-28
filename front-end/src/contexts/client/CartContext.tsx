@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
-/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react'
 import { fetchCartAPI, fetchAddProductToCartAPI } from '~/apis/client/cart.api'
 import type { CartInfoInterface } from '~/interfaces/cart.interface'
+import { useAlertContext } from '~/contexts/alert/AlertContext'
 
 interface CartContextType {
  cartDetail: CartInfoInterface | null
@@ -20,17 +21,20 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartClientProvider = ({ children }: { children: ReactNode }) => {
   const [cartDetail, setCartDetail] = useState<CartInfoInterface | null>(null)
+  const { dispatchAlert } = useAlertContext()
 
-  const refreshCart = async () => {
+  const refreshCart = useCallback(async () => {
     try {
       const res = await fetchCartAPI()
-      console.log('res from CartContext: ', res)
       setCartDetail(res.cartDetail)
     } catch (error) {
-      console.error('Failed to refresh cart:', error)
+      dispatchAlert({
+        type: 'SHOW_ALERT',
+        payload: { message: 'Lỗi khi fetch giỏ hàng', severity: 'error' }
+      })
       setCartDetail(null)
     }
-  }
+  }, [dispatchAlert])
 
   const addToCart = async (
     productId: string,
@@ -38,14 +42,13 @@ export const CartClientProvider = ({ children }: { children: ReactNode }) => {
     color?: string | null,
     size?: string | null
   ) => {
-    // Truyền thêm color và size vào hàm gọi API
     await fetchAddProductToCartAPI(productId, quantity, color, size)
     await refreshCart() // Cập nhật lại giỏ hàng để hiển thị thay đổi
   }
 
   useEffect(() => {
     refreshCart()
-  }, [])
+  }, [refreshCart])
 
   return (
     <CartContext.Provider value={{ cartDetail, addToCart, refreshCart }}>

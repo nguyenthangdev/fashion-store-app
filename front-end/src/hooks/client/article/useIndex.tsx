@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useArticleContext } from '~/contexts/client/ArticleContext'
 import type { AllParams } from '~/interfaces/helper.interface'
@@ -20,7 +20,18 @@ const useIndex = () => {
     fetchArticle(urlParams)
   }, [urlParams.page, urlParams.keyword, urlParams.sortKey, urlParams.sortValue, fetchArticle, urlParams])
 
-  const updateParams = useCallback((params: Partial<AllParams>) => {
+  // const updateParams = useCallback((params: Partial<AllParams>) => {
+  //   const newParams = new URLSearchParams(searchParams)
+  //   Object.entries(params).forEach(([key, value]) => {
+  //     if (value !== undefined && value !== null && value !== '') {
+  //       newParams.set(key, value.toString())
+  //     } else {
+  //       newParams.delete(key)
+  //     }
+  //   })
+  //   setSearchParams(newParams)
+  // }, [searchParams, setSearchParams])
+  const updateParams = (params: Partial<AllParams>) => {
     const newParams = new URLSearchParams(searchParams)
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -30,7 +41,7 @@ const useIndex = () => {
       }
     })
     setSearchParams(newParams)
-  }, [searchParams, setSearchParams])
+  }
 
   return {
     articles,

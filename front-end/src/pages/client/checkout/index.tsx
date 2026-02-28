@@ -5,6 +5,7 @@ import momoLogo from '~/assets/images/payment/momo-logo.png'
 import useCheckout from '~/hooks/client/checkout/useCheckout'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
+import FieldErrorAlert from '~/components/form/FieldErrorAlert'
 
 const Checkout = () => {
   const {
@@ -14,7 +15,8 @@ const Checkout = () => {
     paymentMethod,
     setPaymentMethod,
     cartDetail,
-    isSubmitting
+    isSubmitting,
+    onOrderSubmit
   } = useCheckout()
 
   return (
@@ -25,7 +27,10 @@ const Checkout = () => {
       <div className='bg-gray-50 py-12 mb-[100px]'>
         <div className='container mx-auto px-4'>
           <h1 className='text-3xl font-bold mb-8'>Thanh toán</h1>
-          <form onSubmit={handleSubmit} className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+          <form
+            onSubmit={handleSubmit(onOrderSubmit)}
+            className='grid grid-cols-1 lg:grid-cols-3 gap-8'
+          >
 
             {/* CỘT TRÁI: THÔNG TIN GIAO HÀNG VÀ THANH TOÁN */}
             <div className='lg:col-span-2 bg-white p-6 rounded-lg shadow-md flex flex-col gap-6'>
@@ -40,7 +45,7 @@ const Checkout = () => {
                       type="text"
                       className={`border p-2 rounded outline-none focus:ring-1 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
                     />
-                    {errors.fullName && <span className="text-red-500 text-xs">{errors.fullName.message}</span>}
+                    <FieldErrorAlert errors={errors} fieldName="fullName" />
                   </div>
 
                   <div className='flex flex-col gap-1'>
@@ -50,10 +55,9 @@ const Checkout = () => {
                       type="tel"
                       className={`border p-2 rounded outline-none focus:ring-1 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                     />
-                    {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message}</span>}
+                    <FieldErrorAlert errors={errors} fieldName="phone" />
                   </div>
 
-                  {/* Địa chỉ */}
                   <div className='flex flex-col gap-1 sm:col-span-2'>
                     <label className="font-medium">Địa chỉ</label>
                     <input
@@ -61,10 +65,9 @@ const Checkout = () => {
                       type="text"
                       className={`border p-2 rounded outline-none focus:ring-1 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                     />
-                    {errors.address && <span className="text-red-500 text-xs">{errors.address.message}</span>}
+                    <FieldErrorAlert errors={errors} fieldName="address" />
                   </div>
 
-                  {/* Ghi chú */}
                   <div className='flex flex-col gap-1 sm:col-span-2'>
                     <label className="font-medium">Ghi chú (tùy chọn)</label>
                     <textarea

@@ -42,14 +42,19 @@ const Cart = () => {
                           <TableRow key={`${item.product_id._id}-${item.color}-${item.size}`}>
                             <TableCell>
                               <div className="flex items-center gap-4">
-                                <img src={item.product_id?.thumbnail} className='w-20 h-20 object-cover rounded'/>
-                                <Link to={`/products/detail/${item.product_id?.slug}`} className="font-semibold hover:underline">
+                                <img
+                                  src={item.product_id?.thumbnail}
+                                  className='w-20 h-20 object-cover rounded'
+                                />
+                                <Link
+                                  to={`/products/detail/${item.product_id?.slug}`}
+                                  className="font-semibold hover:underline"
+                                >
                                   {item.product_id?.title}
                                 </Link>
                               </div>
                             </TableCell>
 
-                            {/* === CỘT PHÂN LOẠI MỚI === */}
                             <TableCell>
                               <div className="flex flex-col gap-2">
                                 {item.product_id.colors.length > 0 && (
@@ -59,7 +64,9 @@ const Cart = () => {
                                     className="p-1 border rounded text-sm"
                                   >
                                     {item.product_id.colors.map(color => (
-                                      <option key={color.name} value={color.name}>{color.name}</option>
+                                      <option key={color.name} value={color.name}>
+                                        {color.name}
+                                      </option>
                                     ))}
                                   </select>
                                 )}
@@ -83,25 +90,42 @@ const Cart = () => {
                                   {Math.floor((item.product_id.price * (100 - item.product_id.discountPercentage) / 100)).toLocaleString('vi-VN')}đ
                                 </span>
                                 {item.product_id?.discountPercentage > 0 && (
-                                  <span className="line-through text-gray-400 text-sm">{item.product_id?.price.toLocaleString('vi-VN')}đ</span>
+                                  <span className="line-through text-gray-400 text-sm">
+                                    {item.product_id?.price.toLocaleString('vi-VN')}đ
+                                  </span>
                                 )}
                               </div>
                             </TableCell>
                             <TableCell align="center">
                               <div className="flex items-center justify-center border rounded-full font-bold">
-                                <button type="button" onClick={() => handleQuantityChange(item, item.quantity - 1)} className="px-3 py-1 text-lg">-</button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                                  className="px-3 py-1 text-lg">
+                                  -
+                                </button>
                                 <input
                                   className='w-12 h-full text-center bg-transparent outline-none'
-                                  type='number' value={item.quantity} readOnly
+                                  type='number'
+                                  value={item.quantity}
+                                  readOnly
                                 />
-                                <button type="button" onClick={() => handleQuantityChange(item, item.quantity + 1)} className="px-3 py-1 text-lg">+</button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                                  className="px-3 py-1 text-lg">
+                                  +
+                                </button>
                               </div>
                             </TableCell>
                             <TableCell align="right" className="font-bold">
                               {Math.floor((item.product_id.price * item.quantity * (100 - item.product_id.discountPercentage) / 100)).toLocaleString('vi-VN')}đ
                             </TableCell>
                             <TableCell align="center">
-                              <button onClick={() => handleOpenDeleteDialog(item)} className='text-red-500 hover:text-red-700'>
+                              <button
+                                onClick={() => handleOpenDeleteDialog(item)}
+                                className='text-red-500 hover:text-red-700'
+                              >
                                 <RiDeleteBin5Line size={20}/>
                               </button>
                             </TableCell>
@@ -144,7 +168,7 @@ const Cart = () => {
         <DialogTitle>Xác nhận xóa</DialogTitle>
         <DialogContent>
           <DialogContentText>
-              Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?
+            Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
