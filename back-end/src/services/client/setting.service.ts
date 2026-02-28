@@ -1,6 +1,11 @@
-import SettingsGeneralModel from '~/models/settingGeneral.model'
+import { settingRepositories } from '~/repositories/client/setting.repository'
 
 export const getSettingGeneral = async () => {
-  const settingGeneral = await SettingsGeneralModel.find({})
+  const settingGeneral = await settingRepositories.getSettingGeneral()
+  
   return settingGeneral
+}
+
+export const settingServices = {
+  getSettingGeneral
 }

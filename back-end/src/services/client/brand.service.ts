@@ -1,12 +1,13 @@
-import BrandModel from '~/models/brand.model'
+import { brandRepositories } from '~/repositories/client/brand.repository'
 
-export const getAllBrands = async () => {
-    const find: any = { deleted: false }
+const getAllBrands = async () => {
+  const find: any = { deleted: false }
  
-    const brands = await BrandModel
-      .find(find)
-      .sort({ createdAt: -1 })
-      .lean()
+  const brands = await brandRepositories.getAllBrands(find)
 
-    return brands
+  return brands
+}
+
+export const brandServices = {
+  getAllBrands
 }

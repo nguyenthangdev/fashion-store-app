@@ -44,6 +44,7 @@ const orderSchema = new mongoose.Schema(
         thumbnail: String,
         color: String,
         size: String,
+        slug: String
       }
     ],
     status: {

@@ -1,27 +1,27 @@
 import { Request, Response } from 'express'
-import ProductModel from '~/models/product.model'
-import * as productService from '~/services/client/product.service'
+import { productServices } from '~/services/client/product.service'
 import { StatusCodes } from 'http-status-codes'
 
 // [GET] /products
-export const index = async (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response) => {
   try {
-    const result = await productService.getProducts(req.query)
+    const result = await productServices.getProducts(req.query)
+
     if (!result.success) {
-        res.status(StatusCodes.NOT_FOUND).json({
-          code: result.code,
-          message: result.message,
-          products: result.products,
-          pagination: result.pagination
-        })
-        return
+      return res.status(StatusCodes.NOT_FOUND).json({
+        code: result.code,
+        message: result.message,
+        products: result.products,
+        pagination: result.pagination
+      })
     }
+
     const {
       newProducts,
       objectPagination,
       objectSearch
     } = result
-
+    console.log('newProducts: ', newProducts)
     res.status(StatusCodes.OK).json({
       code: 200,
       message: 'Thành công!',
@@ -41,7 +41,7 @@ export const index = async (req: Request, res: Response) => {
 // [GET] /products/filters
 export const getFilters = async (req: Request, res: Response) => {
   try {
-    const { categories, productAggregations } = await productService.getFilters()
+    const { categories, productAggregations } = await productServices.getFilters()
     // 4. XỬ LÝ KẾT QUẢ TỪ $facet
     const filterData = productAggregations[0]
     if (!filterData) {
@@ -82,7 +82,7 @@ export const getFilters = async (req: Request, res: Response) => {
 // [GET] /products/:slugCategory
 export const category = async (req: Request, res: Response) => {
   try {
-    const { newProducts, category } = await productService.category(req.params.slugCategory)
+    const { newProducts, category } = await productServices.category(req.params.slugCategory)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -101,7 +101,7 @@ export const category = async (req: Request, res: Response) => {
 // [GET] /products/detail/:slugProduct
 export const detail = async (req: Request, res: Response) => {
   try {
-    const product = await productService.detail(req.params.slugProduct)
+    const product = await productServices.detail(req.params.slugProduct)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -119,7 +119,7 @@ export const detail = async (req: Request, res: Response) => {
 // [GET] /products/suggestions
 export const getSearchSuggestions = async (req: Request, res: Response) => {
   try {
-    const result = await productService.getSearchSuggestions(req.query)
+    const result = await productServices.getSearchSuggestions(req.query)
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -147,7 +147,7 @@ export const getSearchSuggestions = async (req: Request, res: Response) => {
 // [GET] /products/related/:productId
 export const getRelatedProducts = async (req: Request, res: Response) => {
   try {
-    const result = await productService.getRelatedProducts(req.params.productId)
+    const result = await productServices.getRelatedProducts(req.params.productId)
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -174,7 +174,7 @@ export const getRelatedProducts = async (req: Request, res: Response) => {
 // [POST] /products/:productId/reviews
 export const createReview = async (req: Request, res: Response) => {
   try {
-    const result = await productService.createReview(req.body, req.params.productId, req['fileUrls'], req["accountUser"].id)
+    const result = await productServices.createReview(req.body, req.params.productId, req['fileUrls'], req["accountUser"]._id)
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -198,7 +198,7 @@ export const createReview = async (req: Request, res: Response) => {
 // [GET] /products/reviews/top-rated
 export const getTopRatedReviews = async (req: Request, res: Response) => {
   try {
-    const formattedReviews = await productService.getTopRatedReviews()
+    const formattedReviews = await productServices.getTopRatedReviews()
 
     res.status(StatusCodes.OK).json({
       code: 200,

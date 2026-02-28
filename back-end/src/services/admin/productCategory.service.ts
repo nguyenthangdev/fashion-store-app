@@ -189,7 +189,7 @@ const productCategoryTrash = async (query: any) => {
 
 const permanentlyDeleteProductCategory = async (productCategory_id: string) => {
   // Lấy danh mục gốc cần xóa
-  const rootCategory = await productCategoryRepositories.findProductCategoryById(productCategory_id)
+  const rootCategory = await productCategoryRepositories.findDeletedProductCategoryById(productCategory_id)
   
   if (!rootCategory) {
     return { 

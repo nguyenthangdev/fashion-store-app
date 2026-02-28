@@ -1,21 +1,13 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import CartModel from '~/models/cart.model'
-import * as cartService from '~/services/client/cart.service'
-
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       cartId?: string
-//     }
-//   }
-// }
+import { cartServices } from '~/services/client/cart.service'
 
 // [GET] /cart
 export const index = async (req: Request, res: Response) => {
   try {
-    const result = await cartService.getCart((req as any)['cartId'])
-    console.log('Cart result:', result)
+    const result = await cartServices.getCart(req["cartId"])
+
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -24,6 +16,7 @@ export const index = async (req: Request, res: Response) => {
       })
       return
     }
+
     const { cart } = result
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -41,7 +34,7 @@ export const index = async (req: Request, res: Response) => {
 // [POST] /cart/add/:productId
 export const addToCart = async (req: Request, res: Response) => {
   try {
-    await cartService.addToCart(req.params.productId, req.body, req["cartId"])
+    await cartServices.addToCart(req.params.productId, req.body, req["cartId"])
 
     res.status(StatusCodes.CREATED).json({
       code: 201,
@@ -58,7 +51,7 @@ export const addToCart = async (req: Request, res: Response) => {
 // [PATCH] /cart/update-quantity
 export const updateQuantity = async (req: Request, res: Response) => {
   try {
-    await cartService.updateQuantity(req['cartId'], req.body)
+    await cartServices.updateQuantity(req['cartId'], req.body)
 
     res.status(StatusCodes.OK).json({ 
       code: 200, 
@@ -75,7 +68,7 @@ export const updateQuantity = async (req: Request, res: Response) => {
 // [DELETE] /cart/delete-item
 export const deleteInCart = async (req: Request, res: Response) => {
   try {
-    await cartService.deleteInCart(req['cartId'], req.body)
+    await cartServices.deleteInCart(req['cartId'], req.body)
 
     res.json({ 
       code: 204, 
@@ -157,7 +150,7 @@ export const changeMulti = async (req: Request, res: Response) => {
 // [PATCH] /cart/update-variant
 export const updateVariant = async (req: Request, res: Response) => {
   try {
-    const result = await cartService.updateVariant(req.body, req["cartId"])
+    const result = await cartServices.updateVariant(req.body, req["cartId"])
 
     if (result.modifiedCount === 0) {
       res.status(StatusCodes.NOT_FOUND).json({ 

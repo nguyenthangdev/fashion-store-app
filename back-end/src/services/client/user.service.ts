@@ -8,132 +8,128 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import { JWTProvider } from '~/providers/jwt.provider'
 import { UserChangePasswordInterface, UserInterface, UserLoginInterface, UserRegisterInterface, UserResetPasswordInterface } from '~/interfaces/client/user.interface'
+import { userRepositories } from '~/repositories/client/user.repository'
 
-export const register = async (data: UserRegisterInterface) => {
+const register = async (data: UserRegisterInterface) => {
   const dataTemp = {
     fullName: data.fullName,
     email: data.email,
     password: data.password,
     confirmPassword: data.confirmPassword
   }
-    const isExistEmail = await UserModel.findOne({
-      email: dataTemp.email
-    })
-    if (isExistEmail) {
-      return { 
-        success: false, 
-        code: 409, 
-        message: 'Email đã tồn tại, vui lòng chọn email khác!' 
-      }
+  const isExistEmail = await userRepositories.isExistEmail(dataTemp.email)
+
+  if (isExistEmail) {
+    return { 
+      success: false, 
+      code: 409, 
+      message: 'Email đã tồn tại, vui lòng chọn email khác!' 
     }
-    const salt = await bcrypt.genSalt(10)
+  }
+  const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(dataTemp.password, salt)
 
-    const user = new UserModel({
-      fullName: dataTemp.fullName,
-      email: dataTemp.email,
-      password: hashedPassword
-    })
-    await user.save()
+  const user = new UserModel({
+    fullName: dataTemp.fullName,
+    email: dataTemp.email,
+    password: hashedPassword
+  })
+  await user.save()
 
-    return { success: true }
+  return { success: true }
 }
 
-export const login = async (data: UserLoginInterface, cartId: string) => {
-    const dataTemp = {
+const login = async (data: UserLoginInterface, cartId: string) => {
+  const dataTemp = {
     email: data.email,
     password: data.password
   }
-    const user = await UserModel.findOne({
-      email: dataTemp.email,
-      deleted: false
-    }).select('+password')
+  const user = await userRepositories.findUserByEmail(dataTemp.email)
 
-    if (!user) {
-      return { 
-        success: false, 
-        code: 401, 
-        message: 'Tài khoản hoặc mật khẩu không chính xác!' 
+  if (!user) {
+    return { 
+      success: false, 
+      code: 401, 
+      message: 'Tài khoản hoặc mật khẩu không chính xác!' 
+    }
+  }
+
+  const isMatch = await bcrypt.compare(dataTemp.password, user.password)
+
+  if (!isMatch) {
+    return { 
+      success: false, 
+      code: 401,
+      message: 'Tài khoản hoặc mật khẩu không chính xác!' 
+    }
+  }
+
+  if (user.status === 'INACTIVE') {
+    return { success: false, code: 403, message: 'Tài khoản đã bị khóa!' }
+  }
+  const payload = { 
+    userId: user._id,
+    email: user.email 
+  }
+  const accessTokenUser = JWTProvider.generateToken(
+    payload, 
+    process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT,
+    '1h' 
+  )
+  const refreshTokenUser = JWTProvider.generateToken(
+    payload, 
+    process.env.JWT_REFRESH_TOKEN_SECRET_CLIENT,
+    '14d' 
+  )
+
+  let finalCartId: string
+  const guestCartId = cartId
+  const userCart = await userRepositories.findCartByUserId(user._id.toString())
+
+  // Case 1: UserModel đã có giỏ hàng cũ (userCart)
+  if (userCart) {
+    if (guestCartId && guestCartId !== userCart._id.toString()) {
+      // Case 1a: UserModel có giỏ cũ VÀ có giỏ khách (guestCartId)
+      // => Gộp sản phẩm từ giỏ khách vào giỏ cũ
+      const guestCart = await userRepositories.findCartById(guestCartId)
+
+      if (guestCart && guestCart.products.length > 0) {
+        userCart.products.push(...guestCart.products)
+        await userCart.save()
+        await CartModel.deleteOne({ _id: guestCartId })
       }
     }
-
-    const isMatch = await bcrypt.compare(dataTemp.password, user.password)
-
-    if (!isMatch) {
-      return { 
-        success: false, 
-        code: 401,
-        message: 'Tài khoản hoặc mật khẩu không chính xác!' 
-      }
+    // Case 1b: UserModel có giỏ cũ, không có giỏ khách
+    // => Chỉ cần set cookie về giỏ cũ
+    finalCartId = userCart._id.toString()
+  } else { // Case 2: UserModel chưa có giỏ hàng (user mới)
+    if (guestCartId) {
+      // Case 2a: UserModel chưa có giỏ, nhưng có giỏ khách
+      // => Gán giỏ khách cho user
+      await userRepositories.updateCartForUser(guestCartId, user._id.toString())
+      finalCartId = guestCartId
+    } else {
+      // Case 2b: UserModel mới, không có giỏ nào
+      // => Tạo giỏ mới cho user
+      const newCart = new CartModel({ user_id: user._id, products: [] })
+      await newCart.save()
+      finalCartId = newCart._id.toString()
     }
+  }
 
-    if (user.status === 'INACTIVE') {
-      return { success: false, code: 403, message: 'Tài khoản đã bị khóa!' }
-    }
-    const payload = { 
-      userId: user._id,
-      email: user.email 
-    }
-    const accessTokenUser = await JWTProvider.generateToken(
-      payload, 
-      process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT,
-      '1h' 
-    )
-    const refreshTokenUser = await JWTProvider.generateToken(
-      payload, 
-      process.env.JWT_REFRESH_TOKEN_SECRET_CLIENT,
-      '14d' 
-    )
-    let finalCartId: string
-    const guestCartId = cartId
-    const userCart = await CartModel.findOne({ user_id: user._id })
+  const userInfo = user.toObject()
+  delete userInfo.password
 
-    // Case 1: UserModel đã có giỏ hàng cũ (userCart)
-    if (userCart) {
-      if (guestCartId && guestCartId !== userCart._id.toString()) {
-        // Case 1a: UserModel có giỏ cũ VÀ có giỏ khách (guestCartId)
-        // => Gộp sản phẩm từ giỏ khách vào giỏ cũ
-        const guestCart = await CartModel.findById(guestCartId)
-        if (guestCart && guestCart.products.length > 0) {
-          userCart.products.push(...guestCart.products)
-          await userCart.save()
-          await CartModel.deleteOne({ _id: guestCartId })
-        }
-      }
-      // Case 1b: UserModel có giỏ cũ, không có giỏ khách
-      // => Chỉ cần set cookie về giỏ cũ
-      finalCartId = userCart._id.toString()
-    } else { // Case 2: UserModel chưa có giỏ hàng (user mới)
-      if (guestCartId) {
-        // Case 2a: UserModel chưa có giỏ, nhưng có giỏ khách
-        // => Gán giỏ khách cho user
-        await CartModel.updateOne(
-          { _id: guestCartId }, 
-          { $set: { user_id: user._id } }
-        )
-        finalCartId = guestCartId
-      } else {
-        // Case 2b: UserModel mới, không có giỏ nào
-        // => Tạo giỏ mới cho user
-        const newCart = new CartModel({ user_id: user._id, products: [] })
-        await newCart.save()
-        finalCartId = newCart._id.toString()
-      }
-    }
-
-    const userInfo = user.toObject()
-    delete userInfo.password
-
-    return {
-      success: true,
-      accessTokenUser,
-      refreshTokenUser,
-      userInfo,
-      cartId: finalCartId
-    }
+  return {
+    success: true,
+    accessTokenUser,
+    refreshTokenUser,
+    userInfo,
+    cartId: finalCartId
+  }
 }
 
-export const refreshToken = async (refreshTokenUser: string) => {
+const refreshToken = async (refreshTokenUser: string) => {
   if (!refreshTokenUser) {
     return { 
       success: false, 
@@ -147,11 +143,8 @@ export const refreshToken = async (refreshTokenUser: string) => {
   ) as {
     userId: string
   }
-  const user = await UserModel.findOne({
-    _id: refreshTokenUserDecoded.userId,
-    deleted: false,
-    status: "ACTIVE"
-  })
+  const user = await userRepositories.findUserById(refreshTokenUserDecoded.userId)
+
   if (!user) {
     return { 
       success: false, 
@@ -163,22 +156,21 @@ export const refreshToken = async (refreshTokenUser: string) => {
     userId: refreshTokenUserDecoded.userId
   }
   
-  const newAccessTokenUser = await JWTProvider.generateToken(
+  const newAccessTokenUser = JWTProvider.generateToken(
     payload,
     process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT,
     '1h'
   )
+
   return {
     success: true,
     newAccessTokenUser
   }
 }
 
-export const forgotPasswordPost = async (email: string) => {
-  const user = await UserModel.findOne({ 
-    email: email, 
-    deleted: false 
-  })
+const forgotPasswordPost = async (email: string) => {
+  const user = await userRepositories.findUserByEmail(email)
+
   if (!user) {
     return {
       success: false,
@@ -187,7 +179,7 @@ export const forgotPasswordPost = async (email: string) => {
     }
   }
   const payload = { userId: user._id }
-  const resetToken = await JWTProvider.generateToken(
+  const resetToken = JWTProvider.generateToken(
     payload,
     process.env.JWT_SECRET_RESET_PASSWORD,
     '2m'
@@ -202,10 +194,11 @@ export const forgotPasswordPost = async (email: string) => {
     <p>Đường link này sẽ hết hạn sau 2 phút.</p>
     `
   sendMailHelper.sendMail(email, subject, html)
+
   return { success: true }
 }
 
-export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
+const resetPasswordPost = async (data: UserResetPasswordInterface) => {
   const dataTemp = {
     password: data.password,
     confirmPassword: data.confirmPassword,
@@ -225,11 +218,12 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
   ) as {
     userId: string
   }
-  const user = await UserModel.findOne({
-    _id: resetTokenDecoded.userId,
-    deleted: false,
-    status: "ACTIVE"
-  })
+  const user = await userRepositories.findUserById(resetTokenDecoded.userId)
+  // const user = await UserModel.findOne({
+  //   _id: resetTokenDecoded.userId,
+  //   deleted: false,
+  //   status: "ACTIVE"
+  // })
   if (!user) {
     return {
       success: false,
@@ -240,14 +234,12 @@ export const resetPasswordPost = async (data: UserResetPasswordInterface) => {
   // Băm mật khẩu mới
   const salt = await bcrypt.genSalt(10)
   const hashedPassword = await bcrypt.hash(dataTemp.password, salt)
-  await UserModel.updateOne(
-      { _id: user._id },
-      { $set: { password: hashedPassword } }
-   )
+  await userRepositories.updateUpserByPassword(user._id.toString(), hashedPassword)
+
   return { success: true }
 }
 
-export const editUser = async (account_id: string, data: UserInterface) => {
+const editUser = async (account_id: string, data: UserInterface) => {
   const dataTemp = {
     fullName: data.fullName,
     email: data.email,
@@ -255,11 +247,8 @@ export const editUser = async (account_id: string, data: UserInterface) => {
     address: data.address,
     avatar: data.avatar
   }
-  const isExistEmail = await UserModel.findOne({
-    _id: { $ne: account_id }, // $ne ($notequal) -> Tránh trường hợp khi tìm bị lặp và không cập nhật lại lên đc.
-    email: dataTemp.email,
-    deleted: false
-  })
+  const isExistEmail = await userRepositories.isExistEmailForEdit(dataTemp.email, account_id)
+
   if (isExistEmail) {
     return {
       success: false,
@@ -267,20 +256,18 @@ export const editUser = async (account_id: string, data: UserInterface) => {
       message: `Email ${dataTemp.email} đã tồn tại, vui lòng chọn email khác!`
     }
   }
-  await UserModel.updateOne({ _id: account_id }, { $set: dataTemp })
+  await userRepositories.editUser(account_id, dataTemp)
   return { success: true }
 }
 
-export const changePasswordUser = async (account_id: string, data: UserChangePasswordInterface) => {
+const changePasswordUser = async (account_id: string, data: UserChangePasswordInterface) => {
   const dataTemp = {
     currentPassword: data.currentPassword,
     password: data.password,
     confirmPassword: data.confirmPassword
   }
-  const user = await UserModel.findOne({
-    _id: account_id,
-    deleted: false
-  }).select('+password')
+  const user = await userRepositories.findAccountById(account_id)
+
   if (!user) {
     return {
       success: false,
@@ -298,14 +285,12 @@ export const changePasswordUser = async (account_id: string, data: UserChangePas
   }
   const salt = await bcrypt.genSalt(10)
   const newHashedPassword = await bcrypt.hash(dataTemp.password, salt)
-  await UserModel.updateOne(
-    { _id: account_id }, 
-    { $set: { password: newHashedPassword } }
-  )
+  await userRepositories.changePasswordUser(account_id, newHashedPassword)
+
   return { success: true }
 }
 
-export const getOrders = async (account_id: string, query: any) => {
+const getOrders = async (account_id: string, query: any) => {
   const find: any = { }
   const { status, date } = query
   const useId = account_id
@@ -364,12 +349,7 @@ export const getOrders = async (account_id: string, query: any) => {
   }
   // End Sort
 
-  const orders = await OrderModel
-    .find(find)
-    .sort(sort)
-    .limit(objectPagination.limitItems)
-    .skip(objectPagination.skip)
-    .lean()
+  const orders = await userRepositories.getOrders(find, sort, objectPagination)
 
   // Sort chay do không sài hàm sort() kia cho các thuộc tính không có trong db.
   if (query.sortKey === 'price' && query.sortValue) {
@@ -383,18 +363,15 @@ export const getOrders = async (account_id: string, query: any) => {
   }
 }
 
-export const cancelOrder = async (order_id: string) => {
-  await OrderModel.updateOne(
-    { _id: order_id },
-    { $set: { status: 'CANCELED' } }
-  )
+const cancelOrder = async (order_id: string) => {
+  await userRepositories.cancelOrder(order_id)
 }
 
-export const googleCallback = async (cartId: string, user: any) => {
+const googleCallback = async (cartId: string, user: any) => {
   // 2. Logic giỏ hàng 
   const guestCartId = cartId
   
-  const userCart = await CartModel.findOne({ user_id: user._id })  
+  const userCart = await userRepositories.findCartByUserId(user._id.toString())
   let finalCartId: string
 
   // TH1: UserModel đã có giỏ hàng cũ(userCart)
@@ -404,7 +381,7 @@ export const googleCallback = async (cartId: string, user: any) => {
     if (guestCartId && guestCartId !== finalCartId) {
       // TH1a: UserModel có giỏ cũ VÀ có giỏ khách(guestCartId)
       // => Gộp sản phẩm từ giỏ khách vào giỏ cũ
-      const guestCart = await CartModel.findById(guestCartId)
+      const guestCart = await userRepositories.findCartById(guestCartId)
       if (guestCart && guestCart.products.length > 0) {
         // Chuyển đổi products sang Object thuần túy để tránh lỗi Mongoose
         const userProducts = userCart.toObject().products || []
@@ -461,7 +438,7 @@ export const googleCallback = async (cartId: string, user: any) => {
       // TH2a: UserModel chưa có giỏ, nhưng có giỏ khách
       // => Gán giỏ khách cho user
       finalCartId = guestCartId
-      await CartModel.updateOne({ _id: guestCartId }, { $set: { user_id: user._id } })
+      await userRepositories.updateCartForUser(guestCartId, user._id.toString())
     } else {
       // TH2b: UserModel mới, không có giỏ nào
       // => Tạo giỏ mới cho user
@@ -474,12 +451,12 @@ export const googleCallback = async (cartId: string, user: any) => {
 
   // 3. Tạo JWT (token đăng nhập chính)
   const payload = { userId: user._id, email: user.email }
-  const accessTokenUser = await JWTProvider.generateToken(
+  const accessTokenUser = JWTProvider.generateToken(
     payload,
     process.env.JWT_ACCESS_TOKEN_SECRET_CLIENT,
     '1h'
   )
-  const refreshTokenUser = await JWTProvider.generateToken(
+  const refreshTokenUser = JWTProvider.generateToken(
     payload,
     process.env.JWT_REFRESH_TOKEN_SECRET_CLIENT,
     '14d'
@@ -489,4 +466,17 @@ export const googleCallback = async (cartId: string, user: any) => {
     refreshTokenUser,
     finalCartId
   }
+}
+
+export const userServices = {
+  register,
+  login,
+  refreshToken,
+  forgotPasswordPost,
+  resetPasswordPost,
+  editUser,
+  changePasswordUser,
+  getOrders,
+  cancelOrder,
+  googleCallback
 }

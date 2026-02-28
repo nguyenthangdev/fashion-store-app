@@ -1,50 +1,27 @@
-import ProductModel from '~/models/product.model'
-import ArticleModel from '~/models/article.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
+import { homeRepositories } from '~/repositories/client/home.repository'
 
-export const home = async () => {
+const getHome = async () => {
   // Lấy ra sản phẩm nổi bật
-  const productsFeatured = await ProductModel.find({
-    featured: '1',
-    deleted: false,
-    status: 'ACTIVE'
-  })
-    .sort({ createdAt: -1 })
-    .limit(6)
+  const productsFeatured = await homeRepositories.findProductsFeatured()
 
   const newProductsFeatured = productsHelper.priceNewProducts(
     productsFeatured as OneProduct[]
   )
 
   // Lấy ra sản phẩm mới nhất
-  const productsNew = await ProductModel.find({
-    deleted: false,
-    status: 'ACTIVE'
-  })
-    .sort({ createdAt: -1 })
-    .limit(6)
+  const productsNew = await homeRepositories.findProductsNew()
 
   const newProductsNew = productsHelper.priceNewProducts(
     productsNew as OneProduct[]
   )
 
   // Lấy ra bài viết nổi bật
-  const articlesFeatured = await ArticleModel.find({
-    featured: '1',
-    deleted: false,
-    status: 'ACTIVE'
-  })
-    .sort({ createdAt: -1 })
-    .limit(5)
+  const articlesFeatured = await homeRepositories.findArticlesFeatured()
 
   // Lấy ra bài viết mới nhất
-  const articlesNew = await ArticleModel.find({
-    deleted: false,
-    status: 'ACTIVE'
-  })
-    .sort({ createdAt: -1 })
-    .limit(5)
+  const articlesNew = await homeRepositories.findArticlesNew()
     
   return {
     newProductsFeatured,
@@ -52,4 +29,8 @@ export const home = async () => {
     articlesFeatured,
     articlesNew
   }
+}
+
+export const homeServices = {
+  getHome
 }

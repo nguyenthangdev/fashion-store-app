@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as settingGeneralService from '~/services/client/setting.service'
+import { settingServices } from '~/services/client/setting.service'
 
 // [GET] /user/settings/general
 export const index = async (req: Request, res: Response) => {
   try {
-    const settingGeneral = await settingGeneralService.getSettingGeneral()
+    const settingGeneral = await settingServices.getSettingGeneral()
     
     res.status(StatusCodes.OK).json({
       code: 200,

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as brandService from '~/services/client/brand.service'
+import { brandServices } from '~/services/client/brand.service'
 
 // [GET] /brands
 export const index = async (req: Request, res: Response) => {
   try {
-    const brands = await brandService.getAllBrands()
+    const brands = await brandServices.getAllBrands()
     
     res.status(StatusCodes.OK).json({
       code: 200,

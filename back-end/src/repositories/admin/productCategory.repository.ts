@@ -55,7 +55,21 @@ const editProductCategory = async (productCategory_id: string, dataTemp: any, up
 
 const findProductCategoryById = async (productCategory_id: string) => {
   const productCategory = await ProductCategoryModel
-    .findOne({ _id: productCategory_id, deleted: true })
+    .findOne({ 
+      _id: productCategory_id, 
+      deleted: false 
+    })
+    .lean()
+
+  return productCategory
+}
+
+const findDeletedProductCategoryById = async (productCategory_id: string) => {
+  const productCategory = await ProductCategoryModel
+    .findOne({ 
+      _id: productCategory_id, 
+      deleted: true 
+    })
     .lean()
 
   return productCategory
@@ -109,5 +123,6 @@ export const productCategoryRepositories = {
   permanentlyDeleteProductCategory,
   findAllProductCategories,
   deleteProductCategoriesByIds,
-  recoverProductCategory
+  recoverProductCategory,
+  findDeletedProductCategoryById
 }

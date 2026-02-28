@@ -1,21 +1,14 @@
-import CartModel from '~/models/cart.model'
 import ProductModel from '~/models/product.model'
 import OrderModel from '~/models/order.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import "~/crons/order.cron"
 import { CheckoutInterface } from '~/interfaces/client/checkout.interface'
+import { checkoutRepositories } from '~/repositories/client/checkout.repository'
 
-export const getCheckout = async (cartId: string) => {
-  const cart = await CartModel
-    .findOne({ _id: cartId })
-    .populate({
-      path: 'products.product_id', // Đường dẫn đến trường cần làm đầy
-      model: 'ProductModel', // Tên model tham chiếu
-      select: 'title thumbnail slug price discountPercentage colors sizes stock' // Chỉ lấy các trường cần thiết
-    })
+const getCheckout = async (cartId: string) => {
+  const cart = await checkoutRepositories.findCardById(cartId)
   
-  // Nếu không có giỏ hàng, trả về an toàn
   if (!cart) {
     return { 
       success: false, 
@@ -24,6 +17,7 @@ export const getCheckout = async (cartId: string) => {
       cart: [] 
     }
   }
+
   // Tính toán tổng tiền sau khi đã có đầy đủ thông tin
   let totalsPrice = 0
   if (cart.products.length > 0) {
@@ -39,13 +33,14 @@ export const getCheckout = async (cartId: string) => {
     }
   }
   cart.totalsPrice = totalsPrice
+
   return {
     success: true,
     cart
   }
 }
 
-export const order = async (cartId: string, userId: string, data: CheckoutInterface) => {
+const order = async (cartId: string, userId: string, data: CheckoutInterface) => {
   const dataTemp = {
     fullName: data.fullName,
     phone: data.phone,
@@ -58,10 +53,8 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
     phone: dataTemp.phone, 
     address: dataTemp.address
   }
-  const cart = await CartModel.findById(cartId).populate({
-    path: 'products.product_id',
-    model: 'ProductModel'
-  })
+  const cart = await checkoutRepositories.findById(cartId)
+
   if (!cart || cart.products.length === 0) {
     return { 
       success: false, 
@@ -70,11 +63,13 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
       cart: [] 
     }
   }
+
   const products = cart.products.map(item => {
     const productInfo = item.product_id as any // Sau khi populate, đây là object
     return {
       product_id: productInfo._id,
       title: productInfo.title,
+      slug: productInfo.slug,
       thumbnail: productInfo.thumbnail,
       price: productInfo.price,
       discountPercentage: productInfo.discountPercentage,
@@ -101,6 +96,7 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
 
   const newOrder = new OrderModel(orderInfo)
   await newOrder.save()
+
   return {
     success: true,
     newOrder,
@@ -108,12 +104,12 @@ export const order = async (cartId: string, userId: string, data: CheckoutInterf
   }
 }
 
-export const success = async (orderId: string) => {
-  const order = await OrderModel.findOne({ _id: orderId })
+const success = async (orderId: string) => {
+  const order = await checkoutRepositories.findOrderById(orderId)
+
   for (const product of order.products) {
-    const productInfo = await ProductModel
-      .findOne({ _id: product.product_id })
-      .select('title thumbnail')
+    const productInfo = await checkoutRepositories.findProductById(product.product_id.toString())
+
     product['productInfo'] = productInfo
     product['priceNew'] = productsHelper.priceNewProduct(product as OneProduct)
     product['totalPrice'] = product['priceNew'] * product.quantity
@@ -123,4 +119,10 @@ export const success = async (orderId: string) => {
     0
   )
   return order
+}
+
+export const checkoutServices = {
+  getCheckout,
+  order,
+  success
 }

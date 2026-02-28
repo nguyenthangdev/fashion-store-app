@@ -5,13 +5,14 @@ import { vnpayCreateOrder } from '~/helpers/vnpayPayment'
 import { zalopayCreateOrder } from '~/helpers/zalopayPayment'
 import { momoCreateOrder } from '~/helpers/momoPayment'
 import "~/crons/order.cron"
-import * as checkoutService from '~/services/client/checkout.service'
+import { checkoutServices } from '~/services/client/checkout.service'
 import { StatusCodes } from 'http-status-codes'
 
 // [GET] /checkout
 export const index = async (req: Request, res: Response) => {
   try {
-    const result = await checkoutService.getCheckout(req["cartId"])
+    const result = await checkoutServices.getCheckout(req["cartId"])
+
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -20,6 +21,7 @@ export const index = async (req: Request, res: Response) => {
       })
       return
     }
+
     const { cart } = result
 
     res.status(StatusCodes.OK).json({
@@ -39,8 +41,9 @@ export const index = async (req: Request, res: Response) => {
 export const order = async (req: Request, res: Response) => {
   try {
     const cartId = req["cartId"]
-    const userId = req["accountUser"].id
-    const result = await checkoutService.order(cartId, userId, req.body)
+    const userId = req["accountUser"]._id
+    const result = await checkoutServices.order(cartId, userId, req.body)
+
     if (!result.success) {
       res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -49,6 +52,7 @@ export const order = async (req: Request, res: Response) => {
       })
       return
     }
+
     const { newOrder, paymentMethod } = result
 
     if (paymentMethod === 'COD') {
@@ -108,7 +112,7 @@ export const order = async (req: Request, res: Response) => {
 // [GET] /checkout/success/:orderId
 export const success = async (req: Request, res: Response) => {
   try {
-    const order = await checkoutService.success(req.params.orderId)
+    const order = await checkoutServices.success(req.params.orderId)
 
     res.status(StatusCodes.OK).json({ 
       code: 200,  

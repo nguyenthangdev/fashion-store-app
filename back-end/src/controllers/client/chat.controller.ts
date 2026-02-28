@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as chatService from '~/services/client/chat.service'
+import { chatServices } from '~/services/client/chat.service'
 
 // Lấy hoặc tạo phòng chat cho client đang đăng nhập
 // [GET] /chats
 export const getChatHistory = async (req: Request, res: Response) => {
   try {
-    const chat = await chatService.getChat(req['accountUser']._id)
+    const chat = await chatServices.getChat(req['accountUser']._id)
     
     res.status(StatusCodes.OK).json({ 
       code: 200, 

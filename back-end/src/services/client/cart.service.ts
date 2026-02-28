@@ -1,19 +1,11 @@
 import CartModel from '~/models/cart.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
-import mongoose from 'mongoose'
+import { cartRepositories } from '~/repositories/client/cart.repository'
 
-export const getCart = async (cartId: any) => {
-  const cart = await CartModel
-    .findOne({ _id: cartId })
-    .populate({
-      path: 'products.product_id', // Đường dẫn đến trường cần làm đầy
-      model: 'ProductModel', // Tên model tham chiếu
-      select: 'title thumbnail slug price discountPercentage colors sizes stock' // Chỉ lấy các trường cần thiết
-    })
-    .lean()
-  console.log('cart: ',cart)
-  // Nếu không có giỏ hàng, trả về an toàn
+const getCart = async (cartId: string) => {
+  const cart = await cartRepositories.findCartById(cartId)
+
   if (!cart) {
     return { 
       success: false, 
@@ -22,6 +14,7 @@ export const getCart = async (cartId: any) => {
       cart: [] 
     }
   }
+
   // Tính toán tổng tiền sau khi đã có đầy đủ thông tin
   let totalsPrice = 0
   if (cart.products.length > 0) {
@@ -37,10 +30,11 @@ export const getCart = async (cartId: any) => {
     }
   }
   cart.totalsPrice = totalsPrice
+
   return { success: true, cart }
 }
 
-export const addToCart = async (productId: string, data: any, cartId: any) => {
+const addToCart = async (productId: string, data: any, cartId: any) => {
   const { quantity, color, size } = data 
   const result = await CartModel.updateOne(
     {
@@ -75,55 +69,31 @@ export const addToCart = async (productId: string, data: any, cartId: any) => {
   }
 }
 
-export const updateQuantity = async (cartId: any, data: any) => {
+const updateQuantity = async (cartId: any, data: any) => {
   const { productId, color, size, quantity } = data
 
-  await CartModel.updateOne(
-    { 
-      _id: cartId,
-      'products.product_id': new mongoose.Types.ObjectId(productId),
-      'products.color': color,
-      'products.size': size
-    },
-    { $set: { 'products.$.quantity': quantity } }
-  )
+  await cartRepositories.updateQuantity(cartId, productId, color, size, quantity)
 }
 
-export const deleteInCart = async (cartId: any, data: any) => {
+const deleteInCart = async (cartId: any, data: any) => {
   const { productId, color, size } = data
-  const productObjectId = mongoose.Types.ObjectId.createFromHexString(productId)
-  await CartModel.updateOne(
-    { _id: cartId },
-    {
-      $pull: { 
-        products: { 
-          product_id: productObjectId,
-          color: color,
-          size: size
-        } 
-      }
-    }
-  )
+
+  await cartRepositories.deleteInCart(cartId, productId, color, size)
 }
 
-export const updateVariant = async (data: any, cartId: any) => {
+const updateVariant = async (data: any, cartId: any) => {
   const { productId, oldColor, oldSize, newColor, newSize } = data
 
   // Tìm sản phẩm trong giỏ hàng với các thuộc tính cũ
-  const result = await CartModel.updateOne(
-    {
-      _id: cartId,
-      'products.product_id': productId,
-      'products.color': oldColor,
-      'products.size': oldSize
-    },
-    {
-      // Cập nhật lại color và size cho sản phẩm đó
-      $set: {
-        'products.$.color': newColor,
-        'products.$.size': newSize
-      }
-    }
-  )
+  const result = await cartRepositories.updateVariant(cartId, productId, oldColor, oldSize, newColor, newSize)
+
   return result
+}
+
+export const cartServices = {
+  getCart,
+  addToCart,
+  updateQuantity,
+  deleteInCart,
+  updateVariant
 }

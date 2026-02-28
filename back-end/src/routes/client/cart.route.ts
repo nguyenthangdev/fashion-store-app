@@ -7,7 +7,8 @@ router.patch('/change-multi', controller.changeMulti)
 router.post('/add/:productId', controller.addToCart)
 // router.delete('/delete/:productId', controller.deleteCart)
 // router.patch('/update/:productId/:quantity', controller.update)
-router.patch('/update-quantity', controller.updateQuantity) // Route mới cho số lượng
-router.delete('/delete-item', controller.deleteInCart) // Route mới để xóa
+router.patch('/update-quantity', controller.updateQuantity)
+router.delete('/delete-item', controller.deleteInCart)
 router.patch('/update-variant', controller.updateVariant)
+
 export const cartRoutes: Router = router

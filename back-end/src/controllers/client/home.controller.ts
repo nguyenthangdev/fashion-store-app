@@ -1,20 +1,20 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import * as homeService from '~/services/client/home.service'
+import { homeServices } from '~/services/client/home.service'
 
 // [GET] /
-export const index = async (req: Request, res: Response) => {
+export const getHome = async (req: Request, res: Response) => {
   try {
     const {
       newProductsFeatured,
       newProductsNew,
       articlesFeatured,
       articlesNew
-    } = await homeService.home()
+    } = await homeServices.getHome()
     
     res.status(StatusCodes.OK).json({
       code: 200,
-      message: ' Thành công!',
+      message: 'Thành công!',
       productsFeatured: newProductsFeatured,
       productsNew: newProductsNew,
       articlesFeatured: articlesFeatured,

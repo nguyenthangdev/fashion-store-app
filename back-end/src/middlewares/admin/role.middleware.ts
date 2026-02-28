@@ -5,16 +5,21 @@ export const requirePermission = (roleName: string[]) => {
     const accountRole = req['accountAdmin.roleName']
 
     if (!accountRole) {
-      res.json({ code: 401, message: "Vui lòng đăng nhập!" })
-      return
+      return res.json({ 
+        code: 401, 
+        message: "Vui lòng đăng nhập!" 
+      })
     }
-    if (accountRole === 'Admin') {
-      return next()
-    }
+
+    if (accountRole === 'Admin') return next()
+
     if (!roleName.includes(accountRole)) {
-      res.json({ code: 403,  message: "Bạn không có quyền truy cập vào trang này!" })
-      return
+      return res.json({ 
+        code: 403,
+        message: "Bạn không có quyền truy cập vào trang này!" 
+      })
     }
+
     next()  
   }
 }

@@ -1,7 +1,7 @@
 export interface TreeInterface {
   _id: any
   parent_id: string
-  [key: string]: any
+  [key: string]: any // nghĩa là có thể có thêm các thuộc tính khác tùy theo từng loại đối tượng (sản phẩm, bài viết, v.v.. ví dụ là name, slug, v.v..)
   index?: number
   children?: TreeInterface[]
 }

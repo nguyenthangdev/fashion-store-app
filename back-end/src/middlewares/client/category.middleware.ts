@@ -10,8 +10,10 @@ export const categoryProduct = async (
   next: NextFunction
 ) => {
   const productsCategory = await ProductCategoryModel.find({
-    deleted: false
+    deleted: false,
+    status: 'ACTIVE'
   }).lean()
+
   const newProductsCategory = buildTreeForItems(productsCategory as unknown as TreeInterface[])
   req['layoutProductsCategory'] = newProductsCategory 
   next()
@@ -23,8 +25,10 @@ export const categoryArticle = async (
   next: NextFunction
 ) => {
   const articlesCategory = await ArticleCategoryModel.find({
-    deleted: false
+    deleted: false,
+    status: 'ACTIVE'
   }).lean()
+
   const newArticlesCategory = buildTreeForItems(articlesCategory as unknown as TreeInterface[])
   req['layoutArticlesCategory'] = newArticlesCategory
   next()

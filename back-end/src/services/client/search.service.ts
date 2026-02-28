@@ -1,14 +1,14 @@
-import ProductModel from '~/models/product.model'
 import * as productsHelper from '~/helpers/product'
 import { OneProduct } from '~/helpers/product'
 import { convertToSlug } from '~/helpers/convertToSlug'
+import { searchRepositories } from '~/repositories/client/search.repository'
 
 interface ObjectSearch {
   keyword: string
   regex?: RegExp
 }
 
-export const getSearch = async (keyword: any) => {
+const getSearch = async (keyword: any) => {
   const objectSearch: ObjectSearch = {
     keyword: ''
   }
@@ -18,18 +18,16 @@ export const getSearch = async (keyword: any) => {
     const stringSlug = convertToSlug(String(keyword))
     const stringSlugRegex = new RegExp(stringSlug, 'i')
     const regex = new RegExp(objectSearch.keyword, 'i')
-    const products = await ProductModel.find({
-      $or: [
-        { title: regex },
-        { slug: stringSlugRegex }
-      ],
-      deleted: false,
-      status: 'ACTIVE'
-    })
+    const products = await searchRepositories.getProductsBySlug(regex, stringSlugRegex)
+  
     newProducts = productsHelper.priceNewProducts(products as OneProduct[])
   }
   return {
     objectSearch,
     newProducts
   }
+}
+
+export const searchServices = {
+  getSearch
 }

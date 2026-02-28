@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { getCookieOptions } from '~/utils/constants'
-import * as userSerivice from '~/services/client/user.service'
+import { userServices } from '~/services/client/user.service'
 
 // [POST] /user/register
 export const register = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.register(req.body)
+    const result = await userServices.register(req.body)
     if (!result.success) {
       res.status(StatusCodes.CONFLICT).json({
         code: result.code,
@@ -30,7 +30,7 @@ export const register = async (req: Request, res: Response) => {
 // [POST] /user/login
 export const login = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.login(req.body, req.cookies.cartId)
+    const result = await userServices.login(req.body, req.cookies.cartId)
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.FORBIDDEN
         
@@ -62,7 +62,7 @@ export const login = async (req: Request, res: Response) => {
 // [POST] /user/refresh-token
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.refreshToken(req.cookies?.refreshTokenUser)
+    const result = await userServices.refreshToken(req.cookies?.refreshTokenUser)
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.NOT_FOUND
       res.status(statusCode).json({
@@ -127,7 +127,7 @@ export const logout = async (req: Request, res: Response) => {
 // [POST] /user/password/forgot
 export const forgotPasswordPost = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.forgotPasswordPost(req.body.email)
+    const result = await userServices.forgotPasswordPost(req.body.email)
     if (!result.success) {
       return res.status(StatusCodes.NOT_FOUND).json({
         code: result.code,
@@ -210,8 +210,8 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
 // [POST] /user/password/reset
 export const resetPasswordPost = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.resetPasswordPost(req.body)
-    console.log("🚀 ~ user.controller.ts ~ resetPasswordPost ~ result:", result);
+    const result = await userServices.resetPasswordPost(req.body)
+    // console.log("🚀 ~ user.controller.ts ~ resetPasswordPost ~ result:", result);
     if (!result.success) {
       const statusCode = result.code === 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.NOT_FOUND
       return res.status(statusCode).json({
@@ -258,7 +258,7 @@ export const info = async (req: Request, res: Response) => {
 // [PATCH] /user/account/info/edit
 export const editUser = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.editUser(req['accountUser'].id, req.body)
+    const result = await userServices.editUser(req['accountUser']._id, req.body)
     if (!result.success) {
       return res.status(StatusCodes.CONFLICT).json({
         code: result.code,
@@ -281,7 +281,7 @@ export const editUser = async (req: Request, res: Response) => {
 // [PATCH] /user/account/info/change-password
 export const changePasswordUser = async (req: Request, res: Response) => {
   try {
-    const result = await userSerivice.changePasswordUser(req['accountUser'].id, req.body)
+    const result = await userServices.changePasswordUser(req['accountUser']._id, req.body)
     if (!result.success) {
       const statusCode = result.code === 404 ? StatusCodes.NOT_FOUND : StatusCodes.BAD_REQUEST
       return res.status(statusCode).json({
@@ -308,7 +308,7 @@ export const getOrders = async (req: Request, res: Response) => {
       orders,
       objectSearch,
       objectPagination
-    } = await userSerivice.getOrders(req["accountUser"].id, req.query)
+    } = await userServices.getOrders(req["accountUser"]._id, req.query)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -328,7 +328,7 @@ export const getOrders = async (req: Request, res: Response) => {
 // [PATCH] /user/my-orders/cancel-order/:id
 export const cancelOrder = async (req: Request, res: Response) => {
   try {
-    await userSerivice.cancelOrder(req.params.id)
+    await userServices.cancelOrder(req.params.id)
 
     res.status(StatusCodes.OK).json({
       code: 200,
@@ -359,7 +359,7 @@ export const googleCallback = async (req: Request, res: Response) => {
       accessTokenUser, 
       refreshTokenUser, 
       finalCartId 
-    } = await userSerivice.googleCallback(req.cookies.cartId, user)
+    } = await userServices.googleCallback(req.cookies.cartId, user)
 
 
     // 4. Gửi JWT về client qua cookie

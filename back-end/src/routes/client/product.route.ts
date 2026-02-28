@@ -7,7 +7,7 @@ import { uploadCloudWithManyImagesToCloud } from '~/middlewares/admin/uploadClou
 // Upload ảnh
 import * as authMiddleware from '~/middlewares/client/auth.middleware'
 
-router.get('/', controller.index)
+router.get('/', controller.getProducts)
 router.get('/suggestions', controller.getSearchSuggestions)
 router.get('/filters', controller.getFilters)
 router.get('/:slugCategory', controller.category)
