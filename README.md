@@ -2,7 +2,7 @@
 ---
 This is a fashion website project, including a customer-facing site (Client) and an administrative system (Admin). The project is built on the MERN stack (MongoDB, Express, React, Node) but modernized with Vite, TypeScript.
 
-<img width="1918" height="919" alt="image" src="https://github.com/user-attachments/assets/e168bbfe-cf73-4ebe-85ac-47bdc1fcc411" />
+<img width="1918" height="1007" alt="Screenshot from 2026-02-28 17-10-13" src="https://github.com/user-attachments/assets/33ab25fd-cb08-4e4d-b2f9-c7b8d6e167a7" />
 
 - Frontend Deploy (Vercel): [https://luxues-store.vercel.app]
 
