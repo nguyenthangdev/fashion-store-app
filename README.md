@@ -5,7 +5,7 @@ This is a fashion website project, including a customer-facing site (Client) and
 <img width="1918" height="919" alt="image" src="https://github.com/user-attachments/assets/e168bbfe-cf73-4ebe-85ac-47bdc1fcc411" />
 
 - Frontend Deploy (Vercel): [https://luxues-store.vercel.app]
-
+- Frontend Deploy (Vercel) admin: [https://luxues-store.vercel.app/admin]
 - Backend Deploy (Render): [https://luxues-store.onrender.com]
 
 ---
